@@ -38,7 +38,7 @@ const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.resolve(__dirname, '../../client/dist')));
+app.use(express.static(path.resolve(__dirname, '../../web/dist')));
 
 // receive OCR from mobile, broadcast to desktop
 const submitHandler = (req: Request, res: Response): void => {
@@ -55,7 +55,7 @@ app.post('/api/submit', submitHandler);
 
 // fallback to index.html for client‑side routing
 app.get('*', (_, res) => {
-  res.sendFile(path.resolve(__dirname, '../../client/dist/index.html'));
+  res.sendFile(path.resolve(__dirname, '../../web/dist/index.html'));
 });
 
 // WebSocket handshake & room join
