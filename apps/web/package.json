@@ -1,6 +1,5 @@
 {
-  "packageManager": "npm@9.6.7",
-  "name": "tax0",
+  "name": "web",
   "private": true,
   "scripts": {
     "dev": "vite",

@@ -1,0 +1,5 @@
+workspace = true
+
+[install]
+peer = true
+hoist = true

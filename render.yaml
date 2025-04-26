@@ -3,12 +3,10 @@ services:
     name: tax0
     env: node
     plan: free
-    # build: first build client, then install server deps
-    buildCommand: ./render-build.sh
-    startCommand: node server/dist/index.js
+    buildCommand: |
+      bun install
+      bun run build
+    startCommand: bun run start
     envVars:
       - key: NODE_ENV
         value: production
-    dockerfilePath: ''
-    autoDeploy: true
-    bun: false

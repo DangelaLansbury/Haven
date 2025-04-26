@@ -1,0 +1,19 @@
+{
+  "name": "tax0",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "bun@1.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "bun run dev:server & bun run dev:web",
+    "build": "bun run build:web && bun run build:server",
+    "start": "bun run start:server",
+    "dev:server": "bun run --cwd apps/server dev",
+    "dev:web": "bun run --cwd apps/web dev",
+    "build:web": "bun run --cwd apps/web build",
+    "build:server": "bun run --cwd apps/server build",
+    "start:server": "bun run --cwd apps/server start"
+  }
+}
