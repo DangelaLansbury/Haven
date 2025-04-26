@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: tax0
+    env: node
+    plan: free
+    # build: first build client, then install server deps
+    buildCommand: |
+      cd client && npm install && npm run build
+      cd ../server && npm install && npm run build
+    startCommand: node server/dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
