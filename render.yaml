@@ -11,3 +11,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+    dockerfilePath: ''
+    autoDeploy: true
+    bun: false
