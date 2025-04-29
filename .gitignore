@@ -1,18 +1,9 @@
-# Node / Bun
 node_modules/
 .bun/
-
-# Build outputs
 dist/
 apps/*/dist/
-
-# Local env files
 .env
 .env.*
-
-# System files
 .DS_Store
 Thumbs.db
-
-# Bun lockfile (optional — if you don't want to track it)
 bun.lockb
