@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
-// import QRCode from 'qrcode.react';
+import QRCode from 'qrcode.react';
 import { createWorker } from 'tesseract.js';
 
 const App = () => {
@@ -47,8 +47,8 @@ const App = () => {
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>Hello, world!</h1>
-      {/* {isUpload ? (
+      {/* <h1>Hello, world!</h1> */}
+      {isUpload ? (
         <>
           <h2>Upload & OCR</h2>
           <input type="file" accept="image/*" capture="environment" onChange={handleFile} />
@@ -61,7 +61,7 @@ const App = () => {
           <h3>OCR result:</h3>
           <pre>{ocrText}</pre>
         </>
-      )} */}
+      )}
     </div>
   );
 };
