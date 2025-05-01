@@ -1,0 +1,14 @@
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@font-face {
+  font-family: 'Gelica';
+  src: url('assets/fonts/gelica-black-webfont.woff2') format('woff2'), url('assets/fonts/gelica-black-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
