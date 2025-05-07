@@ -36,16 +36,27 @@ const App = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const worker = createWorker();
+    // hook into Tesseract progress
+    const worker = createWorker({
+      logger: (m) => console.log('[Tesseract]', m),
+    });
+
+    console.log('[OCR] loading worker…');
     await worker.load();
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
+
+    console.log('[OCR] recognizing…');
     const { data } = await worker.recognize(file);
-    await fetch('/api/submit', {
+    console.log('[OCR] final text:', data.text);
+
+    const res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId, data: data.text }),
     });
+    console.log('[API] /api/submit status=', res.status);
+
     await worker.terminate();
   };
 
