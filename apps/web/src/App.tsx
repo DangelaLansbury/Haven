@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import QRCode from 'qrcode.react';
 import { createWorker } from 'tesseract.js';
+import loadImage from 'blueimp-load-image';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -41,13 +42,25 @@ const App = () => {
       logger: (m) => console.log('[Tesseract]', m),
     });
 
+    // load into canvas, fix orientation & downscale
+    const canvas: HTMLCanvasElement = await new Promise((resolve, reject) => {
+      loadImage(
+        file,
+        (imgOrCanvas: HTMLImageElement | HTMLCanvasElement) => {
+          if (imgOrCanvas instanceof HTMLCanvasElement) resolve(imgOrCanvas);
+          else reject(new Error('Could not get canvas'));
+        },
+        { canvas: true, orientation: true, maxWidth: 1024 }
+      );
+    });
+
     console.log('[OCR] loading worker…');
     await worker.load();
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
 
     console.log('[OCR] recognizing…');
-    const { data } = await worker.recognize(file);
+    const { data } = await worker.recognize(canvas);
     console.log('[OCR] final text:', data.text);
 
     const res = await fetch('/api/submit', {
@@ -66,6 +79,7 @@ const App = () => {
         <>
           <h2>Upload & OCR</h2>
           <input type="file" accept="image/*" capture="environment" onChange={handleFile} />
+          <pre>{ocrText}</pre>
         </>
       ) : (
         <>
