@@ -19,7 +19,11 @@ const App = () => {
 
     // connect Socket.IO
     const sock = io({ query: { sessionId: id } });
-    sock.on('ocrResult', (data: string) => setOcrText(data));
+    sock.on('connect', () => console.log('[Socket.IO] connected, id=', sock.id));
+    sock.on('ocrResult', (data: string) => {
+      console.log('[Socket.IO] ocrResult=', data);
+      setOcrText(data);
+    });
     setSocket(sock);
 
     return () => sock.disconnect();
@@ -47,7 +51,6 @@ const App = () => {
 
   return (
     <div style={{ padding: 20 }}>
-      {/* <h1>Hello, world!</h1> */}
       {isUpload ? (
         <>
           <h2>Upload & OCR</h2>
