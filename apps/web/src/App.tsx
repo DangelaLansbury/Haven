@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import QRCode from 'qrcode.react';
 import { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
+import styles from '../src/css/Form.module.css';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -77,13 +78,13 @@ const App = () => {
     <div style={{ padding: 20 }}>
       {isUpload ? (
         <>
-          <h2>Upload & OCR</h2>
+          <h2 className={styles.formHeader}>Upload & OCR</h2>
           <input type="file" accept="image/*" capture="environment" onChange={handleFile} />
           <pre>{ocrText}</pre>
         </>
       ) : (
         <>
-          <h2>Desktop Form</h2>
+          <h2 className={styles.formHeader}>Desktop Form</h2>
           <p>Scan this QR code:</p>
           <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
           <h3>OCR result:</h3>
