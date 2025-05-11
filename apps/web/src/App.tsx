@@ -3,12 +3,13 @@ import io from 'socket.io-client';
 import QRCode from 'qrcode.react';
 import { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
-import styles from '../src/css/Form.module.css';
+import styles from './css/Form.module.css';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState('');
+  const [grossIncome, setGrossIncome] = useState('');
 
   useEffect(() => {
     // generate or read sessionId
@@ -64,10 +65,27 @@ const App = () => {
     const { data } = await worker.recognize(canvas);
     console.log('[OCR] final text:', data.text);
 
+    // split into lines and build a map of label → value
+    const lines = data.text.split(/\r?\n/);
+    const fields: Record<string, string> = {};
+    lines.forEach((line) => {
+      const match = line.match(/^(.*?)[:\s]\s*(.+)$/);
+      if (match) {
+        const key = match[1].trim().toLowerCase();
+        const value = match[2].trim();
+        fields[key] = value;
+      }
+    });
+
+    // now you can pull out “gross income” (case‐insensitive):
+    const grossIncome = fields['gross income'];
+    setGrossIncome(grossIncome || 'not found');
+    console.log('Extracted gross income:', grossIncome);
+
     const res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, data: data.text }),
+      body: JSON.stringify({ sessionId, data: data.text, grossIncome }),
     });
     console.log('[API] /api/submit status=', res.status);
 
@@ -87,7 +105,8 @@ const App = () => {
           <h2 className={styles.formHeader}>Desktop Form</h2>
           <p>Scan this QR code:</p>
           <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
-          <h3>OCR result:</h3>
+          <h3>OCR text result:</h3>
+          <p>Gross: {grossIncome}</p>
           <pre>{ocrText}</pre>
         </>
       )}
