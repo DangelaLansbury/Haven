@@ -65,27 +65,25 @@ const App = () => {
     const { data } = await worker.recognize(canvas);
     console.log('[OCR] final text:', data.text);
 
-    // split into lines and build a map of label → value
-    const lines = data.text.split(/\r?\n/);
-    const fields: Record<string, string> = {};
-    lines.forEach((line) => {
-      const match = line.match(/^(.*?)[:\s]\s*(.+)$/);
-      if (match) {
-        const key = match[1].trim().toLowerCase();
-        const value = match[2].trim();
-        fields[key] = value;
-      }
-    });
+    const labelMap = {
+      grossIncome: 'Gross Income',
+    };
 
-    // now you can pull out “gross income” (case‐insensitive):
-    const grossIncome = fields['gross income'];
-    setGrossIncome(grossIncome || 'not found');
-    console.log('Extracted gross income:', grossIncome);
+    for (const [i, word] of data.words.entries()) {
+      if (word.text === labelMap.grossIncome) {
+        const nextWord = data.words[i + 1];
+        if (nextWord) {
+          const grossIncomeValue = nextWord.text;
+          setGrossIncome(grossIncomeValue);
+          console.log('[OCR] gross income:', grossIncomeValue);
+        }
+      }
+    }
 
     const res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, data: data.text, grossIncome }),
+      body: JSON.stringify({ sessionId, data: data.text }),
     });
     console.log('[API] /api/submit status=', res.status);
 
@@ -106,7 +104,10 @@ const App = () => {
           <p>Scan this QR code:</p>
           <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
           <h3>OCR text result:</h3>
-          <p>Gross: {grossIncome}</p>
+          <p>
+            <strong>Gross Income:</strong>
+          </p>
+          <input type="text" value={grossIncome} onChange={(e) => setGrossIncome(e.target.value)} placeholder="Gross Income" className={styles.formInput} />
           <pre>{ocrText}</pre>
         </>
       )}
