@@ -5,6 +5,14 @@ import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
+interface FormFields {
+  sessionId: string;
+  data: string;
+  grossIncome?: string;
+  generalDeductions?: string;
+  netIncome?: string;
+}
+
 const sessionData: Record<string, { grossIncome?: string }> = {};
 
 const app = express();
