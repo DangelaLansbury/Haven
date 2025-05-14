@@ -36,7 +36,6 @@ const App = () => {
     return () => sock.disconnect();
   }, []);
 
-  // simple route check
   const isUpload = window.location.pathname.includes('upload');
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,7 +123,7 @@ const App = () => {
         console.log('[Polling] grossIncome updated:', json.grossIncome);
         setGrossIncome(json.grossIncome);
       }
-    }, 3000); // check every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [sessionId, isUpload, grossIncome]);
@@ -143,7 +142,6 @@ const App = () => {
           <p>Scan this QR code:</p>
           <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
           <h3>OCR text result:</h3>
-          <p>Gross: {grossIncome}</p>
           <p>
             <strong>Gross Income:</strong>
           </p>

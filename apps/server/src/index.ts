@@ -23,7 +23,7 @@ const submitHandler = (req: Request, res: Response): void => {
     if (grossIncome) {
       sessionData[sessionId] = { grossIncome };
     }
-    res.json({ status: 'ok' }); // ← no `return`
+    res.json({ status: 'ok' });
   } else {
     res.status(400).json({ status: 'missing sessionId' });
   }
