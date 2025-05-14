@@ -1,36 +1,11 @@
-// import express, { Request, Response, NextFunction } from 'express';
-// import http from 'http';
-// import { Server } from 'socket.io';
-// import path from 'path';
-// import cors from 'cors';
-// import bodyParser from 'body-parser';
-
-// const app = express();
-// const server = http.createServer(app);
-// const io = new Server(server, { cors: { origin: '*' } });
-
-// app.use(cors());
-// app.use(bodyParser.json());
-
-// // serve static frontend
-// app.use(express.static(path.resolve(__dirname, '../../client/dist')));
-
-// // receive OCR from mobile, broadcast to desktop
-// app.post('/api/submit', (req, res, next) => {
-//   const { sessionId, data } = req.body;
-//   if (sessionId) {
-//     io.to(sessionId).emit('ocrResult', data);
-//     return res.json({ status: 'ok' });
-//   }
-//   res.status(400).json({ status: 'missing sessionId' });
-// });
-
 import express, { Request, Response, NextFunction } from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+
+const sessionData: Record<string, { grossIncome?: string }> = {};
 
 const app = express();
 const server = http.createServer(app);
@@ -42,9 +17,12 @@ app.use(express.static(path.resolve(__dirname, '../../web/dist')));
 
 // receive OCR from mobile, broadcast to desktop
 const submitHandler = (req: Request, res: Response): void => {
-  const { sessionId, data } = req.body;
+  const { sessionId, data, grossIncome } = req.body;
   if (sessionId) {
     io.to(sessionId).emit('ocrResult', data);
+    if (grossIncome) {
+      sessionData[sessionId] = { grossIncome };
+    }
     res.json({ status: 'ok' }); // ← no `return`
   } else {
     res.status(400).json({ status: 'missing sessionId' });
@@ -52,6 +30,15 @@ const submitHandler = (req: Request, res: Response): void => {
 };
 
 app.post('/api/submit', submitHandler);
+
+app.get('/api/session-data', (req: Request, res: Response) => {
+  const sessionId = req.query.sessionId as string;
+  if (sessionId && sessionData[sessionId]) {
+    res.json(sessionData[sessionId]);
+  } else {
+    res.json({});
+  }
+});
 
 // fallback to index.html for client‑side routing
 app.get('*', (_, res) => {
