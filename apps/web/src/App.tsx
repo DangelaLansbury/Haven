@@ -9,9 +9,7 @@ const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState('');
-  const [grossIncome, setGrossIncome] = useState('');
-  const [generalDeductions, setGeneralDeductions] = useState('');
-  const [netIncome, setNetIncome] = useState('');
+  const [formData, setFormData] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     // generate or read sessionId
@@ -31,15 +29,15 @@ const App = () => {
     });
     sock.on('ocrGrossIncome', ({ grossIncome }) => {
       console.log('[Socket.IO] received gross income:', grossIncome);
-      setGrossIncome(grossIncome);
+      setFormData((prev) => ({ ...prev, grossIncome }));
     });
     sock.on('ocrGeneralDeductions', ({ generalDeductions }) => {
       console.log('[Socket.IO] received general deductions:', generalDeductions);
-      setGeneralDeductions(generalDeductions);
+      setFormData((prev) => ({ ...prev, generalDeductions }));
     });
     sock.on('ocrNetIncome', ({ netIncome }) => {
       console.log('[Socket.IO] received net income:', netIncome);
-      setNetIncome(netIncome);
+      setFormData((prev) => ({ ...prev, netIncome }));
     });
     setSocket(sock);
 
@@ -107,7 +105,6 @@ const App = () => {
         const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
         if (match) {
           extractedGeneralDeductions = match[0];
-          setGeneralDeductions(extractedGeneralDeductions);
           console.log('[OCR] general deductions (regex):', extractedGeneralDeductions);
         }
       }
@@ -118,15 +115,12 @@ const App = () => {
         const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
         if (match) {
           extractedNetIncome = match[0];
-          setNetIncome(extractedNetIncome);
           console.log('[OCR] net income (regex):', extractedNetIncome);
         }
       }
     }
 
-    setGrossIncome(extractedGrossIncome);
-    setGeneralDeductions(extractedGeneralDeductions);
-    setNetIncome(extractedNetIncome);
+    setFormData((prev) => ({ ...prev, grossIncome: extractedGrossIncome, generalDeductions: extractedGeneralDeductions, netIncome: extractedNetIncome }));
 
     if (socket && socket.connected) {
       console.log('[Socket.IO] emitting gross income:', extractedGrossIncome);
@@ -145,7 +139,13 @@ const App = () => {
     const res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, data: data.text, grossIncome: extractedGrossIncome, generalDeductions: extractedGeneralDeductions, netIncome: extractedNetIncome }),
+      body: JSON.stringify({
+        sessionId,
+        data: data.text,
+        grossIncome: extractedGrossIncome,
+        generalDeductions: extractedGeneralDeductions,
+        netIncome: extractedNetIncome,
+      }),
     });
     console.log('[API] /api/submit status=', res.status);
 
@@ -159,22 +159,22 @@ const App = () => {
       const res = await fetch(`/api/session-data?sessionId=${sessionId}`);
       const json = await res.json();
 
-      if (json.grossIncome && json.grossIncome !== grossIncome) {
+      if (json.grossIncome && json.grossIncome !== formData.grossIncome) {
         console.log('[Polling] grossIncome updated:', json.grossIncome);
-        setGrossIncome(json.grossIncome);
+        setFormData((prev) => ({ ...prev, grossIncome: json.grossIncome }));
       }
-      if (json.generalDeductions && json.generalDeductions !== generalDeductions) {
+      if (json.generalDeductions && json.generalDeductions !== formData.generalDeductions) {
         console.log('[Polling] generalDeductions updated:', json.generalDeductions);
-        setGeneralDeductions(json.generalDeductions);
+        setFormData((prev) => ({ ...prev, generalDeductions: json.generalDeductions }));
       }
-      if (json.netIncome && json.netIncome !== netIncome) {
+      if (json.netIncome && json.netIncome !== formData.netIncome) {
         console.log('[Polling] netIncome updated:', json.netIncome);
-        setNetIncome(json.netIncome);
+        setFormData((prev) => ({ ...prev, netIncome: json.netIncome }));
       }
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [sessionId, isUpload, grossIncome]);
+  }, [sessionId, isUpload, formData]);
 
   return (
     <div style={{ padding: 20 }}>
@@ -193,15 +193,15 @@ const App = () => {
           <p>
             <strong>Gross Income:</strong>
           </p>
-          <input type="text" value={grossIncome} onChange={(e) => setGrossIncome(e.target.value)} placeholder="Gross Income" className={styles.formInput} />
+          <input type="text" value={formData.grossIncome || ''} onChange={(e) => setFormData((prev) => ({ ...prev, grossIncome: e.target.value }))} placeholder="Gross Income" className={styles.formInput} />
           <p>
             <strong>General Deductions:</strong>
           </p>
-          <input type="text" value={generalDeductions} onChange={(e) => setGeneralDeductions(e.target.value)} placeholder="General Deductions" className={styles.formInput} />
+          <input type="text" value={formData.generalDeductions || ''} onChange={(e) => setFormData((prev) => ({ ...prev, generalDeductions: e.target.value }))} placeholder="General Deductions" className={styles.formInput} />
           <p>
             <strong>Net Income:</strong>
           </p>
-          <input type="text" value={netIncome} onChange={(e) => setNetIncome(e.target.value)} placeholder="Net Income" className={styles.formInput} />
+          <input type="text" value={formData.netIncome || ''} onChange={(e) => setFormData((prev) => ({ ...prev, netIncome: e.target.value }))} placeholder="Net Income" className={styles.formInput} />
           <pre>{ocrText}</pre>
         </>
       )}

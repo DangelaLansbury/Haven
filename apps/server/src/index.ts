@@ -30,15 +30,12 @@ const submitHandler = (req: Request, res: Response): void => {
   const { sessionId, data, grossIncome, generalDeductions, netIncome } = req.body as FormFields;
   if (sessionId) {
     io.to(sessionId).emit('ocrResult', data);
-    if (grossIncome) {
-      sessionData[sessionId] = { grossIncome };
-    }
-    if (generalDeductions) {
-      sessionData[sessionId] = { ...sessionData[sessionId], generalDeductions };
-    }
-    if (netIncome) {
-      sessionData[sessionId] = { ...sessionData[sessionId], netIncome };
-    }
+    sessionData[sessionId] = {
+      ...sessionData[sessionId],
+      grossIncome,
+      generalDeductions,
+      netIncome,
+    };
     res.json({ status: 'ok' });
   } else {
     res.status(400).json({ status: 'missing sessionId' });
