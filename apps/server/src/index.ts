@@ -13,7 +13,8 @@ interface FormFields {
   netIncome?: string;
 }
 
-const sessionData: Record<string, { grossIncome?: string }> = {};
+// const sessionData: Record<string, { grossIncome?: string }> = {};
+const sessionData: Record<string, Partial<FormFields>> = {};
 
 const app = express();
 const server = http.createServer(app);
@@ -25,11 +26,18 @@ app.use(express.static(path.resolve(__dirname, '../../web/dist')));
 
 // receive OCR from mobile, broadcast to desktop
 const submitHandler = (req: Request, res: Response): void => {
-  const { sessionId, data, grossIncome } = req.body;
+  // const { sessionId, data, grossIncome } = req.body;
+  const { sessionId, data, grossIncome, generalDeductions, netIncome } = req.body as FormFields;
   if (sessionId) {
     io.to(sessionId).emit('ocrResult', data);
     if (grossIncome) {
       sessionData[sessionId] = { grossIncome };
+    }
+    if (generalDeductions) {
+      sessionData[sessionId] = { ...sessionData[sessionId], generalDeductions };
+    }
+    if (netIncome) {
+      sessionData[sessionId] = { ...sessionData[sessionId], netIncome };
     }
     res.json({ status: 'ok' });
   } else {
