@@ -10,6 +10,8 @@ const App = () => {
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState('');
   const [grossIncome, setGrossIncome] = useState('');
+  const [generalDeductions, setGeneralDeductions] = useState('');
+  const [netIncome, setNetIncome] = useState('');
 
   useEffect(() => {
     // generate or read sessionId
@@ -30,6 +32,14 @@ const App = () => {
     sock.on('ocrGrossIncome', ({ grossIncome }) => {
       console.log('[Socket.IO] received gross income:', grossIncome);
       setGrossIncome(grossIncome);
+    });
+    sock.on('ocrGeneralDeductions', ({ generalDeductions }) => {
+      console.log('[Socket.IO] received general deductions:', generalDeductions);
+      setGeneralDeductions(generalDeductions);
+    });
+    sock.on('ocrNetIncome', ({ netIncome }) => {
+      console.log('[Socket.IO] received net income:', netIncome);
+      setNetIncome(netIncome);
     });
     setSocket(sock);
 
@@ -74,6 +84,8 @@ const App = () => {
     const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
     let extractedGrossIncome = '';
+    let extractedGeneralDeductions = '';
+    let extractedNetIncome = '';
 
     for (const line of data.lines) {
       const lineText = line.text;
@@ -88,24 +100,52 @@ const App = () => {
           console.log('[OCR] gross income (regex):', extractedGrossIncome);
         }
       }
+
+      if (normalize(lineText).includes('generaldeductions')) {
+        console.log('[OCR MATCH] matched line:', lineText);
+
+        const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
+        if (match) {
+          extractedGeneralDeductions = match[0];
+          setGeneralDeductions(extractedGeneralDeductions);
+          console.log('[OCR] general deductions (regex):', extractedGeneralDeductions);
+        }
+      }
+
+      if (normalize(lineText).includes('netincome')) {
+        console.log('[OCR MATCH] matched line:', lineText);
+
+        const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
+        if (match) {
+          extractedNetIncome = match[0];
+          setNetIncome(extractedNetIncome);
+          console.log('[OCR] net income (regex):', extractedNetIncome);
+        }
+      }
     }
 
     setGrossIncome(extractedGrossIncome);
+    setGeneralDeductions(extractedGeneralDeductions);
+    setNetIncome(extractedNetIncome);
 
     if (socket && socket.connected) {
       console.log('[Socket.IO] emitting gross income:', extractedGrossIncome);
       socket.emit('ocrGrossIncome', { sessionId, grossIncome: extractedGrossIncome });
+      socket.emit('ocrGeneralDeductions', { sessionId, generalDeductions: extractedGeneralDeductions });
+      socket.emit('ocrNetIncome', { sessionId, netIncome: extractedNetIncome });
     } else {
       console.warn('[Socket.IO] socket not ready for gross income emit');
     }
 
     console.log('[OCR] final text:', data.text);
     console.log('[OCR] submitting grossIncome:', extractedGrossIncome);
+    console.log('[OCR] submitting generalDeductions:', extractedGeneralDeductions);
+    console.log('[OCR] submitting netIncome:', extractedNetIncome);
 
     const res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, data: data.text, grossIncome: extractedGrossIncome }),
+      body: JSON.stringify({ sessionId, data: data.text, grossIncome: extractedGrossIncome, generalDeductions: extractedGeneralDeductions, netIncome: extractedNetIncome }),
     });
     console.log('[API] /api/submit status=', res.status);
 
@@ -122,6 +162,14 @@ const App = () => {
       if (json.grossIncome && json.grossIncome !== grossIncome) {
         console.log('[Polling] grossIncome updated:', json.grossIncome);
         setGrossIncome(json.grossIncome);
+      }
+      if (json.generalDeductions && json.generalDeductions !== generalDeductions) {
+        console.log('[Polling] generalDeductions updated:', json.generalDeductions);
+        setGeneralDeductions(json.generalDeductions);
+      }
+      if (json.netIncome && json.netIncome !== netIncome) {
+        console.log('[Polling] netIncome updated:', json.netIncome);
+        setNetIncome(json.netIncome);
       }
     }, 3000);
 
@@ -146,6 +194,14 @@ const App = () => {
             <strong>Gross Income:</strong>
           </p>
           <input type="text" value={grossIncome} onChange={(e) => setGrossIncome(e.target.value)} placeholder="Gross Income" className={styles.formInput} />
+          <p>
+            <strong>General Deductions:</strong>
+          </p>
+          <input type="text" value={generalDeductions} onChange={(e) => setGeneralDeductions(e.target.value)} placeholder="General Deductions" className={styles.formInput} />
+          <p>
+            <strong>Net Income:</strong>
+          </p>
+          <input type="text" value={netIncome} onChange={(e) => setNetIncome(e.target.value)} placeholder="Net Income" className={styles.formInput} />
           <pre>{ocrText}</pre>
         </>
       )}
