@@ -8,7 +8,7 @@ import styles from './css/Form.module.css';
 const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
-  const [ocrText, setOcrText] = useState('');
+  const [ocrText, setOcrText] = useState(''); // Not really used, but kept for debugging
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -24,19 +24,15 @@ const App = () => {
     const sock = io({ query: { sessionId: id } });
     sock.on('connect', () => console.log('[Socket.IO] connected, id=', sock.id));
     sock.on('ocrResult', (data: string) => {
-      console.log('[Socket.IO] ocrResult=', data);
       setOcrText(data);
     });
     sock.on('ocrGrossIncome', ({ grossIncome }) => {
-      console.log('[Socket.IO] received gross income:', grossIncome);
       setFormData((prev) => ({ ...prev, grossIncome }));
     });
     sock.on('ocrGeneralDeductions', ({ generalDeductions }) => {
-      console.log('[Socket.IO] received general deductions:', generalDeductions);
       setFormData((prev) => ({ ...prev, generalDeductions }));
     });
     sock.on('ocrNetIncome', ({ netIncome }) => {
-      console.log('[Socket.IO] received net income:', netIncome);
       setFormData((prev) => ({ ...prev, netIncome }));
     });
     setSocket(sock);
@@ -67,17 +63,11 @@ const App = () => {
       );
     });
 
-    console.log('[OCR] loading worker…');
     await worker.load();
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
 
-    console.log('[OCR] recognizing…');
     const { data } = await worker.recognize(canvas);
-    console.log(
-      '[OCR DEBUG] lines detected:',
-      data.lines.map((l) => l.text)
-    );
 
     const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
@@ -87,35 +77,24 @@ const App = () => {
 
     for (const line of data.lines) {
       const lineText = line.text;
-      console.log('[OCR DEBUG] line:', lineText);
-
       if (normalize(lineText).includes('grossincome')) {
-        console.log('[OCR MATCH] matched line:', lineText);
-
         const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
         if (match) {
           extractedGrossIncome = match[0];
-          console.log('[OCR] gross income (regex):', extractedGrossIncome);
         }
       }
 
       if (normalize(lineText).includes('generaldeductions')) {
-        console.log('[OCR MATCH] matched line:', lineText);
-
         const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
         if (match) {
           extractedGeneralDeductions = match[0];
-          console.log('[OCR] general deductions (regex):', extractedGeneralDeductions);
         }
       }
 
       if (normalize(lineText).includes('netincome')) {
-        console.log('[OCR MATCH] matched line:', lineText);
-
         const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
         if (match) {
           extractedNetIncome = match[0];
-          console.log('[OCR] net income (regex):', extractedNetIncome);
         }
       }
     }
@@ -123,18 +102,12 @@ const App = () => {
     setFormData((prev) => ({ ...prev, grossIncome: extractedGrossIncome, generalDeductions: extractedGeneralDeductions, netIncome: extractedNetIncome }));
 
     if (socket && socket.connected) {
-      console.log('[Socket.IO] emitting gross income:', extractedGrossIncome);
       socket.emit('ocrGrossIncome', { sessionId, grossIncome: extractedGrossIncome });
       socket.emit('ocrGeneralDeductions', { sessionId, generalDeductions: extractedGeneralDeductions });
       socket.emit('ocrNetIncome', { sessionId, netIncome: extractedNetIncome });
     } else {
       console.warn('[Socket.IO] socket not ready for gross income emit');
     }
-
-    console.log('[OCR] final text:', data.text);
-    console.log('[OCR] submitting grossIncome:', extractedGrossIncome);
-    console.log('[OCR] submitting generalDeductions:', extractedGeneralDeductions);
-    console.log('[OCR] submitting netIncome:', extractedNetIncome);
 
     const res = await fetch('/api/submit', {
       method: 'POST',
