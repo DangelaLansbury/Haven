@@ -4,11 +4,12 @@ import QRCode from 'qrcode.react';
 import { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
 import styles from './css/Form.module.css';
+import FormInput from './components/FormInput';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
-  const [ocrText, setOcrText] = useState(''); // Not really used, but kept for debugging
+  const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -163,18 +164,9 @@ const App = () => {
           <p>Scan this QR code:</p>
           <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
           <h3>OCR text result:</h3>
-          <p>
-            <strong>Gross Income:</strong>
-          </p>
-          <input type="text" value={formData.grossIncome || ''} onChange={(e) => setFormData((prev) => ({ ...prev, grossIncome: e.target.value }))} placeholder="Gross Income" className={styles.formInput} />
-          <p>
-            <strong>General Deductions:</strong>
-          </p>
-          <input type="text" value={formData.generalDeductions || ''} onChange={(e) => setFormData((prev) => ({ ...prev, generalDeductions: e.target.value }))} placeholder="General Deductions" className={styles.formInput} />
-          <p>
-            <strong>Net Income:</strong>
-          </p>
-          <input type="text" value={formData.netIncome || ''} onChange={(e) => setFormData((prev) => ({ ...prev, netIncome: e.target.value }))} placeholder="Net Income" className={styles.formInput} />
+          <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" className={styles.formInput} />
+          <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" className={styles.formInput} />
+          <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" className={styles.formInput} />
           <pre>{ocrText}</pre>
         </>
       )}
