@@ -3,3 +3,9 @@
   font-size: 2rem;
   font-weight: 900;
 }
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+}
