@@ -164,9 +164,9 @@ const App = () => {
           <p>Scan this QR code:</p>
           <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
           <h3>OCR text result:</h3>
-          <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" className={styles.formInput} />
-          <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" className={styles.formInput} />
-          <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" className={styles.formInput} />
+          <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
+          <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
+          <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
           <pre>{ocrText}</pre>
         </>
       )}
