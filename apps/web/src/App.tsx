@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import QRCode from 'qrcode.react';
 import { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
+import '../../web/index.css';
 import styles from './css/Form.module.css';
 import FormInput from './components/FormInput';
 

@@ -17,20 +17,21 @@
 }
 
 .formLabel {
-  font-size: 0.75rem;
+  font-size: var(--font-xs);
   font-weight: 500;
   margin-bottom: 0.25rem;
 }
 
 .formInput {
-  background-color: #fafafa;
-  border: 1px solid #e0e0e0;
+  background-color: var(--gray-100);
+  border: 1px solid var(--gray-300);
   border-radius: 6px;
   box-shadow: 0 0 0 0 transparent;
   box-sizing: border-box;
-  color: #333;
-  font-size: 0.875rem;
+  color: var(--gray-800);
+  font-size: var(--font-sm);
   font-weight: 400;
+  min-width: 15rem;
   outline: none;
   padding: 0.5rem;
   transition: border-color 0.2s;
