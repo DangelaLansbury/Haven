@@ -31,9 +31,15 @@
   color: var(--gray-800);
   font-size: var(--font-sm);
   font-weight: 400;
-  min-width: 15rem;
+  min-width: 25rem;
+  max-width: 45rem;
   outline: none;
   padding: 0.5rem;
   transition: border-color 0.2s;
   width: 100%;
+  &:focus {
+    background-color: var(--gray-000);
+    border-color: var(--gray-500);
+    box-shadow: 0 0 0 2px var(--gray-200);
+  }
 }

@@ -152,7 +152,7 @@ const App = () => {
   }, [sessionId, isUpload, formData]);
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
         <>
           <h2 className={styles.formHeader}>Upload & OCR</h2>
