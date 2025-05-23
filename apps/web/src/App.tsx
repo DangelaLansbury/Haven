@@ -152,7 +152,7 @@ const App = () => {
   }, [sessionId, isUpload, formData]);
 
   return (
-    <div style={{ padding: 20, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
         <>
           <h2 className={styles.formHeader}>Upload & OCR</h2>
@@ -163,12 +163,14 @@ const App = () => {
         <>
           <div classname={styles.formContainer}>
             <h2 className={styles.formHeader}>Desktop Form</h2>
-            <p>Scan this QR code:</p>
-            <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
-            <h3>OCR text result:</h3>
+            <div className={styles.qrSection}>
+              Scan this QR code:
+              <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
+            </div>
             <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
             <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
             <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
+            <h3>OCR text result:</h3>
             <pre>{ocrText}</pre>
           </div>
         </>
