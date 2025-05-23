@@ -1,13 +1,14 @@
 #root {
   height: 100%;
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 720px;
-  margin: 0 auto;
+  margin: 0; */
   padding: 0 1rem;
+  width: 100%;
 }
 
 body {

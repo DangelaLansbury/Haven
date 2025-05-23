@@ -161,14 +161,16 @@ const App = () => {
         </>
       ) : (
         <>
-          <h2 className={styles.formHeader}>Desktop Form</h2>
-          <p>Scan this QR code:</p>
-          <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
-          <h3>OCR text result:</h3>
-          <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
-          <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
-          <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
-          <pre>{ocrText}</pre>
+          <div classname={styles.formContainer}>
+            <h2 className={styles.formHeader}>Desktop Form</h2>
+            <p>Scan this QR code:</p>
+            <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
+            <h3>OCR text result:</h3>
+            <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
+            <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
+            <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
+            <pre>{ocrText}</pre>
+          </div>
         </>
       )}
     </div>
