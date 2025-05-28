@@ -162,7 +162,7 @@ const App = () => {
       ) : (
         <>
           <div classname={styles.formContainer}>
-            <h2 className={styles.formHeader}>Desktop Form</h2>
+            <h2 className={styles.formHeader}>Tax Ghost</h2>
             <div className={styles.qrSection}>
               Scan this QR code:
               <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
