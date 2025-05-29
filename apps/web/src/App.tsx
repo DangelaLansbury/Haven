@@ -4,7 +4,8 @@ import QRCode from 'qrcode.react';
 import { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
 import '../../web/index.css';
-import styles from './css/Form.module.css';
+import formStyles from './css/Form.module.css';
+import cameraStyles from './css/Camera.module.css';
 import FormInput from './components/FormInput';
 
 const App = () => {
@@ -155,15 +156,20 @@ const App = () => {
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
         <>
-          <h2 className={styles.formHeader}>Upload & OCR</h2>
-          <input type="file" accept="image/*" capture="environment" onChange={handleFile} />
-          <pre>{ocrText}</pre>
+          <div className={cameraStyles.cameraContainer}>
+            <video className={cameraStyles.camera} autoPlay playsInline muted />
+          </div>
+          <div className={cameraStyles.overlay}>
+            <h2 className={formStyles.formHeader}>Upload & OCR</h2>
+            <input type="file" accept="image/*" capture="environment" onChange={handleFile} />
+            <pre>{ocrText}</pre>
+          </div>
         </>
       ) : (
         <>
-          <div classname={styles.formContainer}>
-            <h2 className={styles.formHeader}>Tax Ghost</h2>
-            <div className={styles.qrSection}>
+          <div className={formStyles.formContainer}>
+            <h2 className={formStyles.formHeader}>Tax Ghost</h2>
+            <div className={formStyles.qrSection}>
               Scan this QR code:
               <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
             </div>
