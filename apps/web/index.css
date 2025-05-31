@@ -8,7 +8,8 @@
 
 body {
   background-color: var(--gray-000);
-  font-family: 'Noto Sans', sans-serif;
+  /* font-family: 'Noto Sans', sans-serif; */
+  font-family: 'EB Garamond', serif;
   color: var(--gray-800);
   font-size: 16px;
   margin: 0;
