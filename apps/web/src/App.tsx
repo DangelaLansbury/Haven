@@ -13,6 +13,8 @@ const App = () => {
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
+  const [isInitialScreen, setIsInitialScreen] = useState(true);
+  const [isManualInput, setIsManualInput] = useState(false);
 
   useEffect(() => {
     // generate or read sessionId
@@ -152,6 +154,16 @@ const App = () => {
     return () => clearInterval(interval);
   }, [sessionId, isUpload, formData]);
 
+  function goToManualInput() {
+    setIsManualInput(true);
+    setIsInitialScreen(false);
+  }
+
+  function goToOcr() {
+    setIsManualInput(false);
+    setIsInitialScreen(false);
+  }
+
   return (
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
@@ -167,18 +179,39 @@ const App = () => {
         </>
       ) : (
         <>
-          <div className={formStyles.formContainer}>
-            <h2 className={formStyles.formHeader}>Tax Ghost</h2>
-            <div className={formStyles.qrSection}>
-              Scan this QR code:
-              <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
+          {isInitialScreen ? (
+            <>
+              <h2 className={formStyles.formHeader}>Manual Entry or OCR</h2>
+              <div className={formStyles.buttonContainer}>
+                <button className={formStyles.button} onClick={() => goToManualInput()}>
+                  Manual Entry
+                </button>
+                <button className={formStyles.button} onClick={() => goToOcr()}>
+                  Use OCR
+                </button>
+              </div>
+            </>
+          ) : isManualInput ? (
+            <div className={formStyles.formContainer}>
+              <h2 className={formStyles.formHeader}>Manual Entry</h2>
+              <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
+              <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
+              <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
             </div>
-            <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
-            <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
-            <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
-            <h3>OCR text result:</h3>
-            <pre>{ocrText}</pre>
-          </div>
+          ) : (
+            <div className={formStyles.formContainer}>
+              <h2 className={formStyles.formHeader}>Tax Ghost</h2>
+              <div className={formStyles.qrSection}>
+                Scan this QR code:
+                <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
+              </div>
+              <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
+              <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
+              <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
+              <h3>OCR text result:</h3>
+              <pre>{ocrText}</pre>
+            </div>
+          )}
         </>
       )}
     </div>
