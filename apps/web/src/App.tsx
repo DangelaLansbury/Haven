@@ -7,6 +7,7 @@ import '../../web/index.css';
 import formStyles from './css/Form.module.css';
 import cameraStyles from './css/Camera.module.css';
 import FormInput from './components/FormInput';
+import TaxForm from './components/TaxForm';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -192,12 +193,7 @@ const App = () => {
               </div>
             </>
           ) : isManualInput ? (
-            <div className={formStyles.formContainer}>
-              <h2 className={formStyles.formHeader}>Manual Entry</h2>
-              <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
-              <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
-              <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
-            </div>
+            <TaxForm formData={formData} setFormData={setFormData} />
           ) : (
             <div className={formStyles.formContainer}>
               <h2 className={formStyles.formHeader}>Tax Ghost</h2>
@@ -205,15 +201,11 @@ const App = () => {
                 Scan this QR code:
                 <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
               </div>
-              {ocrText !== '' && (
-                <>
-                  <FormInput label="Gross Income" value={formData.grossIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, grossIncome: value }))} placeholder="Gross Income" />
-                  <FormInput label="General Deductions" value={formData.generalDeductions || ''} onChange={(value) => setFormData((prev) => ({ ...prev, generalDeductions: value }))} placeholder="General Deductions" />
-                  <FormInput label="Net Income" value={formData.netIncome || ''} onChange={(value) => setFormData((prev) => ({ ...prev, netIncome: value }))} placeholder="Net Income" />
-                  <h3>OCR text result:</h3>
-                  <pre>{ocrText}</pre>
-                </>
-              )}
+              <>
+                <TaxForm formData={formData} setFormData={setFormData} />
+                <h3>OCR text result:</h3>
+                <pre>{ocrText}</pre>
+              </>
             </div>
           )}
         </>
