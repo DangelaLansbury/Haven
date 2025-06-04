@@ -183,13 +183,13 @@ const App = () => {
           {isInitialScreen ? (
             <>
               <h2 className={formStyles.formHeader}>Manual Entry or OCR</h2>
-              <div className={formStyles.buttonContainer}>
-                <button className={formStyles.button} onClick={() => goToManualInput()}>
+              <div className={formStyles.formTypeSelectionContainer}>
+                <div className={formStyles.formTypeSelector} onClick={() => goToManualInput()}>
                   Manual Entry
-                </button>
-                <button className={formStyles.button} onClick={() => goToOcr()}>
+                </div>
+                <div className={formStyles.formTypeSelector} onClick={() => goToOcr()}>
                   Use OCR
-                </button>
+                </div>
               </div>
             </>
           ) : isManualInput ? (
