@@ -6,16 +6,15 @@ import loadImage from 'blueimp-load-image';
 import '../../web/index.css';
 import formStyles from './css/Form.module.css';
 import cameraStyles from './css/Camera.module.css';
-import FormInput from './components/FormInput';
 import TaxForm from './components/TaxForm';
+import InitialScreen from './components/InitialScreen';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
-  const [isInitialScreen, setIsInitialScreen] = useState(true);
-  const [isManualInput, setIsManualInput] = useState(false);
+  const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
 
   useEffect(() => {
     // generate or read sessionId
@@ -155,16 +154,6 @@ const App = () => {
     return () => clearInterval(interval);
   }, [sessionId, isUpload, formData]);
 
-  function goToManualInput() {
-    setIsManualInput(true);
-    setIsInitialScreen(false);
-  }
-
-  function goToOcr() {
-    setIsManualInput(false);
-    setIsInitialScreen(false);
-  }
-
   return (
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
@@ -180,19 +169,11 @@ const App = () => {
         </>
       ) : (
         <>
-          {isInitialScreen ? (
+          {screen === 'initial' ? (
             <>
-              <h2 className={formStyles.formHeader}>Manual Entry or OCR</h2>
-              <div className={formStyles.formTypeSelectionContainer}>
-                <div className={formStyles.formTypeSelector} onClick={() => goToManualInput()}>
-                  Manual Entry
-                </div>
-                <div className={formStyles.formTypeSelector} onClick={() => goToOcr()}>
-                  Use OCR
-                </div>
-              </div>
+              <InitialScreen title="Tax Ghost" setScreen={setScreen} />
             </>
-          ) : isManualInput ? (
+          ) : screen === 'manual' ? (
             <TaxForm formData={formData} setFormData={setFormData} />
           ) : (
             <div className={formStyles.formContainer}>
