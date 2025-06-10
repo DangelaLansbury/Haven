@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import formStyles from '../css/Form.module.css';
 
 interface InitialScreenProps {

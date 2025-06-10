@@ -8,6 +8,7 @@ import formStyles from './css/Form.module.css';
 import cameraStyles from './css/Camera.module.css';
 import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
+import Camera from './components/Camera';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -158,14 +159,7 @@ const App = () => {
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
         <>
-          <div className={cameraStyles.cameraContainer}>
-            <video className={cameraStyles.camera} autoPlay playsInline muted />
-          </div>
-          <div className={cameraStyles.overlay}>
-            <h2 className={formStyles.formHeader}>Upload & OCR</h2>
-            <input type="file" accept="image/*" capture="environment" onChange={handleFile} />
-            <pre>{ocrText}</pre>
-          </div>
+          <Camera onCapture={handleFile} />
         </>
       ) : (
         <>
