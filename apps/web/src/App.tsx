@@ -5,7 +5,6 @@ import { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
 import '../../web/index.css';
 import formStyles from './css/Form.module.css';
-import cameraStyles from './css/Camera.module.css';
 import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
