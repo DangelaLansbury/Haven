@@ -175,10 +175,21 @@ const App = () => {
                 Scan this QR code:
                 <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
               </div>
-              <>
+              {/* <>
                 <TaxForm formData={formData} setFormData={setFormData} />
                 <h3>OCR text result:</h3>
                 <pre>{ocrText}</pre>
+              </> */}
+              <>
+                {formData.grossIncome || formData.generalDeductions || formData.netIncome ? (
+                  <>
+                    <TaxForm formData={formData} setFormData={setFormData} />
+                    <h3>OCR text result:</h3>
+                    <pre>{ocrText}</pre>
+                  </>
+                ) : (
+                  <p>Processing OCR data…</p>
+                )}
               </>
             </div>
           )}
