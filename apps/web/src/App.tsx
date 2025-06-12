@@ -83,25 +83,20 @@ const App = () => {
 
     for (const line of data.lines) {
       const lineText = line.text;
-      if (normalize(lineText).includes('grossincome')) {
-        const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
-        if (match) {
-          extractedGrossIncome = match[0];
-        }
+      const norm = normalize(lineText);
+
+      const rightmostDollar = line.words.filter((w) => /\$[\d,]+(?:\.\d{2})?/.test(w.text)).sort((a, b) => b.bbox.x0 - a.bbox.x0)[0];
+
+      if (norm.includes('grossincome') && rightmostDollar) {
+        extractedGrossIncome = rightmostDollar.text;
       }
 
-      if (normalize(lineText).includes('generaldeductions')) {
-        const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
-        if (match) {
-          extractedGeneralDeductions = match[0];
-        }
+      if (norm.includes('generaldeductions') && rightmostDollar) {
+        extractedGeneralDeductions = rightmostDollar.text;
       }
 
-      if (normalize(lineText).includes('netincome')) {
-        const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
-        if (match) {
-          extractedNetIncome = match[0];
-        }
+      if (norm.includes('netincome') && rightmostDollar) {
+        extractedNetIncome = rightmostDollar.text;
       }
     }
 
