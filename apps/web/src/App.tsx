@@ -15,6 +15,7 @@ const App = () => {
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
+  const [OCRReady, setOCRReady] = useState(false);
 
   useEffect(() => {
     // generate or read sessionId
@@ -149,6 +150,9 @@ const App = () => {
         console.log('[Polling] netIncome updated:', json.netIncome);
         setFormData((prev) => ({ ...prev, netIncome: json.netIncome }));
       }
+      if (json.grossIncome || json.generalDeductions || json.netIncome) {
+        setOCRReady(true);
+      }
     }, 3000);
 
     return () => clearInterval(interval);
@@ -176,14 +180,14 @@ const App = () => {
                 <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
               </div>
               <>
-                {formData.grossIncome || formData.generalDeductions || formData.netIncome ? (
+                {OCRReady ? (
                   <>
                     <TaxForm formData={formData} setFormData={setFormData} />
                     <h3>OCR text result:</h3>
                     <pre>{ocrText}</pre>
                   </>
                 ) : (
-                  <p>Processing OCR data…</p>
+                  <p>Your tax details will appear here when you're done…</p>
                 )}
               </>
             </div>
