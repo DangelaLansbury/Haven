@@ -179,7 +179,7 @@ const App = () => {
                 <>
                   <div className={formStyles.qrSection}>
                     Scan this QR code:
-                    <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
+                    <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
                     <p>Your tax details will appear here when you're done…</p>
                   </div>
                 </>
