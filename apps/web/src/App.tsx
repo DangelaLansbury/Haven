@@ -81,25 +81,6 @@ const App = () => {
     let extractedGeneralDeductions = '';
     let extractedNetIncome = '';
 
-    // for (const line of data.lines) {
-    //   const lineText = line.text;
-    //   const norm = normalize(lineText);
-
-    //   const rightmostDollar = line.words.filter((w) => /\$[\d,]+(?:\.\d{2})?/.test(w.text)).sort((a, b) => b.bbox.x0 - a.bbox.x0)[0];
-
-    //   if (norm.includes('grossincome') && rightmostDollar) {
-    //     extractedGrossIncome = rightmostDollar.text;
-    //   }
-
-    //   if (norm.includes('generaldeductions') && rightmostDollar) {
-    //     extractedGeneralDeductions = rightmostDollar.text;
-    //   }
-
-    //   if (norm.includes('netincome') && rightmostDollar) {
-    //     extractedNetIncome = rightmostDollar.text;
-    //   }
-    // }
-
     for (const line of data.lines) {
       const lineText = line.text;
       if (normalize(lineText).includes('grossincome')) {
@@ -194,21 +175,21 @@ const App = () => {
           ) : (
             <div className={formStyles.formContainer}>
               <h2 className={formStyles.formHeader}>Tax Ghost</h2>
-              <div className={formStyles.qrSection}>
-                Scan this QR code:
-                <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
-              </div>
-              <>
-                {OCRReady ? (
-                  <>
-                    <TaxForm formData={formData} setFormData={setFormData} />
-                    <h3>OCR text result:</h3>
-                    <pre>{ocrText}</pre>
-                  </>
-                ) : (
-                  <p>Your tax details will appear here when you're done…</p>
-                )}
-              </>
+              {!OCRReady ? (
+                <>
+                  <div className={formStyles.qrSection}>
+                    Scan this QR code:
+                    <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} />
+                    <p>Your tax details will appear here when you're done…</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <TaxForm formData={formData} setFormData={setFormData} />
+                  <h3>OCR text result:</h3>
+                  <pre>{ocrText}</pre>
+                </>
+              )}
             </div>
           )}
         </>
