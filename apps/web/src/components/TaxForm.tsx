@@ -10,9 +10,9 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData }) => {
   return (
     <div className={formStyles.formContainer}>
       <form className={formStyles.taxForm}>
-        <FormInput label="Gross Income" value={formData.grossIncome || ''} placeholder={'Add Gross Income'} onChange={(value) => setFormData({ ...formData, grossIncome: value })} />
-        <FormInput label="General Deductions" value={formData.generalDeductions || ''} placeholder={'Add General Deductions'} onChange={(value) => setFormData({ ...formData, generalDeductions: value })} />
-        <FormInput label="Net Income" value={formData.netIncome || ''} placeholder={'Calculate Net Income'} onChange={(value) => setFormData({ ...formData, netIncome: value })} />
+        <FormInput label="Gross Income" value={formData.grossIncome || ''} placeholder={'$00,000.00'} onChange={(value) => setFormData({ ...formData, grossIncome: value })} />
+        <FormInput label="General Deductions" value={formData.generalDeductions || ''} placeholder={'$00,000.00'} onChange={(value) => setFormData({ ...formData, generalDeductions: value })} />
+        <FormInput label="Net Income" value={formData.netIncome || ''} placeholder={'$00,000.00'} onChange={(value) => setFormData({ ...formData, netIncome: value })} />
       </form>
     </div>
   );
