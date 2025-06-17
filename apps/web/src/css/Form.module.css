@@ -38,7 +38,7 @@
 }
 
 .formLabel {
-  font-size: var(--font-xs);
+  font-size: var(--font-sm);
   font-weight: 500;
   margin-bottom: 0.25rem;
   flex: 1;
@@ -53,6 +53,7 @@
   box-sizing: border-box;
   color: var(--gray-900);
   font-size: var(--font-sm);
+  font-family: 'EB Garamond', serif;
   font-weight: 400;
   min-width: 8rem;
   max-width: 8rem;
