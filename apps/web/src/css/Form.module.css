@@ -30,25 +30,30 @@
 
 .formGroup {
   align-items: center;
+  background-color: transparent;
+  border-bottom: 1px solid var(--gray-050);
   display: flex;
   flex-direction: row;
-  margin-bottom: 0.75rem;
   width: 20rem;
   justify-content: space-between;
+  transition: background-color ease-in 1s;
+  &:hover {
+    background-color: var(--yellow);
+  }
 }
 
 .formLabel {
   font-size: var(--font-sm);
   font-weight: 500;
-  margin-bottom: 0.25rem;
   flex: 1;
+  padding: 0.25rem 0.5rem;
   width: 100%;
 }
 
 .formInput {
-  background-color: var(--gray-050);
-  border: 1px solid var(--gray-100);
-  border-radius: 6px;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
   box-shadow: 0 0 0 0 transparent;
   box-sizing: border-box;
   color: var(--gray-900);
@@ -59,15 +64,15 @@
   max-width: 8rem;
   outline: none;
   padding: 0.5rem;
-  transition: border-color 0.2s;
   width: 100%;
+  /* &:hover {
+    background-color: var(--yellow);
+  } */
   &:focus {
     background-color: var(--gray-000);
-    border-color: var(--gray-300);
-    box-shadow: 0 0 0 2px var(--gray-100);
   }
   &::placeholder {
-    color: var(--gray-400);
+    color: var(--gray-300);
   }
 }
 

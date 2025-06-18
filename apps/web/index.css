@@ -8,7 +8,6 @@
 
 body {
   background-color: var(--paper);
-  /* font-family: 'Noto Sans', sans-serif; */
   font-family: 'EB Garamond', serif;
   color: var(--gray-800);
   font-size: 16px;
@@ -31,7 +30,8 @@ body {
 
   --paper: #fefcf6;
 
-  --yellow: #fef6ae;
+  /* --yellow: #fef6ae; */
+  --yellow: rgba(255, 239, 68, 0.5);
 
   --font-xs: 0.75rem;
   --font-sm: 0.875rem;
