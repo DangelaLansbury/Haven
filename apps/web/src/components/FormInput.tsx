@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../css/Form.module.css';
+import formStyles from '../css/Form.module.css';
 
 interface FormInputProps {
   label?: string;
@@ -14,18 +14,20 @@ interface FormInputProps {
   onKeyDown?: (event: React.KeyboardEvent) => void;
   onKeyUp?: (event: React.KeyboardEvent) => void;
   onKeyPress?: (event: React.KeyboardEvent) => void;
+  hasDollarSign?: boolean;
 }
 
-function FormInput({ label, type = 'text', value, onChange, placeholder, className, disabled, onBlur, onFocus, onKeyDown, onKeyUp, onKeyPress }: FormInputProps) {
+function FormInput({ label, type = 'text', value, onChange, placeholder, className, disabled, onBlur, onFocus, onKeyDown, onKeyUp, onKeyPress, hasDollarSign = true }: FormInputProps) {
   return (
-    <div className={`${styles.formGroup} ${className}`}>
-      {label && <label className={styles.formLabel}>{label}</label>}
+    <div className={`${formStyles.formGroup} ${className}`}>
+      {label && <label className={formStyles.formLabel}>{label}</label>}
+      {hasDollarSign && <span className={formStyles.dollarSign}>$</span>}
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={styles.formInput}
+        className={formStyles.formInput}
         disabled={disabled}
         onBlur={onBlur}
         onFocus={onFocus}
