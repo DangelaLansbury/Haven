@@ -84,21 +84,21 @@ const App = () => {
     for (const line of data.lines) {
       const lineText = line.text;
       if (normalize(lineText).includes('grossincome')) {
-        const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
+        const match = lineText.match(/(?<=\$)[\d,]+(?:\.\d{2})?/);
         if (match) {
           extractedGrossIncome = match[0];
         }
       }
 
       if (normalize(lineText).includes('generaldeductions')) {
-        const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
+        const match = lineText.match(/(?<=\$)[\d,]+(?:\.\d{2})?/);
         if (match) {
           extractedGeneralDeductions = match[0];
         }
       }
 
       if (normalize(lineText).includes('netincome')) {
-        const match = lineText.match(/\$[\d,]+(?:\.\d{2})?/);
+        const match = lineText.match(/(?<=\$)[\d,]+(?:\.\d{2})?/);
         if (match) {
           extractedNetIncome = match[0];
         }
