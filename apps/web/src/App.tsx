@@ -81,26 +81,34 @@ const App = () => {
     let extractedGeneralDeductions = '';
     let extractedNetIncome = '';
 
+    function matchText(lineText: string, keyword: string): string | null {
+      const match = lineText.match(new RegExp(`(?<=\\$)[\\d,]+(?:\\.\\d{2})?`, 'i'));
+      if (match && normalize(lineText).includes(keyword)) {
+        return match[0];
+      }
+      return null;
+    }
+
     for (const line of data.lines) {
       const lineText = line.text;
       if (normalize(lineText).includes('grossincome')) {
-        const match = lineText.match(/(?<=\$)[\d,]+(?:\.\d{2})?/);
+        const match = matchText(lineText, 'grossincome');
         if (match) {
-          extractedGrossIncome = match[0];
+          extractedGrossIncome = match;
         }
       }
 
       if (normalize(lineText).includes('generaldeductions')) {
-        const match = lineText.match(/(?<=\$)[\d,]+(?:\.\d{2})?/);
+        const match = matchText(lineText, 'generaldeductions');
         if (match) {
-          extractedGeneralDeductions = match[0];
+          extractedGeneralDeductions = match;
         }
       }
 
       if (normalize(lineText).includes('netincome')) {
-        const match = lineText.match(/(?<=\$)[\d,]+(?:\.\d{2})?/);
+        const match = matchText(lineText, 'netincome');
         if (match) {
-          extractedNetIncome = match[0];
+          extractedNetIncome = match;
         }
       }
     }
