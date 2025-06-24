@@ -10,12 +10,13 @@ const InitialScreen: React.FC<InitialScreenProps> = ({ title, setScreen }) => {
   return (
     <div className={formStyles.initialScreen}>
       <h1 className={formStyles.title}>{title}</h1>
+      <p className={formStyles.subtitle}>How do you want to enter your tax information?</p>
       <div className={formStyles.formTypeSelectionContainer}>
         <div className={formStyles.formTypeSelector} onClick={() => setScreen('manual')}>
-          Manual Entry
+          Enter it manually
         </div>
         <div className={formStyles.formTypeSelector} onClick={() => setScreen('ocr')}>
-          Use OCR
+          Take a picture
         </div>
       </div>
     </div>
