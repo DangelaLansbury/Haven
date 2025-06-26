@@ -181,8 +181,8 @@ const App = () => {
           ) : screen === 'manual' ? (
             <TaxForm formData={formData} setFormData={setFormData} />
           ) : (
-            <div className={formStyles.formContainer}>
-              <h2 className={formStyles.formHeader}>Tax Ghost</h2>
+            <>
+              <h1 className={formStyles.formHeader}>Tax Ghost</h1>
               {!OCRReady ? (
                 <>
                   <div className={formStyles.qrSection}>
@@ -198,7 +198,7 @@ const App = () => {
                   <pre>{ocrText}</pre>
                 </>
               )}
-            </div>
+            </>
           )}
         </>
       )}

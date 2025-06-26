@@ -9,7 +9,7 @@ interface InitialScreenProps {
 const InitialScreen: React.FC<InitialScreenProps> = ({ title, setScreen }) => {
   return (
     <div className={formStyles.initialScreen}>
-      <h1 className={formStyles.title}>{title}</h1>
+      <h1 className={formStyles.formHeader}>{title}</h1>
       <p className={formStyles.subtitle}>How do you want to enter your tax information?</p>
       <div className={formStyles.formTypeSelectionContainer}>
         <div className={formStyles.formTypeSelector} onClick={() => setScreen('manual')}>
