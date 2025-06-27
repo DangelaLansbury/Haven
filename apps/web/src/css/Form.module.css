@@ -40,16 +40,18 @@
 .formGroup {
   align-items: baseline;
   background-color: transparent;
-  border-bottom: 1px solid var(--gray-050);
+  border-bottom: 1px solid var(--gray-100);
   display: flex;
   flex-direction: row;
   width: 20rem;
   justify-content: space-between;
-  padding-top: 0.125rem;
   transition: background-color ease-out 1s;
   &:hover {
     background-color: var(--yellow);
     transition: background-color 0.2s ease-in;
+  }
+  &:first-child {
+    border-top: 1px solid var(--gray-100);
   }
 }
 
@@ -71,6 +73,7 @@
 .formInput {
   background-color: transparent;
   border: none;
+  border-left: 1px solid var(--gray-100);
   border-radius: 0;
   box-shadow: 0 0 0 0 transparent;
   box-sizing: border-box;
@@ -78,10 +81,11 @@
   font-size: var(--font-md);
   font-family: 'EB Garamond', serif;
   font-weight: 400;
-  min-width: 6rem;
-  max-width: 8rem;
+  min-width: 5.5rem;
+  max-width: 5.5rem;
   outline: none;
   padding: 0.75rem 0.5rem 0.75rem 0.25rem;
+  text-align: right;
   width: 100%;
   &::placeholder {
     color: var(--gray-300);

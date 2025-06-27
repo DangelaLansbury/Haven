@@ -21,7 +21,7 @@ function FormInput({ label, type = 'text', value, onChange, placeholder, classNa
   return (
     <div className={`${formStyles.formGroup} ${className}`}>
       {label && <label className={formStyles.formLabel}>{label}</label>}
-      {hasDollarSign && <span className={formStyles.dollarSign}>$</span>}
+      {/* {hasDollarSign && <span className={formStyles.dollarSign}>$</span>} */}
       <input
         type={type}
         value={value}
