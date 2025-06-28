@@ -30,8 +30,11 @@ body {
 
   --paper: #fefcf6;
 
-  /* --yellow: #fef6ae; */
+  --yellow-pure: rgba(255, 239, 68, 1);
   --yellow: rgba(255, 239, 68, 0.5);
+
+  --green-pure: rgba(59, 111, 65, 1);
+  --green: rgba(59, 111, 65, 0.15);
 
   --font-xs: 0.75rem;
   --font-sm: 0.875rem;
