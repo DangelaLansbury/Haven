@@ -14,14 +14,12 @@ interface FormInputProps {
   onKeyDown?: (event: React.KeyboardEvent) => void;
   onKeyUp?: (event: React.KeyboardEvent) => void;
   onKeyPress?: (event: React.KeyboardEvent) => void;
-  hasDollarSign?: boolean;
 }
 
-function FormInput({ label, type = 'text', value, onChange, placeholder, className, disabled, onBlur, onFocus, onKeyDown, onKeyUp, onKeyPress, hasDollarSign = true }: FormInputProps) {
+function FormInput({ label, type = 'text', value, onChange, placeholder, className, disabled, onBlur, onFocus, onKeyDown, onKeyUp, onKeyPress }: FormInputProps) {
   return (
     <div className={`${formStyles.formGroup} ${className}`}>
       {label && <label className={formStyles.formLabel}>{label}</label>}
-      {/* {hasDollarSign && <span className={formStyles.dollarSign}>$</span>} */}
       <input
         type={type}
         value={value}

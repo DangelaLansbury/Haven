@@ -38,9 +38,9 @@
 }
 
 .formGroup {
-  align-items: baseline;
+  align-items: center;
   background-color: transparent;
-  border-bottom: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-100);
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
@@ -52,7 +52,10 @@
     transition: background-color 0.2s ease-in;
   }
   &:first-child {
-    border-top: 1px solid var(--gray-200);
+    border-top: 1px solid var(--gray-100);
+  }
+  &:last-child {
+    border-bottom: 1px solid var(--gray-100);
   }
 }
 
@@ -60,36 +63,31 @@
   font-size: var(--font-md);
   font-weight: 500;
   flex: 1;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   width: 100%;
 }
 
-.dollarSign {
-  color: var(--gray-800);
-  font-size: var(--font-md);
-  font-weight: 500;
-  padding: 0.75rem 0 0.75rem 0.5rem;
-}
-
 .formInput {
+  align-items: center;
   background-color: transparent;
   border: none;
-  border-left: 1px solid var(--gray-200);
+  border-left: 1px solid var(--gray-100);
   border-radius: 0;
   box-shadow: 0 0 0 0 transparent;
   box-sizing: border-box;
   color: var(--gray-900);
   font-size: var(--font-md);
-  font-family: 'EB Garamond', serif;
+  font-family: 'Sorts Mill Goudy', serif;
   font-weight: 400;
-  min-width: 5.5rem;
-  max-width: 5.5rem;
+  font-style: italic;
+  min-width: 6rem;
+  max-width: 6rem;
   outline: none;
-  padding: 0.75rem 0.5rem 0.75rem 0.25rem;
+  padding: 0.5rem 1rem;
   text-align: right;
   width: 100%;
   &::placeholder {
-    color: var(--gray-400);
+    color: var(--gray-300);
   }
 }
 
