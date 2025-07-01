@@ -40,7 +40,7 @@
 .formGroup {
   align-items: center;
   background-color: transparent;
-  border-bottom: 1px solid var(--gray-100);
+  border-bottom: 1px solid var(--gray-150);
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
@@ -52,10 +52,10 @@
     transition: background-color 0.2s ease-in;
   }
   &:first-child {
-    border-top: 1px solid var(--gray-100);
+    border-top: 1px solid var(--gray-150);
   }
   &:last-child {
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--gray-150);
   }
 }
 
@@ -63,7 +63,7 @@
   font-size: var(--font-md);
   font-weight: 500;
   flex: 1;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
   width: 100%;
 }
 
@@ -83,7 +83,7 @@
   min-width: 6rem;
   max-width: 6rem;
   outline: none;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
   text-align: right;
   width: 100%;
   &::placeholder {
@@ -106,14 +106,15 @@
   border-radius: 2px;
   display: flex;
   flex-direction: column;
-  height: 5rem;
+  height: 8rem;
   justify-content: center;
   padding: 0.75rem 1rem;
   width: 9rem;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: background-color ease-out 1s, border-color ease-out 1s;
   &:hover {
-    background-color: var(--gray-100);
-    border-color: var(--gray-200);
+    background-color: var(--green);
+    border-color: var(--green-pure);
+    transition: background-color 0.2s ease-in, border-color 0.2s ease-in;
   }
 }
