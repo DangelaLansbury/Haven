@@ -3,7 +3,7 @@ import formStyles from '../css/Form.module.css';
 
 interface InitialScreenProps {
   title: string;
-  setScreen: React.Dispatch<React.SetStateAction<'manual' | 'ocr' | 'initial'>>;
+  setScreen: (screen: 'manual' | 'ocr') => void;
 }
 
 const InitialScreen: React.FC<InitialScreenProps> = ({ title, setScreen }) => {

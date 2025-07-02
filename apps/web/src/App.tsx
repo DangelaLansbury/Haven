@@ -140,7 +140,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (isUpload) return;
+    if (isUpload || screen === 'manual') return;
 
     const interval = setInterval(async () => {
       const res = await fetch(`/api/session-data?sessionId=${sessionId}`);
@@ -166,6 +166,19 @@ const App = () => {
     return () => clearInterval(interval);
   }, [sessionId, isUpload, formData]);
 
+  const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {
+    setScreen(newScreen);
+    if (newScreen === 'ocr') {
+      setOCRReady(false);
+    }
+    if (newScreen === 'manual') {
+      setFormData({ grossIncome: '', generalDeductions: '', netIncome: '' });
+    }
+    if (newScreen === 'initial') {
+      setFormData({ grossIncome: '', generalDeductions: '', netIncome: '' });
+    }
+  };
+
   return (
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
@@ -176,7 +189,7 @@ const App = () => {
         <>
           {screen === 'initial' ? (
             <>
-              <InitialScreen title="Tax Ghost" setScreen={setScreen} />
+              <InitialScreen title="Tax Ghost" setScreen={handleSetScreen} />
             </>
           ) : screen === 'manual' ? (
             <TaxForm formData={formData} setFormData={setFormData} />
