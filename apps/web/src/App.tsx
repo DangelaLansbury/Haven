@@ -192,12 +192,13 @@ const App = () => {
               <InitialScreen title="Tax Ghost" setScreen={handleSetScreen} />
             </>
           ) : screen === 'manual' ? (
-            <TaxForm formData={formData} setFormData={setFormData} />
+            <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} />
           ) : (
             <>
-              <h1 className={formStyles.formHeader}>Tax Ghost</h1>
               {!OCRReady ? (
                 <>
+                  <h1 className={formStyles.formHeader}>Tax Ghost</h1>
+                  <p className={formStyles.formDescription}>Take a picture of your tax form.</p>
                   <div className={formStyles.qrSection}>
                     Scan this QR code:
                     <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
@@ -206,7 +207,7 @@ const App = () => {
                 </>
               ) : (
                 <>
-                  <TaxForm formData={formData} setFormData={setFormData} />
+                  <TaxForm title={'Tax Ghost'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} />
                   <h3>OCR text result:</h3>
                   <pre>{ocrText}</pre>
                 </>
