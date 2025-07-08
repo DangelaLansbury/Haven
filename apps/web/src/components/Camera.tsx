@@ -10,7 +10,8 @@ function Camera({ onCapture }: CameraProps) {
   return (
     <div className={cameraStyles.cameraContainer}>
       <div className={cameraStyles.overlay}>
-        <h2 className={formStyles.formHeader}>Upload & OCR</h2>
+        <h2 className={formStyles.formHeader}>Take a picture</h2>
+        <p className={formStyles.formDescription}>Capture your tax form using your device's camera.</p>
         <input type="file" accept="image/*" capture="environment" onChange={onCapture} />
       </div>
     </div>
