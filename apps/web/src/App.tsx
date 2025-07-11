@@ -141,7 +141,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    // if (isUpload || screen === 'manual') return;
     if (isUpload || screen === 'manual' || OCRReady) return;
 
     const interval = setInterval(async () => {
@@ -194,11 +193,15 @@ const App = () => {
               <InitialScreen title="Tax Ghost" setScreen={handleSetScreen} />
             </>
           ) : screen === 'manual' ? (
-            <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} />
+            <>
+              <button onClick={() => handleSetScreen('initial')}>Back</button>
+              <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} />
+            </>
           ) : (
             <>
               {!OCRReady ? (
                 <>
+                  <button onClick={() => handleSetScreen('initial')}>Back</button>
                   <h1 className={formStyles.formHeader}>Tax Ghost</h1>
                   <p className={formStyles.formDescription}>Take a picture of your tax form.</p>
                   <div className={formStyles.qrSection}>
