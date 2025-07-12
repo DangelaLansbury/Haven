@@ -141,7 +141,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (isUpload || screen === 'manual' || OCRReady) return;
+    if (isUpload || screen === 'manual') return;
 
     const interval = setInterval(async () => {
       const res = await fetch(`/api/session-data?sessionId=${sessionId}`);
@@ -184,7 +184,7 @@ const App = () => {
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
         <>
-          <Camera onCapture={handleFile} />
+          <Camera onCapture={handleFile} OCRReady={OCRReady} setOCRReady={setOCRReady} />
         </>
       ) : (
         <>
