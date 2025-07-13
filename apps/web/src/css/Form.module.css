@@ -61,10 +61,10 @@
 }
 
 .formLabel {
-  font-size: var(--font-md);
+  font-size: var(--font-sm);
   font-weight: 500;
   flex: 1;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem;
   width: 100%;
 }
 
@@ -77,14 +77,13 @@
   box-shadow: 0 0 0 0 transparent;
   box-sizing: border-box;
   color: var(--gray-900);
-  font-size: var(--font-md);
-  font-family: 'Sorts Mill Goudy', serif;
+  font-size: var(--font-sm);
+  font-family: 'overpass', sans-serif;
   font-weight: 400;
-  font-style: italic;
   min-width: 6rem;
   max-width: 6rem;
   outline: none;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem;
   text-align: right;
   width: 100%;
   &::placeholder {
