@@ -14,7 +14,6 @@ const App = () => {
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
-  const [userOverride, setUserOverride] = useState(false);
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
 
@@ -141,7 +140,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (isUpload || screen === 'manual') return;
+    if (screen === 'manual') return;
 
     const interval = setInterval(async () => {
       const res = await fetch(`/api/session-data?sessionId=${sessionId}`);
@@ -184,7 +183,7 @@ const App = () => {
     <div style={{ padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
         <>
-          <Camera onCapture={handleFile} OCRReady={OCRReady} setOCRReady={setOCRReady} />
+          <Camera onCapture={handleFile} OCRReady={OCRReady} />
         </>
       ) : (
         <>

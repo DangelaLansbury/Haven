@@ -5,10 +5,9 @@ import cameraStyles from '../css/Camera.module.css';
 interface CameraProps {
   onCapture: (imageSrc: string) => void;
   OCRReady: boolean;
-  setOCRReady: (ready: boolean) => void;
 }
 
-function Camera({ onCapture, OCRReady, setOCRReady }: CameraProps) {
+function Camera({ onCapture, OCRReady }: CameraProps) {
   return (
     <div className={cameraStyles.cameraContainer}>
       <div className={cameraStyles.overlay}>
@@ -20,8 +19,8 @@ function Camera({ onCapture, OCRReady, setOCRReady }: CameraProps) {
           </>
         ) : (
           <>
-            <h2 className={formStyles.formHeader}>Picture Taken</h2>
-            <button onClick={setOCRReady}>Take again</button>
+            <h2 className={formStyles.formHeader}>Success!</h2>
+            <p className={formStyles.formDescription}>You may return to your browser.</p>
           </>
         )}
       </div>
