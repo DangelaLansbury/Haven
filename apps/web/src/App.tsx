@@ -47,6 +47,7 @@ const App = () => {
   }, []);
 
   const isUpload = window.location.pathname.includes('upload');
+  const isDemo = window.location.pathname.includes('demo');
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -187,33 +188,46 @@ const App = () => {
         </>
       ) : (
         <>
-          {screen === 'initial' ? (
+          {isDemo ? (
             <>
-              <InitialScreen title="Tax Ghost" setScreen={handleSetScreen} />
-            </>
-          ) : screen === 'manual' ? (
-            <>
-              <button onClick={() => handleSetScreen('initial')}>Back</button>
-              <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} />
+              <h1 className={formStyles.formHeader}>Demo</h1>
             </>
           ) : (
             <>
-              {!OCRReady ? (
+              {screen === 'initial' ? (
+                <>
+                  <InitialScreen title="Tax Ghost" setScreen={handleSetScreen} />
+                </>
+              ) : screen === 'manual' ? (
                 <>
                   <button onClick={() => handleSetScreen('initial')}>Back</button>
-                  <h1 className={formStyles.formHeader}>Tax Ghost</h1>
-                  <p className={formStyles.formDescription}>Take a picture of your tax form.</p>
-                  <div className={formStyles.qrSection}>
-                    Scan this QR code:
-                    <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
-                    <p>Your tax details will appear here when you're done…</p>
-                  </div>
+                  <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} />
                 </>
               ) : (
                 <>
-                  <TaxForm title={'Tax Ghost'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} />
-                  <h3>OCR text result:</h3>
-                  <pre>{ocrText}</pre>
+                  {!OCRReady ? (
+                    <>
+                      <button onClick={() => handleSetScreen('initial')}>Back</button>
+                      <h1 className={formStyles.formHeader}>Tax Ghost</h1>
+                      <p className={formStyles.formDescription}>
+                        Take a picture of your tax form.{' '}
+                        <a className={formStyles.formLink} href={`{window.location.origin}/demo?sessionId=${sessionId}`} target="_blank">
+                          Try the demo
+                        </a>
+                      </p>
+                      <div className={formStyles.qrSection}>
+                        Scan this QR code:
+                        <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
+                        <p>Your tax details will appear here when you're done…</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <TaxForm title={'Tax Ghost'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} />
+                      <h3>OCR text result:</h3>
+                      <pre>{ocrText}</pre>
+                    </>
+                  )}
                 </>
               )}
             </>
