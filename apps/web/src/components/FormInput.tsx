@@ -9,6 +9,7 @@ interface FormInputProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  readonly?: boolean;
   onBlur?: () => void;
   onFocus?: () => void;
   onKeyDown?: (event: React.KeyboardEvent) => void;
@@ -16,7 +17,7 @@ interface FormInputProps {
   onKeyPress?: (event: React.KeyboardEvent) => void;
 }
 
-function FormInput({ label, type = 'text', value, onChange, placeholder, className, disabled, onBlur, onFocus, onKeyDown, onKeyUp, onKeyPress }: FormInputProps) {
+function FormInput({ label, type = 'text', value, onChange, placeholder, className, disabled, readonly, onBlur, onFocus, onKeyDown, onKeyUp, onKeyPress }: FormInputProps) {
   return (
     <div className={`${formStyles.formGroup} ${className}`}>
       {label && <label className={formStyles.formLabel}>{label}</label>}
@@ -32,6 +33,7 @@ function FormInput({ label, type = 'text', value, onChange, placeholder, classNa
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
         onKeyPress={onKeyPress}
+        readOnly={readonly}
       />
     </div>
   );

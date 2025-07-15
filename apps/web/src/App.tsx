@@ -8,6 +8,7 @@ import formStyles from './css/Form.module.css';
 import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
+import DemoForm from './components/DemoForm';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -190,7 +191,7 @@ const App = () => {
         <>
           {isDemo ? (
             <>
-              <h1 className={formStyles.formHeader}>Demo</h1>
+              <DemoForm />
             </>
           ) : (
             <>
