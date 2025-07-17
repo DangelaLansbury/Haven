@@ -12,7 +12,7 @@ const DemoForm: React.FC = () => {
         <form className={formStyles.taxForm}>
           <FormInput label="Gross Income" value={'$50,000'} readonly onChange={noop} />
           <FormInput label="General Deductions" value={'$10,000'} readonly onChange={noop} />
-          <FormInput label="Net Income" value={'$40,000'} onChange={noop} readonly />
+          <FormInput label="Net Income" value={'$40,000'} readonly onChange={noop} />
         </form>
       </div>
     </>
