@@ -17,21 +17,6 @@
   padding: 1rem;
 }
 
-.formHeader {
-  font-family: 'Gelica', serif;
-  font-size: 2rem;
-  font-weight: 900;
-  margin: 1rem 0;
-}
-
-.qrSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
 .formSection {
   display: flex;
   flex-direction: column;
