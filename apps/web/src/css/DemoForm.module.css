@@ -1,0 +1,92 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0 auto;
+  flex: 1;
+}
+
+.demoForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 10rem;
+  padding: 1rem;
+}
+
+.formHeader {
+  font-family: 'Gelica', serif;
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 1rem 0;
+}
+
+.qrSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.formGroup {
+  align-items: center;
+  background-color: transparent;
+  border-bottom: 1px solid var(--gray-150);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  width: 20rem;
+  justify-content: space-between;
+  transition: background-color ease-out 1s;
+  &:hover {
+    background-color: var(--green);
+    transition: background-color 0.2s ease-in;
+  }
+  &:first-child {
+    border-top: 1px solid var(--gray-150);
+  }
+  &:last-child {
+    border-bottom: 1px solid var(--gray-150);
+  }
+}
+
+.formLabel {
+  font-size: var(--font-sm);
+  font-weight: 500;
+  flex: 1;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.formInput {
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  border-left: 1px solid var(--gray-150);
+  border-radius: 0;
+  box-shadow: 0 0 0 0 transparent;
+  box-sizing: border-box;
+  color: var(--gray-900);
+  font-size: var(--font-sm);
+  font-family: 'overpass', sans-serif;
+  font-weight: 400;
+  min-width: 6rem;
+  max-width: 6rem;
+  outline: none;
+  padding: 0.5rem;
+  text-align: right;
+  width: 100%;
+  &::placeholder {
+    color: var(--gray-300);
+  }
+}
