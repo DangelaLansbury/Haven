@@ -11,6 +11,7 @@
 .demoForm {
   display: flex;
   flex-direction: column;
+  font-family: 'Sorts Mill Goudy', serif;
   align-items: center;
   justify-content: center;
   width: 10rem;
@@ -63,7 +64,8 @@
   box-sizing: border-box;
   color: var(--gray-900);
   font-size: var(--font-sm);
-  font-family: 'overpass', sans-serif;
+  font-family: 'Sorts Mill Goudy', serif;
+  font-style: italic;
   font-weight: 400;
   min-width: 6rem;
   max-width: 6rem;

@@ -1,5 +1,5 @@
 import React from 'react';
-import demoStyles from '../css/Form.module.css';
+import demoStyles from '../css/DemoForm.module.css';
 import formStyles from '../css/Form.module.css';
 import FormInput from './FormInput';
 

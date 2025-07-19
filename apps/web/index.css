@@ -8,13 +8,20 @@
 
 body {
   background-color: var(--paper);
-  /* font-family: 'Sorts Mill Goudy', serif; */
   font-family: 'overpass', sans-serif;
   font-weight: 400;
   color: var(--gray-800);
   font-size: 16px;
   margin: 0;
   padding: 0;
+}
+
+a {
+  color: var(--gray-800);
+  text-decoration: underline;
+  text-decoration-thickness: 0.125rem;
+  text-underline-offset: 0.125rem;
+  text-decoration-color: var(--yellow-pure);
 }
 
 :root {
