@@ -21,7 +21,11 @@ a {
   text-decoration: underline;
   text-decoration-thickness: 0.125rem;
   text-underline-offset: 0.125rem;
-  text-decoration-color: var(--yellow-pure);
+  text-decoration-color: var(--green-pure);
+  transition: all 0.2s ease-in-out;
+  &:hover {
+    background-color: var(--green);
+  }
 }
 
 :root {
