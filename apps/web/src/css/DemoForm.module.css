@@ -24,7 +24,7 @@
   margin-bottom: 1rem;
 }
 
-.formGroup {
+.demoFormRow {
   align-items: center;
   background-color: transparent;
   border-bottom: 1px solid var(--gray-150);
@@ -46,7 +46,7 @@
   }
 }
 
-.formLabel {
+.demoFormLabel {
   font-size: var(--font-sm);
   font-weight: 500;
   flex: 1;
@@ -54,14 +54,11 @@
   width: 100%;
 }
 
-.formInput {
+.demoFormValue {
   align-items: center;
   background-color: transparent;
-  border: none;
   border-left: 1px solid var(--gray-150);
   border-radius: 0;
-  box-shadow: 0 0 0 0 transparent;
-  box-sizing: border-box;
   color: var(--gray-900);
   font-size: var(--font-sm);
   font-family: 'Sorts Mill Goudy', serif;
@@ -69,11 +66,7 @@
   font-weight: 400;
   min-width: 6rem;
   max-width: 6rem;
-  outline: none;
   padding: 0.5rem;
   text-align: right;
   width: 100%;
-  &::placeholder {
-    color: var(--gray-300);
-  }
 }
