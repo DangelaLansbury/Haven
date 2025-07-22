@@ -22,7 +22,7 @@ const DemoForm: React.FC = () => {
   return (
     <>
       <h1 className={formStyles.formHeader}>{'Demo Form'}</h1>
-      <p className={demoStyles.formDescription}>{`Use your device to take a picture and populate the Tax Ghost form.`}</p>
+      <p className={demoStyles.formDescription}>{`Use your device's camera to auto-fill the Tax Ghost form.`}</p>
       <div className={demoStyles.formContainer}>
         <form className={demoStyles.demoForm}>
           <FormInput label="Gross Income" value={'$50,000'} readonly onChange={noop} />
