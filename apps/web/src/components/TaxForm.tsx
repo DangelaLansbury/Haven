@@ -7,11 +7,19 @@ interface TaxFormProps {
   description?: string;
   formData: { [key: string]: string };
   setFormData: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
+  handleBack?: (screen: string) => void;
 }
-const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setFormData }) => {
+const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setFormData, handleBack }) => {
   return (
     <>
       <div className={formStyles.formContainer}>
+        {handleBack && (
+          <div className={formStyles.backButtonContainer}>
+            <button className={formStyles.backButton} onClick={(): void => handleBack('initial')}>
+              Back
+            </button>
+          </div>
+        )}
         <h1 className={formStyles.formHeader}>{title || 'Tax Ghost'}</h1>
         {description && <p className={formStyles.formDescription}>{description}</p>}
         <form className={formStyles.taxForm}>

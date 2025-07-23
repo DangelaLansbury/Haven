@@ -4,7 +4,7 @@ import QRCode from 'qrcode.react';
 import { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
 import '../../web/index.css';
-import formStyles from './css/Form.module.css';
+import formStyles from './css/form.module.css';
 import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
@@ -201,8 +201,8 @@ const App = () => {
                 </>
               ) : screen === 'manual' ? (
                 <>
-                  <button onClick={() => handleSetScreen('initial')}>Back</button>
-                  <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} />
+                  {/* <button onClick={() => handleSetScreen('initial')}>Back</button> */}
+                  <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} />
                 </>
               ) : (
                 <>
