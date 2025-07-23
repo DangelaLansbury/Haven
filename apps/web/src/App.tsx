@@ -201,7 +201,6 @@ const App = () => {
                 </>
               ) : screen === 'manual' ? (
                 <>
-                  {/* <button onClick={() => handleSetScreen('initial')}>Back</button> */}
                   <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} />
                 </>
               ) : (
