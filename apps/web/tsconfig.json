@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "*.module.css": ["src/global.d.ts"]
+    },
+    "lib": ["esnext", "dom"]
+  },
+  "include": ["src"]
+}
