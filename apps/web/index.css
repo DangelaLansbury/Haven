@@ -1,13 +1,13 @@
 #root {
   height: 100vh;
   margin: 0;
-  padding: 0;
+  padding: 1rem;
   width: 100vw;
   overflow: hidden;
 }
 
 body {
-  background-color: var(--paper);
+  background-color: var(--gray-000);
   font-family: 'overpass', sans-serif;
   font-weight: 400;
   color: var(--gray-800);
