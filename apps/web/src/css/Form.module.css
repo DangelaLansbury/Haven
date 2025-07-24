@@ -2,13 +2,12 @@
   background-color: var(--paper);
   border-radius: 0.5rem;
   border: 1px solid var(--gray-100);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  margin: 0 auto;
-  flex: 1;
   padding: 1rem;
   width: 100%;
   max-width: 42rem;
@@ -51,7 +50,6 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  /* width: 20rem; */
   width: 100%;
   justify-content: space-between;
   transition: background-color ease-out 1s;
@@ -72,7 +70,7 @@
   font-weight: 500;
   flex: 1;
   padding: 0.5rem;
-  width: 100%;
+  /* width: 100%; */
 }
 
 .formInput {
