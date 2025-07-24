@@ -1,7 +1,7 @@
 .formContainer {
   background-color: var(--paper);
   border-radius: 0.5rem;
-  border: 1px solid var(--gray-100);
+  border: 1px solid var(--gray-075);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -104,7 +104,7 @@
 
 .formTypeSelector {
   align-items: center;
-  background-color: var(--gray-050);
+  background-color: var(--gray-025);
   border: 1px solid var(--gray-150);
   border-radius: 4px;
   display: flex;

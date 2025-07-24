@@ -28,8 +28,10 @@ a {
 }
 
 :root {
-  --gray-000: #f9f8f8;
-  --gray-050: #efeeee;
+  --gray-000: #f8f8f8;
+  --gray-025: #efedee;
+  --gray-050: #e6e3e4;
+  --gray-075: #dcd9da;
   --gray-100: #d3cfd0;
   --gray-150: #c8c0c2;
   --gray-200: #b7b0b2;
