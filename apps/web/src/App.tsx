@@ -182,7 +182,7 @@ const App = () => {
   };
 
   return (
-    <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {isUpload ? (
         <>
           <Camera onCapture={handleFile} OCRReady={OCRReady} />

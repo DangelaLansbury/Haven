@@ -5,7 +5,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   height: 100%;
   padding: 1rem;
@@ -16,10 +16,9 @@
 .taxForm {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   width: 100%;
-  padding: 1rem;
 }
 
 .formHeader {
@@ -70,7 +69,6 @@
   font-weight: 500;
   flex: 1;
   padding: 0.5rem;
-  /* width: 100%; */
 }
 
 .formInput {
