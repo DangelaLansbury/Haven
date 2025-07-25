@@ -1,5 +1,6 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
+import commonStyles from '../css/Common.module.css';
 import FormInput from './FormInput';
 
 interface TaxFormProps {
@@ -12,7 +13,7 @@ interface TaxFormProps {
 const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setFormData, handleBack }) => {
   return (
     <>
-      <div className={formStyles.formContainer}>
+      <div className={commonStyles.mainContainer}>
         {handleBack && (
           <div className={formStyles.backButtonContainer}>
             <button className={formStyles.backButton} onClick={(): void => handleBack('initial')}>
@@ -20,8 +21,8 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
             </button>
           </div>
         )}
-        <h1 className={formStyles.formHeader}>{title || 'Tax Ghost'}</h1>
-        {description && <p className={formStyles.formDescription}>{description}</p>}
+        <h1 className={commonStyles.header}>{title || 'Tax Ghost'}</h1>
+        {description && <p className={commonStyles.description}>{description}</p>}
         <form className={formStyles.taxForm}>
           <FormInput label="Gross Income" value={formData.grossIncome || ''} placeholder={'00,000.00'} onChange={(value) => setFormData({ ...formData, grossIncome: value })} />
           <FormInput label="General Deductions" value={formData.generalDeductions || ''} placeholder={'00,000.00'} onChange={(value) => setFormData({ ...formData, generalDeductions: value })} />

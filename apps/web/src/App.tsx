@@ -5,6 +5,7 @@ import { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
 import '../../web/index.css';
 import formStyles from './css/Form.module.css';
+import commonStyles from './css/Common.module.css';
 import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
@@ -208,8 +209,8 @@ const App = () => {
                   {!OCRReady ? (
                     <>
                       <button onClick={() => handleSetScreen('initial')}>Back</button>
-                      <h1 className={formStyles.formHeader}>Tax Ghost</h1>
-                      <p className={formStyles.formDescription}>
+                      <h1 className={commonStyles.header}>Tax Ghost</h1>
+                      <p className={commonStyles.description}>
                         Take a picture of your tax form.{' '}
                         <a className={formStyles.formLink} href={`{window.location.origin}/demo?sessionId=${sessionId}`} target="_blank">
                           Try the demo

@@ -1,0 +1,21 @@
+.mainContainer {
+  background-color: var(--paper);
+  border-radius: 0.5rem;
+  border: 1px solid var(--gray-075);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  height: 100%;
+  padding: 1rem;
+  width: 100%;
+  max-width: 42rem;
+}
+
+.header {
+  font-family: 'Gelica', serif;
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 1rem 0;
+}

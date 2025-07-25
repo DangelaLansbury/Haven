@@ -1,6 +1,7 @@
 import React from 'react';
 import demoStyles from '../css/DemoForm.module.css';
 import formStyles from '../css/Form.module.css';
+import commonStyles from '../css/Common.module.css';
 
 interface DemoFormRowProps {
   label: string;
@@ -19,8 +20,8 @@ const DemoFormRow: React.FC<DemoFormRowProps> = ({ label, value }) => {
 const DemoForm: React.FC = () => {
   return (
     <>
-      <h1 className={formStyles.formHeader}>{'Demo Form'}</h1>
-      <p className={demoStyles.formDescription}>{`Use your device's camera to auto-fill the Tax Ghost form.`}</p>
+      <h1 className={commonStyles.header}>{'Demo Form'}</h1>
+      <p className={commonStyles.description}>{`Use your device's camera to auto-fill the Tax Ghost form.`}</p>
       <div className={demoStyles.formContainer}>
         <form className={demoStyles.demoForm}>
           <DemoFormRow label="Gross Income" value={'$50,000'} />
