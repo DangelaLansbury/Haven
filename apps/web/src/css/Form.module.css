@@ -22,7 +22,7 @@
 
 .formGroup {
   align-items: center;
-  background-color: transparent;
+  background-color: var(--paper);
   border-bottom: 1px solid var(--gray-150);
   box-sizing: border-box;
   display: flex;
@@ -30,6 +30,13 @@
   width: 100%;
   justify-content: space-between;
   transition: background-color ease-out 1s;
+  &:nth-child(even) {
+    background-color: var(--gray-000);
+    &:hover {
+      background-color: var(--green);
+      transition: background-color 0.2s ease-in;
+    }
+  }
   &:hover {
     background-color: var(--green);
     transition: background-color 0.2s ease-in;

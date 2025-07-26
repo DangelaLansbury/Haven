@@ -202,7 +202,7 @@ const App = () => {
                 </>
               ) : screen === 'manual' ? (
                 <>
-                  <TaxForm title={'Haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} />
+                  <TaxForm title={'Haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
                 </>
               ) : (
                 <>
