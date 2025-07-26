@@ -84,36 +84,54 @@ const App = () => {
     let extractedGeneralDeductions = '';
     let extractedNetIncome = '';
 
-    function matchText(lineText: string, keyword: string): string | null {
-      const match = lineText.match(new RegExp(`(?<=\\$)[\\d,]+(?:\\.\\d{2})?`, 'i'));
-      if (match && normalize(lineText).includes(keyword)) {
-        return match[0];
-      }
-      return null;
+    // function matchText(lineText: string, keyword: string): string | null {
+    //   const match = lineText.match(new RegExp(`(?<=\\$)[\\d,]+(?:\\.\\d{2})?`, 'i'));
+    //   if (match && normalize(lineText).includes(keyword)) {
+    //     return match[0];
+    //   }
+    //   return null;
+    // }
+    function matchText(lineText: string, lineNumber: string): string | null {
+      // Only match if line starts with something like "1.", "2.", etc.
+      const pattern = new RegExp(`^\\s*${lineNumber}[.:\\)]\\s*.*?(\\$[\\d,]+(?:\\.\\d{2})?)`, 'i');
+      const match = lineText.match(pattern);
+      return match ? match[1] : null;
     }
 
+    // for (const line of data.lines) {
+    //   const lineText = line.text;
+    //   if (normalize(lineText).includes('grossincome')) {
+    //     const match = matchText(lineText, 'grossincome');
+    //     if (match) {
+    //       extractedGrossIncome = match;
+    //     }
+    //   }
+
+    //   if (normalize(lineText).includes('generaldeductions')) {
+    //     const match = matchText(lineText, 'generaldeductions');
+    //     if (match) {
+    //       extractedGeneralDeductions = match;
+    //     }
+    //   }
+
+    //   if (normalize(lineText).includes('netincome')) {
+    //     const match = matchText(lineText, 'netincome');
+    //     if (match) {
+    //       extractedNetIncome = match;
+    //     }
+    //   }
+    // }
     for (const line of data.lines) {
-      const lineText = line.text;
-      if (normalize(lineText).includes('grossincome')) {
-        const match = matchText(lineText, 'grossincome');
-        if (match) {
-          extractedGrossIncome = match;
-        }
-      }
+      const text = line.text;
 
-      if (normalize(lineText).includes('generaldeductions')) {
-        const match = matchText(lineText, 'generaldeductions');
-        if (match) {
-          extractedGeneralDeductions = match;
-        }
-      }
+      const gross = matchText(text, '1');
+      if (gross) extractedGrossIncome = gross;
 
-      if (normalize(lineText).includes('netincome')) {
-        const match = matchText(lineText, 'netincome');
-        if (match) {
-          extractedNetIncome = match;
-        }
-      }
+      const deductions = matchText(text, '2');
+      if (deductions) extractedGeneralDeductions = deductions;
+
+      const net = matchText(text, '3');
+      if (net) extractedNetIncome = net;
     }
 
     setFormData((prev) => ({ ...prev, grossIncome: extractedGrossIncome, generalDeductions: extractedGeneralDeductions, netIncome: extractedNetIncome }));
