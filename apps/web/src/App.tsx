@@ -84,15 +84,7 @@ const App = () => {
     let extractedGeneralDeductions = '';
     let extractedNetIncome = '';
 
-    // function matchText(lineText: string, keyword: string): string | null {
-    //   const match = lineText.match(new RegExp(`(?<=\\$)[\\d,]+(?:\\.\\d{2})?`, 'i'));
-    //   if (match && normalize(lineText).includes(keyword)) {
-    //     return match[0];
-    //   }
-    //   return null;
-    // }
     function matchText(lineText: string, lineNumber: string): string | null {
-      // Only match if line starts with something like "1.", "2.", etc.
       const pattern = new RegExp(`^\\s*${lineNumber}[.:\\)]\\s*.*?(\\$[\\d,]+(?:\\.\\d{2})?)`, 'i');
       const match = lineText.match(pattern);
       return match ? match[1] : null;
@@ -101,13 +93,22 @@ const App = () => {
     for (const line of data.lines) {
       const lineText = line.text;
       if (normalize(lineText).includes('gross income') || normalize(lineText).startsWith('1.')) {
-        extractedGrossIncome = matchText(lineText, '1') || extractedGrossIncome;
+        const match = matchText(lineText, '1');
+        if (match) {
+          extractedGrossIncome = match.replace(/[$,]/g, '');
+        }
       }
       if (normalize(lineText).includes('general deductions') || normalize(lineText).startsWith('2.')) {
-        extractedGeneralDeductions = matchText(lineText, '2') || extractedGeneralDeductions;
+        const match = matchText(lineText, '2');
+        if (match) {
+          extractedGeneralDeductions = match.replace(/[$,]/g, '');
+        }
       }
       if (normalize(lineText).includes('net income') || normalize(lineText).startsWith('3.')) {
-        extractedNetIncome = matchText(lineText, '3') || extractedNetIncome;
+        const match = matchText(lineText, '3');
+        if (match) {
+          extractedNetIncome = match.replace(/[$,]/g, '');
+        }
       }
     }
 
