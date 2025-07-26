@@ -198,18 +198,18 @@ const App = () => {
             <>
               {screen === 'initial' ? (
                 <>
-                  <InitialScreen title="Tax Ghost" setScreen={handleSetScreen} />
+                  <InitialScreen title="Haven" setScreen={handleSetScreen} />
                 </>
               ) : screen === 'manual' ? (
                 <>
-                  <TaxForm title={'Tax Ghost'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} />
+                  <TaxForm title={'Haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} />
                 </>
               ) : (
                 <>
                   {!OCRReady ? (
                     <>
                       <button onClick={() => handleSetScreen('initial')}>Back</button>
-                      <h1 className={commonStyles.header}>Tax Ghost</h1>
+                      <h1 className={commonStyles.header}>Haven</h1>
                       <p className={commonStyles.description}>
                         Take a picture of your tax form.{' '}
                         <a className={formStyles.formLink} href={`{window.location.origin}/demo?sessionId=${sessionId}`} target="_blank">
@@ -224,7 +224,7 @@ const App = () => {
                     </>
                   ) : (
                     <>
-                      <TaxForm title={'Tax Ghost'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} />
+                      <TaxForm title={'Haven'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} />
                       <h3>OCR text result:</h3>
                       <pre>{ocrText}</pre>
                     </>

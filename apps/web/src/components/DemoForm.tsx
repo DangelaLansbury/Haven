@@ -21,7 +21,7 @@ const DemoForm: React.FC = () => {
   return (
     <>
       <h1 className={commonStyles.header}>{'Demo Form'}</h1>
-      <p className={commonStyles.description}>{`Use your device's camera to auto-fill the Tax Ghost form.`}</p>
+      <p className={commonStyles.description}>{`Use your device's camera to auto-fill the Haven form.`}</p>
       <div className={demoStyles.formContainer}>
         <form className={demoStyles.demoForm}>
           <DemoFormRow label="Gross Income" value={'$50,000'} />

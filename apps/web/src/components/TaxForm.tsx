@@ -21,7 +21,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
             </button>
           </div>
         )}
-        <h1 className={commonStyles.header}>{title || 'Tax Ghost'}</h1>
+        <h1 className={commonStyles.header}>{title || 'Haven'}</h1>
         {description && <p className={commonStyles.description}>{description}</p>}
         <form className={formStyles.taxForm}>
           <FormInput label="Gross Income" value={formData.grossIncome || ''} placeholder={'00,000.00'} onChange={(value) => setFormData({ ...formData, grossIncome: value })} />
