@@ -1,3 +1,3 @@
-# Tax Ghost
+# Haven
 
-Exploring multi-device OCR workflows with the original 1913 income tax form.
+Using the "Double Irish with a Dutch Sandwich" scheme to explore multi-device OCR workflows.
