@@ -25,7 +25,12 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
             </button>
           </div>
         )}
-        <h1 className={commonStyles.header}>{title || 'Haven'}</h1>
+        <div className={commonStyles.headerContainer}>
+          <div className={commonStyles.logoContainer}>
+            <img src="/assets/images/HavenBanana.svg" alt="Haven Logo" />
+          </div>
+          <h1 className={commonStyles.header}>{title || 'Haven'}</h1>
+        </div>
         <p className={commonStyles.description}>Capture your tax form using your device's camera.</p>
         <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
       </div>
