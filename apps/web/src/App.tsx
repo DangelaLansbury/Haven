@@ -34,14 +34,17 @@ const App = () => {
     sock.on('ocrResult', (data: string) => {
       setOcrText(data);
     });
-    sock.on('ocrGrossIncome', ({ grossIncome }) => {
-      setFormData((prev) => ({ ...prev, grossIncome }));
+    sock.on('ocrParent', ({ parent_rate }) => {
+      setFormData((prev) => ({ ...prev, parent_rate }));
     });
-    sock.on('ocrGeneralDeductions', ({ generalDeductions }) => {
-      setFormData((prev) => ({ ...prev, generalDeductions }));
+    sock.on('ocrOperating', ({ operating_rate }) => {
+      setFormData((prev) => ({ ...prev, operating_rate }));
     });
-    sock.on('ocrNetIncome', ({ netIncome }) => {
-      setFormData((prev) => ({ ...prev, netIncome }));
+    sock.on('ocrSublicensor', ({ sublicensor_rate }) => {
+      setFormData((prev) => ({ ...prev, sublicensor_rate }));
+    });
+    sock.on('ocrLicensor', ({ licensor_rate }) => {
+      setFormData((prev) => ({ ...prev, licensor_rate }));
     });
     setSocket(sock);
 
@@ -80,48 +83,68 @@ const App = () => {
 
     const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
-    let extractedGrossIncome = '';
-    let extractedGeneralDeductions = '';
-    let extractedNetIncome = '';
+    let extractedParentRate = '';
+    let extractedOperatingRate = '';
+    let extractedSublicensorRate = '';
+    let extractedLicensorRate = '';
 
     function matchText(lineText: string, keyword: string): string | null {
-      const match = lineText.match(new RegExp(`(?<=\\$)[\\d,]+(?:\\.\\d{2})?`, 'i'));
-      if (match && normalize(lineText).includes(keyword)) {
-        return match[0];
+      if (!normalize(lineText).includes(keyword)) return null;
+
+      const percentMatch = lineText.match(/[\d,.]+%/);
+      if (percentMatch) {
+        return percentMatch[0];
       }
-      return null;
+
+      const words = lineText.trim().split(/\s+/);
+      return words.length > 0 ? words[words.length - 1] : null;
     }
 
     for (const line of data.lines) {
       const lineText = line.text;
-      if (normalize(lineText).includes('grossincome') || normalize(lineText).startsWith('1.')) {
-        const match = matchText(lineText, 'grossincome');
+
+      if (normalize(lineText).includes('parent')) {
+        const match = matchText(lineText, 'parent');
         if (match) {
-          extractedGrossIncome = match;
+          extractedParentRate = match;
         }
       }
 
-      if (normalize(lineText).includes('generaldeductions') || normalize(lineText).startsWith('2.')) {
-        const match = matchText(lineText, 'generaldeductions');
+      if (normalize(lineText).includes('operating')) {
+        const match = matchText(lineText, 'operating');
         if (match) {
-          extractedGeneralDeductions = match;
+          extractedOperatingRate = match;
         }
       }
 
-      if (normalize(lineText).includes('netincome') || normalize(lineText).startsWith('3.')) {
-        const match = matchText(lineText, 'netincome');
+      if (normalize(lineText).includes('sublicensor')) {
+        const match = matchText(lineText, 'sublicensor');
         if (match) {
-          extractedNetIncome = match;
+          extractedSublicensorRate = match;
+        }
+      }
+
+      if (normalize(lineText).includes('licensor')) {
+        const match = matchText(lineText, 'licensor');
+        if (match) {
+          extractedLicensorRate = match;
         }
       }
     }
 
-    setFormData((prev) => ({ ...prev, grossIncome: extractedGrossIncome, generalDeductions: extractedGeneralDeductions, netIncome: extractedNetIncome }));
+    setFormData((prev) => ({
+      ...prev,
+      parent_rate: extractedParentRate,
+      operating_rate: extractedOperatingRate,
+      sublicensor_rate: extractedSublicensorRate,
+      licensor_rate: extractedLicensorRate,
+    }));
 
     if (socket && socket.connected) {
-      socket.emit('ocrGrossIncome', { sessionId, grossIncome: extractedGrossIncome });
-      socket.emit('ocrGeneralDeductions', { sessionId, generalDeductions: extractedGeneralDeductions });
-      socket.emit('ocrNetIncome', { sessionId, netIncome: extractedNetIncome });
+      socket.emit('ocrParent', { sessionId, parent_rate: extractedParentRate });
+      socket.emit('ocrOperating', { sessionId, operating_rate: extractedOperatingRate });
+      socket.emit('ocrSublicensor', { sessionId, sublicensor_rate: extractedSublicensorRate });
+      socket.emit('ocrLicensor', { sessionId, licensor_rate: extractedLicensorRate });
     } else {
       console.warn('[Socket.IO] socket not ready for gross income emit');
     }
@@ -132,12 +155,17 @@ const App = () => {
       body: JSON.stringify({
         sessionId,
         data: data.text,
-        grossIncome: extractedGrossIncome,
-        generalDeductions: extractedGeneralDeductions,
-        netIncome: extractedNetIncome,
+        // grossIncome: extractedGrossIncome,
+        // generalDeductions: extractedGeneralDeductions,
+        // netIncome: extractedNetIncome,
+        parent_rate: extractedParentRate,
+        operating_rate: extractedOperatingRate,
+        sublicensor_rate: extractedSublicensorRate,
+        licensor_rate: extractedLicensorRate,
       }),
     });
     console.log('[API] /api/submit status=', res.status);
+    console.log('ocrText:', data.text);
 
     await worker.terminate();
   };
@@ -149,19 +177,25 @@ const App = () => {
       const res = await fetch(`/api/session-data?sessionId=${sessionId}`);
       const json = await res.json();
 
-      if (json.grossIncome && json.grossIncome !== formData.grossIncome) {
-        console.log('[Polling] grossIncome updated:', json.grossIncome);
-        setFormData((prev) => ({ ...prev, grossIncome: json.grossIncome }));
+      if (!json) return;
+
+      if (json.parent_rate && json.parent_rate !== formData.parent_rate) {
+        console.log('[Polling] parent_rate updated:', json.parent_rate);
+        setFormData((prev) => ({ ...prev, parent_rate: json.parent_rate }));
       }
-      if (json.generalDeductions && json.generalDeductions !== formData.generalDeductions) {
-        console.log('[Polling] generalDeductions updated:', json.generalDeductions);
-        setFormData((prev) => ({ ...prev, generalDeductions: json.generalDeductions }));
+      if (json.operating_rate && json.operating_rate !== formData.operating_rate) {
+        console.log('[Polling] operating_rate updated:', json.operating_rate);
+        setFormData((prev) => ({ ...prev, operating_rate: json.operating_rate }));
       }
-      if (json.netIncome && json.netIncome !== formData.netIncome) {
-        console.log('[Polling] netIncome updated:', json.netIncome);
-        setFormData((prev) => ({ ...prev, netIncome: json.netIncome }));
+      if (json.sublicensor_rate && json.sublicensor_rate !== formData.sublicensor_rate) {
+        console.log('[Polling] sublicensor_rate updated:', json.sublicensor_rate);
+        setFormData((prev) => ({ ...prev, sublicensor_rate: json.sublicensor_rate }));
       }
-      if (json.grossIncome || json.generalDeductions || json.netIncome) {
+      if (json.licensor_rate && json.licensor_rate !== formData.licensor_rate) {
+        console.log('[Polling] licensor_rate updated:', json.licensor_rate);
+        setFormData((prev) => ({ ...prev, licensor_rate: json.licensor_rate }));
+      }
+      if (json.parent_rate || json.operating_rate || json.sublicensor_rate || json.licensor_rate) {
         setOCRReady(true);
       }
     }, 3000);
@@ -175,10 +209,12 @@ const App = () => {
       setOCRReady(false);
     }
     if (newScreen === 'manual') {
-      setFormData({ grossIncome: '', generalDeductions: '', netIncome: '' });
+      // setFormData({ grossIncome: '', generalDeductions: '', netIncome: '' });
+      setFormData({ parent_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
     }
     if (newScreen === 'initial') {
-      setFormData({ grossIncome: '', generalDeductions: '', netIncome: '' });
+      // setFormData({ grossIncome: '', generalDeductions: '', netIncome: '' });
+      setFormData({ parent_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
     }
   };
 

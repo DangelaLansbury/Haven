@@ -4,6 +4,13 @@ import commonStyles from '../css/Common.module.css';
 import FormInput from './FormInput';
 import QRCode from 'qrcode.react';
 
+interface FormData {
+  parent_rate?: string;
+  operating_rate?: string;
+  sublicensor_rate?: string;
+  licensor_rate?: string;
+}
+
 interface TaxFormProps {
   title?: string;
   description?: string;
@@ -12,6 +19,7 @@ interface TaxFormProps {
   setFormData: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
   handleBack?: (screen: string) => void;
 }
+
 const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setFormData, handleBack, sessionId }) => {
   return (
     <div className={commonStyles.pageContainer}>
@@ -31,9 +39,10 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
         <h1 className={commonStyles.header}>{'Enter details below'}</h1>
         {description && <p className={commonStyles.description}>{description}</p>}
         <form className={formStyles.taxForm}>
-          <FormInput label="Gross Income" value={formData.grossIncome || ''} placeholder={'00,000.00'} onChange={(value) => setFormData({ ...formData, grossIncome: value })} />
-          <FormInput label="General Deductions" value={formData.generalDeductions || ''} placeholder={'00,000.00'} onChange={(value) => setFormData({ ...formData, generalDeductions: value })} />
-          <FormInput label="Net Income" value={formData.netIncome || ''} placeholder={'00,000.00'} onChange={(value) => setFormData({ ...formData, netIncome: value })} />
+          <FormInput label="Parent Company" value={formData.parent_rate || ''} placeholder={'21%'} onChange={(value) => setFormData({ ...formData, parent_rate: value })} />
+          <FormInput label="Operating Company" value={formData.operating_rate || ''} placeholder={'12.5%'} onChange={(value) => setFormData({ ...formData, operating_rate: value })} />
+          <FormInput label="Sublicensor" value={formData.sublicensor_rate || ''} placeholder={'0%'} onChange={(value) => setFormData({ ...formData, sublicensor_rate: value })} />
+          <FormInput label="Licensor" value={formData.licensor_rate || ''} placeholder={'0%'} onChange={(value) => setFormData({ ...formData, licensor_rate: value })} />
         </form>
       </div>
     </div>

@@ -8,9 +8,10 @@ import bodyParser from 'body-parser';
 interface FormFields {
   sessionId: string;
   data: string;
-  grossIncome?: string;
-  generalDeductions?: string;
-  netIncome?: string;
+  parent_rate: string;
+  operating_rate: string;
+  sublicensor_rate: string;
+  licensor_rate: string;
 }
 
 const sessionData: Record<string, Partial<FormFields>> = {};
@@ -25,14 +26,16 @@ app.use(express.static(path.resolve(__dirname, '../../web/dist')));
 
 // receive OCR from mobile, broadcast to desktop
 const submitHandler = (req: Request, res: Response): void => {
-  const { sessionId, data, grossIncome, generalDeductions, netIncome } = req.body as FormFields;
+  // const { sessionId, data, grossIncome, generalDeductions, netIncome } = req.body as FormFields;
+  const { sessionId, data, parent_rate, operating_rate, sublicensor_rate, licensor_rate } = req.body as FormFields;
   if (sessionId) {
     io.to(sessionId).emit('ocrResult', data);
     sessionData[sessionId] = {
       ...sessionData[sessionId],
-      grossIncome,
-      generalDeductions,
-      netIncome,
+      parent_rate,
+      operating_rate,
+      sublicensor_rate,
+      licensor_rate,
     };
     res.json({ status: 'ok' });
   } else {
