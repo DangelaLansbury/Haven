@@ -1,4 +1,4 @@
-![Haven logo](/assets/images/HavenBanana_LogoMark.png 'Haven')
+![Haven logo](apps/web/public/assets/images/HavenBanana_LogoMark.png 'Haven')
 
 # Haven
 
