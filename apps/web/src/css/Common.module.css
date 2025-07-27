@@ -38,6 +38,7 @@
   padding: 1.5rem;
   width: 100%;
   max-width: 42rem;
+  overflow-y: auto;
 }
 
 .scrollableMain {
@@ -77,10 +78,10 @@
   width: 100%;
 }
 
-.header {
-  font-family: 'Gelica', serif;
-  font-size: 2rem;
-  line-height: 2.5rem;
+h2.header {
+  font-family: 'Overpass Mono', monospace;
+  font-size: 1.5rem;
+  line-height: 2rem;
   font-weight: 900;
   margin: 0;
 }

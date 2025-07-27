@@ -14,6 +14,151 @@
   margin-bottom: 1rem;
 }
 
+/* Table Form */
+.formTable {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.formTableHeaderRow {
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--gray-650);
+  display: flex;
+  flex-direction: row;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding: 0 0.25rem;
+  width: 100%;
+}
+
+.formTableHeader {
+  align-items: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  &.rightAligned {
+    justify-content: flex-end;
+    text-align: right;
+  }
+  &.rate {
+    justify-content: flex-end;
+    min-width: 5rem;
+    max-width: 5rem;
+    text-align: right;
+  }
+}
+
+.formTableRow {
+  align-items: flex-start;
+  background-color: var(--paper);
+  color: var(--gray-800);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  padding: 0 0.25rem;
+  transition: background-color 0.2s ease-in-out;
+  width: 100%;
+  &:hover {
+    background-color: var(--gray-050);
+  }
+  &:nth-child(even) {
+    background-color: var(--gray-025);
+    &:hover {
+      background-color: var(--gray-050);
+    }
+  }
+}
+
+.formTableCell {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  box-sizing: border-box;
+  justify-content: flex-start;
+  min-height: 3rem;
+  padding: 0.75rem 0.75rem;
+  text-align: left;
+  &.rightAligned {
+    justify-content: flex-end;
+    text-align: right;
+  }
+  & .cellValue {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    gap: 0.375rem;
+    justify-content: flex-start;
+    text-align: left;
+    &.rightAligned {
+      justify-content: flex-end;
+      text-align: right;
+    }
+    &.subValue {
+      font-size: var(--font-xs);
+      color: var(--gray-300);
+      margin-bottom: 0.063rem;
+    }
+  }
+}
+
+.flagContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flag {
+  height: 0.75rem;
+  width: 1rem;
+  & img {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.cellInput {
+  align-items: flex-start;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 0 0 0 transparent;
+  box-sizing: border-box;
+  color: var(--gray-900);
+  font-size: var(--font-sm);
+  font-family: 'overpass', sans-serif;
+  font-weight: 600;
+  min-height: 3rem;
+  outline: none;
+  padding: 0.75rem;
+  text-align: left;
+  width: 100%;
+  &::placeholder {
+    color: var(--gray-300);
+  }
+  &.rightAligned {
+    justify-content: flex-end;
+    text-align: right;
+  }
+  &.rate {
+    justify-content: flex-end;
+    min-width: 5rem;
+    max-width: 5rem;
+    text-align: right;
+  }
+}
+
+/* Normal Form */
+
 .formSection {
   display: flex;
   flex-direction: column;
@@ -56,6 +201,16 @@
   padding: 0.5rem;
 }
 
+.countrySelector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-left: 1px solid var(--gray-150);
+  width: 10rem;
+}
+
 .formInput {
   align-items: center;
   background-color: transparent;
@@ -68,8 +223,8 @@
   font-size: var(--font-sm);
   font-family: 'overpass', sans-serif;
   font-weight: 400;
-  min-width: 6rem;
-  max-width: 6rem;
+  min-width: 5rem;
+  max-width: 5rem;
   outline: none;
   padding: 0.5rem;
   text-align: right;

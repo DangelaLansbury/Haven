@@ -24,6 +24,7 @@ const App = () => {
   });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
+  const [fileAdded, setFileAdded] = React.useState(false);
 
   useEffect(() => {
     // generate or read sessionId
@@ -63,6 +64,8 @@ const App = () => {
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setFileAdded(true);
 
     // hook into Tesseract progress
     const worker = createWorker({
@@ -229,7 +232,7 @@ const App = () => {
       </div>
       {isUpload ? (
         <>
-          <Camera onCapture={handleFile} OCRReady={OCRReady} />
+          <Camera onCapture={handleFile} OCRReady={OCRReady} fileAdded={fileAdded} />
         </>
       ) : (
         <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh' }}>
