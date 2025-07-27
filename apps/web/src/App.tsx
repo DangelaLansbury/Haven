@@ -10,12 +10,18 @@ import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
 import DemoForm from './components/DemoForm';
+import { FormFields } from '../types';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
-  const [formData, setFormData] = useState<{ [key: string]: string }>({});
+  const [formData, setFormData] = useState<FormFields>({
+    parent_rate: '',
+    operating_rate: '',
+    sublicensor_rate: '',
+    licensor_rate: '',
+  });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
 
@@ -155,9 +161,6 @@ const App = () => {
       body: JSON.stringify({
         sessionId,
         data: data.text,
-        // grossIncome: extractedGrossIncome,
-        // generalDeductions: extractedGeneralDeductions,
-        // netIncome: extractedNetIncome,
         parent_rate: extractedParentRate,
         operating_rate: extractedOperatingRate,
         sublicensor_rate: extractedSublicensorRate,

@@ -1,6 +1,5 @@
 import React from 'react';
 import demoStyles from '../css/DemoForm.module.css';
-import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
 
 interface DemoFormRowProps {
@@ -24,9 +23,10 @@ const DemoForm: React.FC = () => {
       <p className={commonStyles.description}>{`Use your device's camera to auto-fill the Haven form.`}</p>
       <div className={demoStyles.formContainer}>
         <form className={demoStyles.demoForm}>
-          <DemoFormRow label="1. Gross Income" value={'$50,000'} />
-          <DemoFormRow label="2. General Deductions" value={'$10,000'} />
-          <DemoFormRow label="3. Net Income" value={'$40,000'} />
+          <DemoFormRow label="Parent Company" value={'21.0%'} />
+          <DemoFormRow label="Operating Company" value={'12.5%'} />
+          <DemoFormRow label="Sublicensor" value={'0.0%'} />
+          <DemoFormRow label="Licensor" value={'0.0%'} />
         </form>
       </div>
     </>
