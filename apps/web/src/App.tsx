@@ -212,11 +212,9 @@ const App = () => {
       setOCRReady(false);
     }
     if (newScreen === 'manual') {
-      // setFormData({ grossIncome: '', generalDeductions: '', netIncome: '' });
       setFormData({ parent_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
     }
     if (newScreen === 'initial') {
-      // setFormData({ grossIncome: '', generalDeductions: '', netIncome: '' });
       setFormData({ parent_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
     }
   };

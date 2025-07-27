@@ -29,13 +29,13 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
           <div className={commonStyles.logoContainer}>
             <img src="/assets/images/HavenBanana.svg" alt="Haven Logo" />
           </div>
-          <h1 className={commonStyles.header}>{title || 'Haven'}</h1>
+          <h1 className={commonStyles.header}>{'haven'}</h1>
         </div>
         <p className={commonStyles.description}>Capture your tax form using your device's camera.</p>
         <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
       </div>
       <div className={commonStyles.mainContainer}>
-        <h1 className={commonStyles.header}>{'Enter details below'}</h1>
+        <h1 className={commonStyles.header}>{title || 'Enter details below'}</h1>
         {description && <p className={commonStyles.description}>{description}</p>}
         <form className={formStyles.taxForm}>
           <FormInput label="Parent Company" value={formData.parent_rate || ''} placeholder={'21.0%'} onChange={(value) => setFormData({ ...formData, parent_rate: value })} />
