@@ -4,8 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview",
-    "postinstall": "react-flagpack"
+    "serve": "vite preview"
   },
   "dependencies": {
     "blueimp-load-image": "5.16.0",
