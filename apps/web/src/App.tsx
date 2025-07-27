@@ -84,30 +84,34 @@ const App = () => {
     let extractedGeneralDeductions = '';
     let extractedNetIncome = '';
 
-    function matchText(lineText: string, lineNumber: string): string | null {
-      const pattern = new RegExp(`^\\s*${lineNumber}[.:\\)]\\s*.*?(\\$[\\d,]+(?:\\.\\d{2})?)`, 'i');
-      const match = lineText.match(pattern);
-      return match ? match[1] : null;
+    function matchText(lineText: string, keyword: string): string | null {
+      const match = lineText.match(new RegExp(`(?<=\\$)[\\d,]+(?:\\.\\d{2})?`, 'i'));
+      if (match && normalize(lineText).includes(keyword)) {
+        return match[0];
+      }
+      return null;
     }
 
     for (const line of data.lines) {
       const lineText = line.text;
-      if (normalize(lineText).includes('gross income') || normalize(lineText).startsWith('1.')) {
-        const match = matchText(lineText, '1');
+      if (normalize(lineText).includes('grossincome') || normalize(lineText).startsWith('1.')) {
+        const match = matchText(lineText, 'grossincome');
         if (match) {
-          extractedGrossIncome = match.replace(/[$,]/g, '');
+          extractedGrossIncome = match;
         }
       }
-      if (normalize(lineText).includes('general deductions') || normalize(lineText).startsWith('2.')) {
-        const match = matchText(lineText, '2');
+
+      if (normalize(lineText).includes('generaldeductions') || normalize(lineText).startsWith('2.')) {
+        const match = matchText(lineText, 'generaldeductions');
         if (match) {
-          extractedGeneralDeductions = match.replace(/[$,]/g, '');
+          extractedGeneralDeductions = match;
         }
       }
-      if (normalize(lineText).includes('net income') || normalize(lineText).startsWith('3.')) {
-        const match = matchText(lineText, '3');
+
+      if (normalize(lineText).includes('netincome') || normalize(lineText).startsWith('3.')) {
+        const match = matchText(lineText, 'netincome');
         if (match) {
-          extractedNetIncome = match.replace(/[$,]/g, '');
+          extractedNetIncome = match;
         }
       }
     }
