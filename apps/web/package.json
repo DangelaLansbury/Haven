@@ -4,15 +4,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "postinstall": "react-flagpack"
   },
   "dependencies": {
+    "blueimp-load-image": "5.16.0",
+    "qrcode.react": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "socket.io-client": "^4.5.0",
-    "tesseract.js": "^2.1.5",
-    "qrcode.react": "^1.0.1",
-    "blueimp-load-image": "5.16.0"
+    "tesseract.js": "^2.1.5"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

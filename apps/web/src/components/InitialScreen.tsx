@@ -10,11 +10,8 @@ interface InitialScreenProps {
 const InitialScreen: React.FC<InitialScreenProps> = ({ title, setScreen }) => {
   return (
     <div className={formStyles.initialScreen}>
-      <div className={commonStyles.fullLogo}>
-        {/* <div className={commonStyles.logoContainer}>
-          <img src="/assets/images/HavenBanana.svg" alt="Haven Logo" />
-        </div> */}
-        <h1 className={commonStyles.logoText}>{title || 'haven'}</h1>
+      <div className={commonStyles.headerContainer}>
+        <h1 className={commonStyles.header}>{title || 'haven'}</h1>
       </div>
       <p className={commonStyles.subtitle}>How do you want to enter your tax information?</p>
       <div className={formStyles.formTypeSelectionContainer}>
