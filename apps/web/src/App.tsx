@@ -206,73 +206,81 @@ const App = () => {
     return () => clearInterval(interval);
   }, [sessionId, isUpload, OCRReady]);
 
+  const resetFormData = () => {
+    setFormData({ parent_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
+  };
+
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {
     setScreen(newScreen);
     if (newScreen === 'ocr') {
       setOCRReady(false);
     }
-    if (newScreen === 'manual') {
-      setFormData({ parent_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
-    }
-    if (newScreen === 'initial') {
-      setFormData({ parent_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
+    if (newScreen === 'manual' || newScreen === 'initial') {
+      resetFormData();
     }
   };
 
   return (
-    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <>
+      <div className={`${commonStyles.appHeader} ${isUpload ? commonStyles.uploadHeader : ''}`}>
+        <div className={commonStyles.logoContainer} onClick={() => handleSetScreen('initial')}>
+          <img src="/assets/images/HavenBanana.svg" alt="Haven Logo" />
+        </div>
+      </div>
       {isUpload ? (
         <>
           <Camera onCapture={handleFile} OCRReady={OCRReady} />
         </>
       ) : (
-        <>
-          {isDemo ? (
-            <>
-              <DemoForm />
-            </>
-          ) : (
-            <>
-              {screen === 'initial' ? (
-                <>
-                  <InitialScreen title="haven" setScreen={handleSetScreen} />
-                </>
-              ) : screen === 'manual' ? (
-                <>
-                  <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
-                </>
-              ) : (
-                <>
-                  {!OCRReady ? (
-                    <>
-                      <button onClick={() => handleSetScreen('initial')}>Back</button>
-                      <h1 className={commonStyles.header}>haven</h1>
-                      <p className={commonStyles.description}>
-                        Take a picture of your tax form.{' '}
-                        <a className={formStyles.formLink} href={`{window.location.origin}/demo?sessionId=${sessionId}`} target="_blank">
-                          Try the demo
-                        </a>
-                      </p>
-                      <div className={formStyles.qrSection}>
-                        Scan this QR code:
-                        <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
-                        <p>Your tax details will appear here when you're done…</p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <TaxForm title={'haven'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} />
-                      <h3>OCR text result:</h3>
-                      <pre>{ocrText}</pre>
-                    </>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </>
+        <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh' }}>
+          <>
+            {isDemo ? (
+              <>
+                <DemoForm />
+              </>
+            ) : (
+              <>
+                {screen === 'initial' ? (
+                  <>
+                    <InitialScreen title="haven" setScreen={handleSetScreen} />
+                  </>
+                ) : screen === 'manual' ? (
+                  <>
+                    <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
+                  </>
+                ) : (
+                  <>
+                    {!OCRReady ? (
+                      <>
+                        <button onClick={() => handleSetScreen('initial')}>Back</button>
+                        <h1 className={commonStyles.header}>haven</h1>
+                        <p className={commonStyles.description}>
+                          Take a picture of your tax form.{' '}
+                          <a className={formStyles.formLink} href={`{window.location.origin}/demo?sessionId=${sessionId}`} target="_blank">
+                            Try the demo
+                          </a>
+                        </p>
+                        <div className={formStyles.qrSection}>
+                          Scan this QR code:
+                          <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
+                          <p>Your tax details will appear here when you're done…</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <TaxForm title={'haven'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} />
+                        <h3>OCR text result:</h3>
+                        <pre>{ocrText}</pre>
+                      </>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

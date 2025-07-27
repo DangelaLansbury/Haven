@@ -1,12 +1,14 @@
 .cameraContainer {
+  background-color: var(--gray-800);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - var(--app-header-height));
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 video {
@@ -28,5 +30,14 @@ video {
   top: 0;
   left: 0;
   width: 100%;
+  height: 100%;
+}
+
+.cameraInstructions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--app-header-height);
   height: 100%;
 }
