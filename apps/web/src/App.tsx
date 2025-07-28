@@ -10,14 +10,15 @@ import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
 import DemoForm from './components/DemoForm';
-import { FormFields } from './types';
+import { FormFields, EntityRoles } from './types';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
   const [formData, setFormData] = useState<FormFields>({
-    parent_rate: '',
+    revenue: '',
+    royalty_rate: '',
     operating_rate: '',
     sublicensor_rate: '',
     licensor_rate: '',
@@ -41,16 +42,19 @@ const App = () => {
     sock.on('ocrResult', (data: string) => {
       setOcrText(data);
     });
-    sock.on('ocrParent', ({ parent_rate }) => {
-      setFormData((prev) => ({ ...prev, parent_rate }));
+    sock.on('ocrRevenue', ({ revenue }): void => {
+      setFormData((prev) => ({ ...prev, revenue }));
     });
-    sock.on('ocrOperating', ({ operating_rate }) => {
+    sock.on('ocrRoyalty', ({ royalty_rate }): void => {
+      setFormData((prev) => ({ ...prev, royalty_rate }));
+    });
+    sock.on('ocrOperating', ({ operating_rate }): void => {
       setFormData((prev) => ({ ...prev, operating_rate }));
     });
-    sock.on('ocrSublicensor', ({ sublicensor_rate }) => {
+    sock.on('ocrSublicensor', ({ sublicensor_rate }): void => {
       setFormData((prev) => ({ ...prev, sublicensor_rate }));
     });
-    sock.on('ocrLicensor', ({ licensor_rate }) => {
+    sock.on('ocrLicensor', ({ licensor_rate }): void => {
       setFormData((prev) => ({ ...prev, licensor_rate }));
     });
     setSocket(sock);
@@ -61,7 +65,7 @@ const App = () => {
   const isUpload = window.location.pathname.includes('upload');
   const isDemo = window.location.pathname.includes('demo');
 
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -92,7 +96,8 @@ const App = () => {
 
     const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
-    let extractedParentRate = '';
+    let extractedRevenue = '';
+    let extractedRoyaltyRate = '';
     let extractedOperatingRate = '';
     let extractedSublicensorRate = '';
     let extractedLicensorRate = '';
@@ -112,10 +117,17 @@ const App = () => {
     for (const line of data.lines) {
       const lineText = line.text;
 
-      if (normalize(lineText).includes('parent')) {
-        const match = matchText(lineText, 'parent');
+      if (normalize(lineText).includes('revenue')) {
+        const match = matchText(lineText, 'revenue');
         if (match) {
-          extractedParentRate = match;
+          extractedRevenue = match;
+        }
+      }
+
+      if (normalize(lineText).includes('royalty')) {
+        const match = matchText(lineText, 'royalty');
+        if (match) {
+          extractedRoyaltyRate = match;
         }
       }
 
@@ -143,14 +155,16 @@ const App = () => {
 
     setFormData((prev) => ({
       ...prev,
-      parent_rate: extractedParentRate,
+      revenue_rate: extractedRevenue,
+      royalty_rate: extractedRoyaltyRate,
       operating_rate: extractedOperatingRate,
       sublicensor_rate: extractedSublicensorRate,
       licensor_rate: extractedLicensorRate,
     }));
 
     if (socket && socket.connected) {
-      socket.emit('ocrParent', { sessionId, parent_rate: extractedParentRate });
+      socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
+      socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyaltyRate });
       socket.emit('ocrOperating', { sessionId, operating_rate: extractedOperatingRate });
       socket.emit('ocrSublicensor', { sessionId, sublicensor_rate: extractedSublicensorRate });
       socket.emit('ocrLicensor', { sessionId, licensor_rate: extractedLicensorRate });
@@ -164,7 +178,8 @@ const App = () => {
       body: JSON.stringify({
         sessionId,
         data: data.text,
-        parent_rate: extractedParentRate,
+        revenue: extractedRevenue,
+        royalty_rate: extractedRoyaltyRate,
         operating_rate: extractedOperatingRate,
         sublicensor_rate: extractedSublicensorRate,
         licensor_rate: extractedLicensorRate,
@@ -185,9 +200,9 @@ const App = () => {
 
       if (!json) return;
 
-      if (json.parent_rate && json.parent_rate !== formData.parent_rate) {
-        console.log('[Polling] parent_rate updated:', json.parent_rate);
-        setFormData((prev) => ({ ...prev, parent_rate: json.parent_rate }));
+      if (json.revenue && json.revenue !== formData.revenue) {
+        console.log('[Polling] revenue updated:', json.revenue);
+        setFormData((prev) => ({ ...prev, revenue: json.revenue }));
       }
       if (json.operating_rate && json.operating_rate !== formData.operating_rate) {
         console.log('[Polling] operating_rate updated:', json.operating_rate);
@@ -201,7 +216,7 @@ const App = () => {
         console.log('[Polling] licensor_rate updated:', json.licensor_rate);
         setFormData((prev) => ({ ...prev, licensor_rate: json.licensor_rate }));
       }
-      if (json.parent_rate || json.operating_rate || json.sublicensor_rate || json.licensor_rate) {
+      if (json.revenue || json.royalty_rate || json.operating_rate || json.sublicensor_rate || json.licensor_rate) {
         setOCRReady(true);
       }
     }, 3000);
@@ -210,7 +225,7 @@ const App = () => {
   }, [sessionId, isUpload, OCRReady]);
 
   const resetFormData = () => {
-    setFormData({ parent_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
+    setFormData({ revenue: '', royalty_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
   };
 
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {
@@ -272,8 +287,6 @@ const App = () => {
                     ) : (
                       <>
                         <TaxForm title={'haven'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} />
-                        <h3>OCR text result:</h3>
-                        <pre>{ocrText}</pre>
                       </>
                     )}
                   </>

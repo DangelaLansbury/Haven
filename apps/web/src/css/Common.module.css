@@ -37,7 +37,7 @@
   height: calc(100vh - var(--app-header-height) - 4rem);
   padding: 1.5rem;
   width: 100%;
-  max-width: 42rem;
+  max-width: 38rem;
   overflow-y: auto;
 }
 

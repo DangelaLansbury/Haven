@@ -4,15 +4,18 @@ import { Server } from 'socket.io';
 import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { FormFields } from '../../web/src/types';
 
-interface FormFields {
-  sessionId: string;
-  data: string;
-  parent_rate: string;
-  operating_rate: string;
-  sublicensor_rate: string;
-  licensor_rate: string;
-}
+// export interface FormFields {
+//   sessionId: string;
+//   data: string;
+//   // parent_rate: string;
+//   revenue: string;
+//   royalty_rate: string;
+//   operating_rate: string;
+//   sublicensor_rate: string;
+//   licensor_rate: string;
+// }
 
 const sessionData: Record<string, Partial<FormFields>> = {};
 
@@ -21,18 +24,24 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '1mb' }));
 app.use(express.static(path.resolve(__dirname, '../../web/dist')));
 
-// receive OCR from mobile, broadcast to desktop
 const submitHandler = (req: Request, res: Response): void => {
-  // const { sessionId, data, grossIncome, generalDeductions, netIncome } = req.body as FormFields;
-  const { sessionId, data, parent_rate, operating_rate, sublicensor_rate, licensor_rate } = req.body as FormFields;
+  const { sessionId, data, revenue, royalty_rate, operating_rate, sublicensor_rate, licensor_rate } = req.body as FormFields;
+  if (!sessionId || !/^[a-z0-9]+$/.test(sessionId)) {
+    return res.status(400).json({ status: 'invalid sessionId' });
+  }
+
+  if (typeof data !== 'string' || data.length > 5000) {
+    return res.status(400).json({ status: 'invalid data payload' });
+  }
   if (sessionId) {
     io.to(sessionId).emit('ocrResult', data);
     sessionData[sessionId] = {
       ...sessionData[sessionId],
-      parent_rate,
+      revenue,
+      royalty_rate,
       operating_rate,
       sublicensor_rate,
       licensor_rate,
@@ -54,7 +63,7 @@ app.get('/api/session-data', (req: Request, res: Response) => {
   }
 });
 
-// fallback to index.html for client‑side routing
+// fallback
 app.get('*', (_, res) => {
   res.sendFile(path.resolve(__dirname, '../../web/dist/index.html'));
 });

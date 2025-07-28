@@ -1,5 +1,6 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
+import { Country, Entity } from 'src/types';
 
 interface FormTableCellInputProps {
   value: string;
@@ -47,43 +48,42 @@ export function FormTableCell({ name, value }: FormTableCellProps) {
 
 interface FormTableRowProps {
   key?: string;
-  entity: string;
-  country: 'Ireland' | 'Netherlands' | 'USA' | 'Bermuda';
-  countryNote?: string;
-  rate: string;
-  role: 'parent' | 'operating' | 'sublicensor' | 'licensor';
-  roleDescription?: string;
-  onNameChange?: (name: string) => void;
-  onCountryChange?: (country: string) => void;
+  entity: Entity;
   onRateChange?: (rate: string) => void;
   readOnly?: boolean;
 }
 
-export function FormTableRow({ entity, country, countryNote, rate, role, roleDescription, readOnly = true, onNameChange, onCountryChange, onRateChange }: FormTableRowProps) {
-  const countryPath = country.toLowerCase();
-  const flag = `/assets/images/flags/${countryPath}.svg`;
+export function FormTableRow({ entity, readOnly = true, onRateChange }: FormTableRowProps) {
   return (
     <div className={formStyles.formTableRow}>
       <div className={formStyles.formTableCell} style={{ flex: 1 }}>
-        <span className={formStyles.cellValue} data-id={`${role}-entity`}>
-          {entity}
+        <span className={formStyles.cellValue} data-id={`${entity.role}-role`}>
+          {entity.role.charAt(0).toUpperCase() + entity.role.slice(1)}
         </span>
-        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${role}-description`}>
-          {roleDescription}
+        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${entity.role}-name`}>
+          {entity.name}
         </span>
       </div>
       <div className={formStyles.formTableCell} style={{ flex: 2 }}>
-        <span className={formStyles.cellValue} data-id={`${role}-incorporated`}>
+        <span className={formStyles.cellValue} data-id={`${entity.role}-location`}>
           <div className={formStyles.flagContainer}>
-            <img src={flag} alt={`${country} flag`} className={formStyles.flag} />
+            <img src={entity.country.flag} alt={`${entity.country.name} flag`} className={formStyles.flag} />
           </div>
-          {country}
+          {entity.country.name}
         </span>
-        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${role}-countryNote`}>
-          {countryNote || ''}
+        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${entity.role}-note`}>
+          {entity.country.note || ''}
         </span>
       </div>
-      <FormTableCellInput name={`${role}-rate`} value={rate} onChange={onRateChange} placeholder="0.0%" className={`${formStyles.cellInput} ${formStyles.rate}`} data-id={`${role}-rate`} readOnly={readOnly} />
+      <FormTableCellInput
+        name={`${entity.role}-rate`}
+        value={entity.country.tax_rate}
+        onChange={onRateChange}
+        placeholder="0.0%"
+        className={`${formStyles.cellInput} ${formStyles.rate}`}
+        data-id={`${entity.role}-rate`}
+        readOnly={readOnly}
+      />
     </div>
   );
 }

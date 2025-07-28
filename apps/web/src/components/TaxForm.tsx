@@ -1,9 +1,9 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormTableCellInput, FormTableRow } from './FormInput';
+import { FormTableRow } from './FormInput';
 import QRCode from 'qrcode.react';
-import { FormFields } from '../types';
+import { FormFields, EntityRoles } from '../types';
 
 interface TaxFormProps {
   title?: string;
@@ -41,43 +41,43 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
                 Entity
               </div>
               <div className={formStyles.formTableHeader} style={{ flex: 2 }}>
-                Residence
+                Location
               </div>
               <div className={`${formStyles.formTableHeader} ${formStyles.rate}`}>Tax Rate</div>
             </div>
-            <FormTableRow entity="Parent" roleDescription="Owns everything" country={'USA'} rate={formData.parent_rate || '21.07%'} role="parent" onRateChange={(value) => setFormData({ ...formData, parent_rate: value })} />
+            {Object.keys(EntityRoles).map((role) => {
+              const entity = EntityRoles[role];
+              return <FormTableRow key={role} entity={entity} onRateChange={(rate) => setFormData({ ...formData, [`${role}_rate`]: rate })} />;
+            })}
+            {/* <FormTableRow entity="Parent" entity_name="Owns everything" country={'USA'} rate={formData.parent_rate || '21.07%'} role="parent" onRateChange={(value) => setFormData({ ...formData, parent_rate: value })} />
             <FormTableRow
               entity="Operating Co."
-              roleDescription="Books sales"
+              entity_name="Pirate Holdings Limited"
               country={'Ireland'}
-              countryNote="Relatively low corporate tax"
+              note_keyword="Relatively low corporate tax"
               rate={formData.operating_rate || '12.57%'}
               role="operating"
               onRateChange={(value) => setFormData({ ...formData, operating_rate: value })}
             />
             <FormTableRow
               entity="Sublicensor"
-              roleDescription="Passthrough for royalties"
+              entity_name="Pirate Holdings BV"
               country={'Netherlands'}
-              countryNote="Allows tax-free flow of royalties out of country"
+              note_keyword="Allows tax-free flow of royalties out of country"
               rate={formData.sublicensor_rate || '0.07%'}
               role="sublicensor"
               onRateChange={(value) => setFormData({ ...formData, sublicensor_rate: value })}
             />
             <FormTableRow
               entity="Licensor"
-              roleDescription="Holds IP"
+              entity_name="Pirate Holdings Ireland"
               country={'Bermuda'}
-              countryNote={`"Manage" business from here with no corporate tax`}
+              note_keyword={`"Manage" business from here with no corporate tax`}
               rate={formData.licensor_rate || '0.07%'}
               role="licensor"
               onRateChange={(value) => setFormData({ ...formData, licensor_rate: value })}
-            />
+            /> */}
           </div>
-          {/* <FormTableCellInput label="Parent Company" value={formData.parent_rate || ''} placeholder={'21.0%'} onChange={(value) => setFormData({ ...formData, parent_rate: value })} readonly />
-          <FormTableCellInput label="Operating Company" value={formData.operating_rate || ''} placeholder={'12.5%'} onChange={(value) => setFormData({ ...formData, operating_rate: value })} readonly />
-          <FormTableCellInput label="Sublicensor" value={formData.sublicensor_rate || ''} placeholder={'0.0%'} onChange={(value) => setFormData({ ...formData, sublicensor_rate: value })} readonly />
-          <FormTableCellInput label="Licensor" value={formData.licensor_rate || ''} placeholder={'0.0%'} onChange={(value) => setFormData({ ...formData, licensor_rate: value })} readonly /> */}
         </form>
       </div>
     </div>
