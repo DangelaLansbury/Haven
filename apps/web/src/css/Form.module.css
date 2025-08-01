@@ -58,7 +58,7 @@
   align-items: flex-start;
   background-color: var(--paper);
   color: var(--gray-800);
-  border-radius: 4px;
+  border-radius: 6px;
   display: flex;
   flex-direction: row;
   font-size: var(--font-sm);

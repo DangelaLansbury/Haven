@@ -10,7 +10,7 @@ import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
 import DemoForm from './components/DemoForm';
-import { FormFields, EntityRoles } from './types';
+import { FormFields, Entities } from './types';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
