@@ -67,12 +67,13 @@ export function CountrySelector({ country, onChange, options }: CountrySelectorP
 interface FormTableRowProps {
   key?: string;
   entity: Entity;
+  newRate?: string;
   onRateChange?: (rate: string) => void;
   onCountryChange?: (country: Country) => void;
   readOnly?: boolean;
 }
 
-export function FormTableRow({ entity, readOnly = true, onRateChange, onCountryChange }: FormTableRowProps) {
+export function FormTableRow({ entity, newRate, readOnly = true, onRateChange, onCountryChange }: FormTableRowProps) {
   // const [country, setCountry] = React.useState<Country>(entity.default_country);
 
   return (
@@ -98,7 +99,7 @@ export function FormTableRow({ entity, readOnly = true, onRateChange, onCountryC
       </div>
       <FormTableCellInput
         name={`${entity.role}-rate`}
-        value={entity.default_country.tax_rate}
+        value={newRate !== '' ? newRate : entity.default_country.tax_rate}
         onChange={onRateChange}
         placeholder="0.0%"
         className={`${formStyles.cellInput} ${formStyles.rate}`}

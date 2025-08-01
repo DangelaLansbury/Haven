@@ -16,8 +16,6 @@ interface TaxFormProps {
 }
 
 const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setFormData, handleBack, sessionId }) => {
-  const tableref = React.useRef<HTMLDivElement>(null);
-
   return (
     <div className={commonStyles.pageContainer}>
       <div className={commonStyles.sideCard}>
@@ -33,7 +31,21 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
         {description && <p className={commonStyles.description}>{description}</p>}
 
         <form className={`${formStyles.taxForm} `}>
-          <div className={formStyles.formTable} ref={tableref}>
+          <div className={formStyles.formTableRow}>
+            <div className={formStyles.formTableCell} style={{ flex: 1 }}>
+              <span className={formStyles.cellValue} data-id="revenue">
+                {formData.revenue ? `${formData.revenue}` : '$5000'}
+              </span>
+            </div>
+          </div>
+          <div className={formStyles.formTableRow}>
+            <div className={formStyles.formTableCell} style={{ flex: 1 }}>
+              <span className={formStyles.cellValue} data-id="royalty-rate">
+                {formData.royalty_rate ? `${formData.royalty_rate}` : '90%'}
+              </span>
+            </div>
+          </div>
+          <div className={formStyles.formTable}>
             <div className={formStyles.formTableHeaderRow}>
               <div className={formStyles.formTableHeader} style={{ flex: 1 }}>
                 Entity
@@ -46,7 +58,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
 
             {Object.keys(Entities).map((role) => {
               const entity = Entities[role];
-              return <FormTableRow key={role} entity={entity} onRateChange={(rate) => setFormData({ ...formData, [`${role}_rate`]: rate })} />;
+              return <FormTableRow key={role} entity={entity} newRate={formData[`${role}_rate`] || ''} onRateChange={(rate) => setFormData({ ...formData, [`${role}_rate`]: rate })} />;
             })}
           </div>
         </form>

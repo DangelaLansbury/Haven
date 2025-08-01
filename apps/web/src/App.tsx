@@ -10,7 +10,7 @@ import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
 import DemoForm from './components/DemoForm';
-import { FormFields, Entities } from './types';
+import { FormFields } from './types';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -94,13 +94,13 @@ const App = () => {
 
     const { data } = await worker.recognize(canvas);
 
-    const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-
     let extractedRevenue = '';
     let extractedRoyaltyRate = '';
     let extractedOperatingRate = '';
     let extractedSublicensorRate = '';
     let extractedLicensorRate = '';
+
+    const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
     function matchText(lineText: string, keyword: string): string | null {
       if (!normalize(lineText).includes(keyword)) return null;
@@ -113,6 +113,36 @@ const App = () => {
       const words = lineText.trim().split(/\s+/);
       return words.length > 0 ? words[words.length - 1] : null;
     }
+
+    // // Helper function to check horizontal overlap between two bounding boxes
+    // function overlapsX(b1: { x0: number; x1: number }, b2: { x0: number; x1: number }): boolean {
+    //   return b1.x1 >= b2.x0 && b2.x1 >= b1.x0;
+    // }
+
+    // // Function to find the text value directly below a keyword line within overlapping x-range
+    // function findValueBelow(lines: any[], keyword: string): string | null {
+    //   const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    //   // Find the line containing the keyword
+    //   const keywordLine = lines.find((line) => normalize(line.text).includes(keyword));
+    //   if (!keywordLine) return null;
+
+    //   const kbbox = keywordLine.bbox;
+    //   // Find lines below keyword line with overlapping x-range
+    //   const candidates = lines.filter((line) => {
+    //     const lbbox = line.bbox;
+    //     return lbbox.y0 > kbbox.y1 && overlapsX({ x0: kbbox.x0, x1: kbbox.x1 }, { x0: lbbox.x0, x1: lbbox.x1 });
+    //   });
+
+    //   if (candidates.length === 0) return null;
+
+    //   // Return the text of the closest line below
+    //   candidates.sort((a, b) => a.bbox.y0 - b.bbox.y0);
+    //   return candidates[0].text.trim();
+    // }
+
+    // Try box-above-value matching first
+    // extractedRevenue = findValueBelow(data.lines, 'revenue') || extractedRevenue;
+    // extractedRoyaltyRate = findValueBelow(data.lines, 'royalty') || extractedRoyaltyRate;
 
     for (const line of data.lines) {
       const lineText = line.text;
@@ -203,6 +233,10 @@ const App = () => {
       if (json.revenue && json.revenue !== formData.revenue) {
         console.log('[Polling] revenue updated:', json.revenue);
         setFormData((prev) => ({ ...prev, revenue: json.revenue }));
+      }
+      if (json.royalty_rate && json.royalty_rate !== formData.royalty_rate) {
+        console.log('[Polling] royalty_rate updated:', json.royalty_rate);
+        setFormData((prev) => ({ ...prev, royalty_rate: json.royalty_rate }));
       }
       if (json.operating_rate && json.operating_rate !== formData.operating_rate) {
         console.log('[Polling] operating_rate updated:', json.operating_rate);
