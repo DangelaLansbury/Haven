@@ -33,14 +33,24 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
         <form className={`${formStyles.taxForm} `}>
           <div className={formStyles.formTableRow}>
             <div className={formStyles.formTableCell} style={{ flex: 1 }}>
-              <span className={formStyles.cellValue} data-id="revenue">
+              <span className={formStyles.cellValue} data-id="revenue-label">
+                {'Revenue'}
+              </span>
+            </div>
+            <div className={formStyles.formTableCell} style={{ flex: 2 }}>
+              <span className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id="revenue">
                 {formData.revenue ? `${formData.revenue}` : '$5000'}
               </span>
             </div>
           </div>
           <div className={formStyles.formTableRow}>
             <div className={formStyles.formTableCell} style={{ flex: 1 }}>
-              <span className={formStyles.cellValue} data-id="royalty-rate">
+              <span className={formStyles.cellValue} data-id="royalty-rate-label">
+                {'Royalty Rate'}
+              </span>
+            </div>
+            <div className={formStyles.formTableCell} style={{ flex: 2 }}>
+              <span className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id="royalty-rate">
                 {formData.royalty_rate ? `${formData.royalty_rate}` : '90%'}
               </span>
             </div>
