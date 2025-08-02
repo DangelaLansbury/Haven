@@ -19,7 +19,6 @@
       "dependencies": {
         "blueimp-load-image": "5.16.0",
         "framer-motion": "^12.23.9",
-        "moniker": "^0.1.2",
         "qrcode.react": "^1.0.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
@@ -911,8 +910,6 @@
     "mime-types": ["mime-types@2.1.35", "", { "dependencies": { "mime-db": "1.52.0" } }, "sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw=="],
 
     "minimatch": ["minimatch@3.1.2", "", { "dependencies": { "brace-expansion": "^1.1.7" } }, "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw=="],
-
-    "moniker": ["moniker@0.1.2", "", {}, "sha512-Uj9iV0QYr6281G+o0TvqhKwHHWB2Q/qUTT4LPQ3qDGc0r8cbMuqQjRXPZuVZ+gcL7APx+iQgE8lcfWPrj1LsLA=="],
 
     "motion-dom": ["motion-dom@12.23.9", "", { "dependencies": { "motion-utils": "^12.23.6" } }, "sha512-6Sv++iWS8XMFCgU1qwKj9l4xuC47Hp4+2jvPfyTXkqDg2tTzSgX6nWKD4kNFXk0k7llO59LZTPuJigza4A2K1A=="],
 

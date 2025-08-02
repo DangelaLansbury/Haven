@@ -1,10 +1,9 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormTableRow } from './FormInput';
+import { CountryDecorator, FormTableRow } from './FormInput';
 import QRCode from 'qrcode.react';
 import { FormFields, Entities } from '../types';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 
 interface TaxFormProps {
   title?: string;
@@ -27,49 +26,40 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
       </div>
 
       <div className={commonStyles.mainCard}>
-        <h1 className={commonStyles.header}>{title || 'Enter details below'}</h1>
-        {description && <p className={commonStyles.description}>{description}</p>}
-
-        <form className={`${formStyles.taxForm} `}>
-          <div className={formStyles.formTableRow}>
-            <div className={formStyles.formTableCell} style={{ flex: 1 }}>
-              <span className={formStyles.cellValue} data-id="revenue-label">
-                {'Revenue'}
-              </span>
+        <form className={`${formStyles.taxFormContainer} `}>
+          <div className={formStyles.formTable}>
+            <div className={formStyles.formTableHeader}>
+              <div className={formStyles.formTableTh}>
+                <span className={formStyles.section}>{'§1.1'}</span>
+                {'Earnings and Expenditures'}
+              </div>
             </div>
-            <div className={formStyles.formTableCell} style={{ flex: 2 }}>
-              <span className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id="revenue">
-                {formData.revenue ? `${formData.revenue}` : '$5000'}
-              </span>
-            </div>
-          </div>
-          <div className={formStyles.formTableRow}>
-            <div className={formStyles.formTableCell} style={{ flex: 1 }}>
-              <span className={formStyles.cellValue} data-id="royalty-rate-label">
-                {'Royalty Rate'}
-              </span>
-            </div>
-            <div className={formStyles.formTableCell} style={{ flex: 2 }}>
-              <span className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id="royalty-rate">
-                {formData.royalty_rate ? `${formData.royalty_rate}` : '90%'}
-              </span>
+            <div className={formStyles.formTableRows}>
+              <FormTableRow key="revenue" label="Revenue" value={formData.revenue || '$10,000,000'} />
+              <FormTableRow key="royalty_rate" label={'Royalties & IP Fees'} value={formData.royalty_rate || '90%'} valueNote="As a percentage of revenue" />
             </div>
           </div>
           <div className={formStyles.formTable}>
-            <div className={formStyles.formTableHeaderRow}>
-              <div className={formStyles.formTableHeader} style={{ flex: 1 }}>
-                Entity
+            <div className={formStyles.formTableHeader}>
+              <div className={formStyles.formTableTh}>
+                <span className={formStyles.section}>{'§2.1'}</span>
+                {'Business Entities'}
               </div>
-              <div className={formStyles.formTableHeader} style={{ flex: 2 }}>
-                Location
-              </div>
-              <div className={`${formStyles.formTableHeader} ${formStyles.rate}`}>Tax Rate</div>
+              <div className={`${formStyles.formTableTh} ${formStyles.rightAligned}`}>{'Corp. Tax Rate'}</div>
             </div>
-
-            {Object.keys(Entities).map((role) => {
-              const entity = Entities[role];
-              return <FormTableRow key={role} entity={entity} newRate={formData[`${role}_rate`] || ''} onRateChange={(rate) => setFormData({ ...formData, [`${role}_rate`]: rate })} />;
-            })}
+            <div className={formStyles.formTableRows}>
+              {Object.keys(Entities).map((role) => {
+                const entity = Entities[role];
+                return (
+                  <FormTableRow
+                    key={role}
+                    label={entity.display_role}
+                    value={entity.default_country.tax_rate}
+                    decorator={<CountryDecorator country={entity.default_country} text={`${entity.default_name} (${entity.default_country.code})`} />}
+                  />
+                );
+              })}
+            </div>
           </div>
         </form>
       </div>
@@ -77,3 +67,5 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
   );
 };
 export default TaxForm;
+
+// entity={entity} newRate={formData[`${role}_rate`] || ''} onRateChange={(rate) => setFormData({ ...formData, [`${role}_rate`]: rate })}

@@ -46,6 +46,30 @@ export function FormTableCell({ name, value }: FormTableCellProps) {
   );
 }
 
+interface CountryDecoratorProps {
+  country: Country;
+  text?: string;
+  rightAligned?: boolean;
+}
+
+export function CountryDecorator({ country, text, rightAligned }: CountryDecoratorProps) {
+  return (
+    <div className={formStyles.countryDecorator} style={{ textAlign: rightAligned ? 'right' : 'left' }}>
+      {!rightAligned && (
+        <div className={formStyles.flagContainer}>
+          <img src={country.flag} alt={`${country.name} flag`} className={formStyles.flag} />
+        </div>
+      )}
+      <span className={formStyles.countryText}>{text || country.name}</span>
+      {rightAligned && (
+        <div className={formStyles.flagContainer}>
+          <img src={country.flag} alt={`${country.name} flag`} className={formStyles.flag} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface CountrySelectorProps {
   country: Country;
   onChange: (country: Country) => void;
@@ -66,43 +90,43 @@ export function CountrySelector({ country, onChange, options }: CountrySelectorP
 
 interface FormTableRowProps {
   key?: string;
-  entity: Entity;
-  newRate?: string;
-  onRateChange?: (rate: string) => void;
-  onCountryChange?: (country: Country) => void;
-  readOnly?: boolean;
+  label?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  decorator?: React.ReactNode;
+  valueNote?: string;
 }
 
-export function FormTableRow({ entity, newRate, readOnly = true, onRateChange, onCountryChange }: FormTableRowProps) {
-  // const [country, setCountry] = React.useState<Country>(entity.default_country);
-  const id = entity.role.toLowerCase();
+export function FormTableRow({ key, label, value, onChange, decorator, valueNote }: FormTableRowProps) {
+  const id = label ? label.toLowerCase().replace(/\s+/g, '-') : key || 'row';
 
   return (
     <div className={formStyles.formTableRow}>
-      <div className={formStyles.formTableCell} style={{ flex: 1 }}>
-        <span className={formStyles.cellValue} data-id={`${id}-role`}>
-          {entity.display_role}
+      <div className={formStyles.formTableCell}>
+        <span className={formStyles.cellValue} data-id={`${id}-label`}>
+          {label}
         </span>
-        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${id}-name`}>
-          {entity.default_name}
-        </span>
+        {decorator && (
+          <span className={`${formStyles.cellValue} ${formStyles.decorator}`} data-id={`${id}-decorator`}>
+            {decorator}
+          </span>
+        )}
       </div>
-      <div className={formStyles.formTableCell} style={{ flex: 2 }}>
-        <span className={formStyles.cellValue} data-id={`${id}-location`}>
-          <div className={formStyles.flagContainer}>
-            <img src={entity.default_country.flag} alt={`${entity.default_country.name} flag`} className={formStyles.flag} />
-          </div>
-          {entity.default_country.name}
+      <div className={formStyles.formTableCell}>
+        <span className={`${formStyles.cellValue} ${formStyles.mainValue} ${formStyles.rightAligned}`} data-id={`${id}-value`}>
+          {value}
         </span>
-        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${id}-note`}>
-          {entity.default_country.note || ''}
-        </span>
+        {valueNote && (
+          <span className={`${formStyles.cellValue} ${formStyles.subValue} ${formStyles.rightAligned}`} data-id={`${id}-value-note`}>
+            {valueNote}
+          </span>
+        )}
       </div>
-      <div className={formStyles.formTableCell} style={{ flex: 1 }}>
+      {/* <div className={formStyles.formTableCell} style={{ flex: 1 }}>
         <span className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id={`${id}-rate`}>
           {newRate !== '' ? newRate : entity.default_country.tax_rate}
         </span>
-      </div>
+      </div> */}
       {/* <FormTableCellInput
         name={`${id}-rate`}
         value={newRate !== '' ? newRate : entity.default_country.tax_rate}

@@ -9,7 +9,6 @@
   "dependencies": {
     "blueimp-load-image": "5.16.0",
     "framer-motion": "^12.23.9",
-    "moniker": "^0.1.2",
     "qrcode.react": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
