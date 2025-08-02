@@ -6,17 +6,6 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import { FormFields } from '../../web/src/types';
 
-// export interface FormFields {
-//   sessionId: string;
-//   data: string;
-//   // parent_rate: string;
-//   revenue: string;
-//   royalty_rate: string;
-//   operating_rate: string;
-//   sublicensor_rate: string;
-//   licensor_rate: string;
-// }
-
 const sessionData: Record<string, Partial<FormFields>> = {};
 
 const app = express();
@@ -28,7 +17,7 @@ app.use(bodyParser.json({ limit: '1mb' }));
 app.use(express.static(path.resolve(__dirname, '../../web/dist')));
 
 const submitHandler = (req: Request, res: Response): void => {
-  const { sessionId, data, revenue, royalty_rate, operating_rate, sublicensor_rate, licensor_rate } = req.body as FormFields;
+  const { sessionId, data, revenue, royalty_rate, operating_rate, conduit_rate, licensor_rate } = req.body as FormFields;
   if (!sessionId || !/^[a-z0-9]+$/.test(sessionId)) {
     return res.status(400).json({ status: 'invalid sessionId' });
   }
@@ -43,7 +32,7 @@ const submitHandler = (req: Request, res: Response): void => {
       revenue,
       royalty_rate,
       operating_rate,
-      sublicensor_rate,
+      conduit_rate,
       licensor_rate,
     };
     res.json({ status: 'ok' });

@@ -4,7 +4,7 @@ export interface FormFields {
   revenue: string;
   royalty_rate: string;
   operating_rate: string;
-  sublicensor_rate: string;
+  conduit_rate: string;
   licensor_rate: string;
 }
 
@@ -110,6 +110,7 @@ export const Countries: Record<string, Country> = {
 
 export interface Entity {
   role: string;
+  display_role: string;
   default_name: string;
   description: string;
   default_country?: Country;
@@ -119,13 +120,15 @@ export interface Entity {
 export const Entities: Record<string, Entity> = {
   operating: {
     role: 'operating',
+    display_role: 'Operating Base',
     default_name: 'Haven Holdings Ltd',
     description: 'Books sales (front-end)',
     default_country: OperatingBases.IRELAND,
     countries: OperatingBases,
   },
-  sublicensor: {
-    role: 'sublicensor',
+  conduit: {
+    role: 'conduit',
+    display_role: 'Conduit',
     default_name: 'Haven Holdings BV',
     description: 'Passthrough for royalties',
     default_country: Conduits.NETHERLANDS,
@@ -133,6 +136,7 @@ export const Entities: Record<string, Entity> = {
   },
   licensor: {
     role: 'licensor',
+    display_role: 'Licensor',
     default_name: 'Haven Holdings Ireland',
     description: 'Holds IP and receives royalties',
     default_country: TaxHavens.BERMUDA,
@@ -140,6 +144,7 @@ export const Entities: Record<string, Entity> = {
   },
   parent: {
     role: 'parent',
+    display_role: 'Parent Company',
     default_name: 'Haven Corp',
     description: 'Owns and controls all entities',
     default_country: Countries.USA,

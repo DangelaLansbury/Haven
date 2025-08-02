@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import QRCode from 'qrcode.react';
-import { createWorker } from 'tesseract.js';
+import Tesseract, { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
 import '../../web/index.css';
 import formStyles from './css/Form.module.css';
@@ -20,7 +20,7 @@ const App = () => {
     revenue: '',
     royalty_rate: '',
     operating_rate: '',
-    sublicensor_rate: '',
+    conduit_rate: '',
     licensor_rate: '',
   });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
@@ -43,19 +43,19 @@ const App = () => {
       setOcrText(data);
     });
     sock.on('ocrRevenue', ({ revenue }): void => {
-      setFormData((prev) => ({ ...prev, revenue }));
+      setFormData((prev: FormFields) => ({ ...prev, revenue }));
     });
     sock.on('ocrRoyalty', ({ royalty_rate }): void => {
-      setFormData((prev) => ({ ...prev, royalty_rate }));
+      setFormData((prev: FormFields) => ({ ...prev, royalty_rate }));
     });
     sock.on('ocrOperating', ({ operating_rate }): void => {
-      setFormData((prev) => ({ ...prev, operating_rate }));
+      setFormData((prev: FormFields) => ({ ...prev, operating_rate }));
     });
-    sock.on('ocrSublicensor', ({ sublicensor_rate }): void => {
-      setFormData((prev) => ({ ...prev, sublicensor_rate }));
+    sock.on('ocrConduit', ({ conduit_rate }): void => {
+      setFormData((prev: FormFields) => ({ ...prev, conduit_rate }));
     });
     sock.on('ocrLicensor', ({ licensor_rate }): void => {
-      setFormData((prev) => ({ ...prev, licensor_rate }));
+      setFormData((prev: FormFields) => ({ ...prev, licensor_rate }));
     });
     setSocket(sock);
 
@@ -94,12 +94,6 @@ const App = () => {
 
     const { data } = await worker.recognize(canvas);
 
-    let extractedRevenue = '';
-    let extractedRoyaltyRate = '';
-    let extractedOperatingRate = '';
-    let extractedSublicensorRate = '';
-    let extractedLicensorRate = '';
-
     const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
     function matchText(lineText: string, keyword: string): string | null {
@@ -114,81 +108,28 @@ const App = () => {
       return words.length > 0 ? words[words.length - 1] : null;
     }
 
-    // // Helper function to check horizontal overlap between two bounding boxes
-    // function overlapsX(b1: { x0: number; x1: number }, b2: { x0: number; x1: number }): boolean {
-    //   return b1.x1 >= b2.x0 && b2.x1 >= b1.x0;
-    // }
-
-    // // Function to find the text value directly below a keyword line within overlapping x-range
-    // function findValueBelow(lines: any[], keyword: string): string | null {
-    //   const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-    //   // Find the line containing the keyword
-    //   const keywordLine = lines.find((line) => normalize(line.text).includes(keyword));
-    //   if (!keywordLine) return null;
-
-    //   const kbbox = keywordLine.bbox;
-    //   // Find lines below keyword line with overlapping x-range
-    //   const candidates = lines.filter((line) => {
-    //     const lbbox = line.bbox;
-    //     return lbbox.y0 > kbbox.y1 && overlapsX({ x0: kbbox.x0, x1: kbbox.x1 }, { x0: lbbox.x0, x1: lbbox.x1 });
-    //   });
-
-    //   if (candidates.length === 0) return null;
-
-    //   // Return the text of the closest line below
-    //   candidates.sort((a, b) => a.bbox.y0 - b.bbox.y0);
-    //   return candidates[0].text.trim();
-    // }
-
-    // Try box-above-value matching first
-    // extractedRevenue = findValueBelow(data.lines, 'revenue') || extractedRevenue;
-    // extractedRoyaltyRate = findValueBelow(data.lines, 'royalty') || extractedRoyaltyRate;
-
-    for (const line of data.lines) {
-      const lineText = line.text;
-
-      if (normalize(lineText).includes('revenue')) {
-        const match = matchText(lineText, 'revenue');
-        if (match) {
-          extractedRevenue = match;
+    function findTextInline(lines: Tesseract.Line[], keyword: string): string | null {
+      for (const line of lines) {
+        if (normalize(line.text).includes(keyword)) {
+          const match = matchText(line.text, keyword);
+          if (match) return match;
         }
       }
-
-      if (normalize(lineText).includes('royalty')) {
-        const match = matchText(lineText, 'royalty');
-        if (match) {
-          extractedRoyaltyRate = match;
-        }
-      }
-
-      if (normalize(lineText).includes('operating')) {
-        const match = matchText(lineText, 'operating');
-        if (match) {
-          extractedOperatingRate = match;
-        }
-      }
-
-      if (normalize(lineText).includes('sublicensor')) {
-        const match = matchText(lineText, 'sublicensor');
-        if (match) {
-          extractedSublicensorRate = match;
-        }
-      }
-
-      if (normalize(lineText).includes('licensor')) {
-        const match = matchText(lineText, 'licensor');
-        if (match) {
-          extractedLicensorRate = match;
-        }
-      }
+      return null;
     }
 
-    setFormData((prev) => ({
+    const extractedRevenue = findTextInline(data.lines, 'revenue') || '';
+    const extractedRoyaltyRate = findTextInline(data.lines, 'royalty') || '';
+    const extractedOperatingRate = findTextInline(data.lines, 'operating') || '';
+    const extractedConduitRate = findTextInline(data.lines, 'conduit') || '';
+    const extractedLicensorRate = findTextInline(data.lines, 'licensor') || '';
+
+    setFormData((prev: FormFields) => ({
       ...prev,
       revenue_rate: extractedRevenue,
       royalty_rate: extractedRoyaltyRate,
       operating_rate: extractedOperatingRate,
-      sublicensor_rate: extractedSublicensorRate,
+      conduit_rate: extractedConduitRate,
       licensor_rate: extractedLicensorRate,
     }));
 
@@ -196,7 +137,7 @@ const App = () => {
       socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
       socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyaltyRate });
       socket.emit('ocrOperating', { sessionId, operating_rate: extractedOperatingRate });
-      socket.emit('ocrSublicensor', { sessionId, sublicensor_rate: extractedSublicensorRate });
+      socket.emit('ocrConduit', { sessionId, conduit_rate: extractedConduitRate });
       socket.emit('ocrLicensor', { sessionId, licensor_rate: extractedLicensorRate });
     } else {
       console.warn('[Socket.IO] socket not ready for gross income emit');
@@ -211,7 +152,7 @@ const App = () => {
         revenue: extractedRevenue,
         royalty_rate: extractedRoyaltyRate,
         operating_rate: extractedOperatingRate,
-        sublicensor_rate: extractedSublicensorRate,
+        conduit_rate: extractedConduitRate,
         licensor_rate: extractedLicensorRate,
       }),
     });
@@ -232,25 +173,25 @@ const App = () => {
 
       if (json.revenue && json.revenue !== formData.revenue) {
         console.log('[Polling] revenue updated:', json.revenue);
-        setFormData((prev) => ({ ...prev, revenue: json.revenue }));
+        setFormData((prev: FormFields) => ({ ...prev, revenue: json.revenue }));
       }
       if (json.royalty_rate && json.royalty_rate !== formData.royalty_rate) {
         console.log('[Polling] royalty_rate updated:', json.royalty_rate);
-        setFormData((prev) => ({ ...prev, royalty_rate: json.royalty_rate }));
+        setFormData((prev: FormFields) => ({ ...prev, royalty_rate: json.royalty_rate }));
       }
       if (json.operating_rate && json.operating_rate !== formData.operating_rate) {
         console.log('[Polling] operating_rate updated:', json.operating_rate);
-        setFormData((prev) => ({ ...prev, operating_rate: json.operating_rate }));
+        setFormData((prev: FormFields) => ({ ...prev, operating_rate: json.operating_rate }));
       }
-      if (json.sublicensor_rate && json.sublicensor_rate !== formData.sublicensor_rate) {
-        console.log('[Polling] sublicensor_rate updated:', json.sublicensor_rate);
-        setFormData((prev) => ({ ...prev, sublicensor_rate: json.sublicensor_rate }));
+      if (json.conduit_rate && json.conduit_rate !== formData.conduit_rate) {
+        console.log('[Polling] conduit_rate updated:', json.conduit_rate);
+        setFormData((prev: FormFields) => ({ ...prev, conduit_rate: json.conduit_rate }));
       }
       if (json.licensor_rate && json.licensor_rate !== formData.licensor_rate) {
         console.log('[Polling] licensor_rate updated:', json.licensor_rate);
-        setFormData((prev) => ({ ...prev, licensor_rate: json.licensor_rate }));
+        setFormData((prev: FormFields) => ({ ...prev, licensor_rate: json.licensor_rate }));
       }
-      if (json.revenue || json.royalty_rate || json.operating_rate || json.sublicensor_rate || json.licensor_rate) {
+      if (json.revenue || json.royalty_rate || json.operating_rate || json.conduit_rate || json.licensor_rate) {
         setOCRReady(true);
       }
     }, 3000);
@@ -259,7 +200,7 @@ const App = () => {
   }, [sessionId, isUpload, OCRReady]);
 
   const resetFormData = () => {
-    setFormData({ revenue: '', royalty_rate: '', operating_rate: '', sublicensor_rate: '', licensor_rate: '' });
+    setFormData({ revenue: '', royalty_rate: '', operating_rate: '', conduit_rate: '', licensor_rate: '' });
   };
 
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {

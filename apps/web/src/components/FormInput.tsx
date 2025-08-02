@@ -75,37 +75,43 @@ interface FormTableRowProps {
 
 export function FormTableRow({ entity, newRate, readOnly = true, onRateChange, onCountryChange }: FormTableRowProps) {
   // const [country, setCountry] = React.useState<Country>(entity.default_country);
+  const id = entity.role.toLowerCase();
 
   return (
     <div className={formStyles.formTableRow}>
       <div className={formStyles.formTableCell} style={{ flex: 1 }}>
-        <span className={formStyles.cellValue} data-id={`${entity.role}-role`}>
-          {entity.role.charAt(0).toUpperCase() + entity.role.slice(1)}
+        <span className={formStyles.cellValue} data-id={`${id}-role`}>
+          {entity.display_role}
         </span>
-        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${entity.role}-name`}>
+        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${id}-name`}>
           {entity.default_name}
         </span>
       </div>
       <div className={formStyles.formTableCell} style={{ flex: 2 }}>
-        <span className={formStyles.cellValue} data-id={`${entity.role}-location`}>
+        <span className={formStyles.cellValue} data-id={`${id}-location`}>
           <div className={formStyles.flagContainer}>
             <img src={entity.default_country.flag} alt={`${entity.default_country.name} flag`} className={formStyles.flag} />
           </div>
           {entity.default_country.name}
         </span>
-        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${entity.role}-note`}>
+        <span className={`${formStyles.cellValue} ${formStyles.subValue}`} data-id={`${id}-note`}>
           {entity.default_country.note || ''}
         </span>
       </div>
-      <FormTableCellInput
-        name={`${entity.role}-rate`}
+      <div className={formStyles.formTableCell} style={{ flex: 1 }}>
+        <span className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id={`${id}-rate`}>
+          {newRate !== '' ? newRate : entity.default_country.tax_rate}
+        </span>
+      </div>
+      {/* <FormTableCellInput
+        name={`${id}-rate`}
         value={newRate !== '' ? newRate : entity.default_country.tax_rate}
         onChange={onRateChange}
         placeholder="0.0%"
         className={`${formStyles.cellInput} ${formStyles.rate}`}
-        data-id={`${entity.role}-rate`}
+        data-id={`${id}-rate`}
         readOnly={readOnly}
-      />
+      /> */}
     </div>
   );
 }
