@@ -17,7 +17,7 @@ interface TaxFormProps {
 const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setFormData, handleBack, sessionId }) => {
   return (
     <div className={commonStyles.pageContainer}>
-      <div className={commonStyles.sideCard}>
+      <div className={formStyles.sideCard}>
         <div className={commonStyles.headerContainer}>
           <h1 className={commonStyles.header}>{'Take a picture.'}</h1>
         </div>
@@ -25,7 +25,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ title, description, formData, setForm
         <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
       </div>
 
-      <div className={commonStyles.mainCard}>
+      <div className={formStyles.mainCard}>
         <form className={`${formStyles.taxFormContainer} `}>
           <div className={formStyles.formTable}>
             <div className={formStyles.formTableHeader}>

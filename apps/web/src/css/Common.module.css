@@ -25,22 +25,6 @@
   height: 100%;
 }
 
-.mainCard {
-  background-color: var(--paper);
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-color);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  height: calc(100vh - var(--app-header-height) - 4rem);
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 38rem;
-  overflow-y: auto;
-}
-
 .scrollableMain {
   box-sizing: border-box;
   display: flex;
@@ -53,20 +37,6 @@
   overflow-y: auto;
   padding: 1rem;
   gap: 1rem;
-}
-
-.sideCard {
-  background-color: var(--paper);
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-color);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  flex: 1;
-  max-width: 20rem;
-  padding: 1.5rem;
 }
 
 .headerContainer {

@@ -115,7 +115,6 @@ export const Countries: Record<string, Country> = {
 
 export interface Entity {
   role: string;
-  formIndex: string;
   display_role: string;
   default_name: string;
   description: string;
@@ -127,7 +126,6 @@ export interface Entity {
 export const Entities: Record<string, Entity> = {
   operating: {
     role: 'operating',
-    formIndex: '2a',
     display_role: 'Operating Base',
     default_name: 'Acme Ireland Limited',
     description: 'Books sales (front-end)',
@@ -137,7 +135,6 @@ export const Entities: Record<string, Entity> = {
   },
   conduit: {
     role: 'conduit',
-    formIndex: '2b',
     display_role: 'Conduit',
     default_name: 'Acme Netherlands Holdings BV',
     description: 'Passthrough for royalties',
@@ -147,7 +144,6 @@ export const Entities: Record<string, Entity> = {
   },
   licensor: {
     role: 'licensor',
-    formIndex: '2c',
     display_role: 'Licensor',
     default_name: 'Acme Ireland Holdings',
     description: 'Holds IP and receives royalties',
@@ -155,12 +151,13 @@ export const Entities: Record<string, Entity> = {
     countries: TaxHavens,
     OCRKeyword: 'licensor',
   },
-  // parent: {
-  //   role: 'parent',
-  //   display_role: 'Parent Company',
-  //   default_name: 'Acme Corp',
-  //   description: 'Owns and controls all entities',
-  //   default_country: Countries.USA,
-  //   countries: Countries,
-  // },
+  parent: {
+    role: 'parent',
+    display_role: 'Parent Company',
+    default_name: 'Acme Corp',
+    description: 'Owns and controls all entities',
+    default_country: Countries.USA,
+    countries: Countries,
+    OCRKeyword: 'parent',
+  },
 };
