@@ -120,6 +120,7 @@ export interface Entity {
   description: string;
   default_country?: Country;
   countries?: Record<string, Country>;
+  formIndex: string;
   OCRKeyword: string;
 }
 
@@ -131,6 +132,7 @@ export const Entities: Record<string, Entity> = {
     description: 'Books sales (front-end)',
     default_country: OperatingBases.IRELAND,
     countries: OperatingBases,
+    formIndex: '2a',
     OCRKeyword: 'operating',
   },
   conduit: {
@@ -140,6 +142,7 @@ export const Entities: Record<string, Entity> = {
     description: 'Passthrough for royalties',
     default_country: Conduits.NETHERLANDS,
     countries: Conduits,
+    formIndex: '2b',
     OCRKeyword: 'conduit',
   },
   licensor: {
@@ -149,6 +152,7 @@ export const Entities: Record<string, Entity> = {
     description: 'Holds IP and receives royalties',
     default_country: TaxHavens.BERMUDA,
     countries: TaxHavens,
+    formIndex: '2c',
     OCRKeyword: 'licensor',
   },
   parent: {
@@ -158,6 +162,7 @@ export const Entities: Record<string, Entity> = {
     description: 'Owns and controls all entities',
     default_country: Countries.USA,
     countries: Countries,
+    formIndex: '2d',
     OCRKeyword: 'parent',
   },
 };

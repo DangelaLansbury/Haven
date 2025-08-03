@@ -63,7 +63,6 @@ const App = () => {
   }, []);
 
   const isUpload = window.location.pathname.includes('upload');
-  const isDemo = window.location.pathname.includes('demo');
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
@@ -109,21 +108,21 @@ const App = () => {
       return lastWord ? lastWord.replace(/[^0-9.,]/g, '') : null;
     }
 
-    function findTextInline(lines: Tesseract.Line[], keyword: string): string | null {
+    function findTextInline(lines: Tesseract.Line[], keyword: string, formIndex?: string): string | null {
       for (const line of lines) {
         if (normalize(line.text).includes(keyword)) {
-          const match = matchText(line.text, keyword);
+          const match = matchText(line.text, keyword) || matchText(line.text, formIndex || '');
           if (match) return match;
         }
       }
       return null;
     }
 
-    const extractedRevenue = findTextInline(data.lines, 'revenue') || '';
-    const extractedRoyaltyRate = findTextInline(data.lines, 'royalties') || '';
-    const extractedOperatingRate = findTextInline(data.lines, Entities.operating.OCRKeyword) || '';
-    const extractedConduitRate = findTextInline(data.lines, Entities.conduit.OCRKeyword) || '';
-    const extractedLicensorRate = findTextInline(data.lines, Entities.licensor.OCRKeyword) || '';
+    const extractedRevenue = findTextInline(data.lines, 'revenue', '1a') || '';
+    const extractedRoyaltyRate = findTextInline(data.lines, 'royalties', '1b') || '';
+    const extractedOperatingRate = findTextInline(data.lines, Entities.operating.OCRKeyword, Entities.operating.formIndex) || '';
+    const extractedConduitRate = findTextInline(data.lines, Entities.conduit.OCRKeyword, Entities.conduit.formIndex) || '';
+    const extractedLicensorRate = findTextInline(data.lines, Entities.licensor.OCRKeyword, Entities.licensor.formIndex) || '';
 
     setFormData((prev: FormFields) => ({
       ...prev,
@@ -237,23 +236,21 @@ const App = () => {
           <Camera onCapture={handleFile} OCRReady={OCRReady} fileAdded={fileAdded} />
         </>
       ) : (
-        <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh' }}>
-          <>
+        <>
+          {screen === 'initial' ? (
             <>
-              {screen === 'initial' ? (
+              <InitialScreen title="haven" setScreen={handleSetScreen} />
+            </>
+          ) : screen === 'manual' ? (
+            <>
+              {/* <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} /> */}
+              <Explorer formData={formData} setFormData={setFormData} />
+            </>
+          ) : (
+            <>
+              {!OCRReady ? (
                 <>
-                  <InitialScreen title="haven" setScreen={handleSetScreen} />
-                </>
-              ) : screen === 'manual' ? (
-                <>
-                  {/* <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} /> */}
-                  <Explorer formData={formData} setFormData={setFormData} />
-                </>
-              ) : (
-                <>
-                  {!OCRReady ? (
-                    <>
-                      {/* <button onClick={() => handleSetScreen('initial')}>Back</button>
+                  {/* <button onClick={() => handleSetScreen('initial')}>Back</button>
                       <h1 className={commonStyles.header}>haven</h1>
                       <p className={commonStyles.description}>Take a picture of your tax form. </p>
                       <div className={formStyles.qrSection}>
@@ -261,19 +258,17 @@ const App = () => {
                         <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
                         <p>Your tax details will appear here when you're done…</p>
                       </div> */}
-                      <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
-                    </>
-                  ) : (
-                    <>
-                      {/* <TaxForm title={'haven'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} /> */}
-                      <Explorer formData={formData} setFormData={setFormData} />
-                    </>
-                  )}
+                  <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
+                </>
+              ) : (
+                <>
+                  {/* <TaxForm title={'haven'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} /> */}
+                  <Explorer formData={formData} setFormData={setFormData} />
                 </>
               )}
             </>
-          </>
-        </div>
+          )}
+        </>
       )}
     </>
   );

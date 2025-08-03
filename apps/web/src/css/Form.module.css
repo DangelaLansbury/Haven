@@ -2,7 +2,7 @@
   align-items: flex-start;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
   justify-content: center;
   width: 100%;
 }
@@ -60,7 +60,7 @@
   color: var(--gray-650);
   display: flex;
   flex-direction: row;
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   font-weight: 500;
   margin-bottom: 0.5rem;
   width: 100%;
@@ -68,7 +68,7 @@
     align-items: center;
     display: flex;
     flex-direction: row;
-    height: 2.5rem;
+    height: 2rem;
     padding: 0 0.75rem;
     width: 100%;
     &.rightAligned {
@@ -78,7 +78,6 @@
     }
     & > .section {
       color: var(--green-pure);
-      font-weight: 600;
       margin-right: 0.75rem;
     }
   }
@@ -99,8 +98,7 @@
   display: flex;
   flex-direction: row;
   font-size: var(--font-sm);
-  font-weight: 500;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-out;
   width: 100%;
   &:hover {
     background-color: var(--gray-075);
@@ -123,12 +121,21 @@
   padding: 0.5rem 0.75rem;
   text-align: left;
   width: 100%;
+  &.mainValue {
+    width: 25%;
+    & .cellValue {
+      color: var(--gray-900);
+      font-size: var(--font-sm);
+      font-weight: 500;
+    }
+  }
   & .cellValue {
     align-items: center;
     display: flex;
     flex-direction: row;
     flex: 1;
-    gap: 0.375rem;
+    font-weight: 400;
+    gap: 0.5rem;
     justify-content: flex-start;
     text-align: left;
     &.rightAligned {
@@ -138,13 +145,19 @@
     }
     &.subValue {
       font-size: var(--font-xs);
+      font-weight: 300;
       color: var(--gray-300);
-      margin-bottom: 0.063rem;
+      margin-bottom: 1px;
     }
     &.mainValue {
       color: var(--gray-900);
       font-size: var(--font-sm);
-      font-weight: 700;
+      font-weight: 500;
+    }
+    & .formIndex {
+      color: var(--gray-800);
+      font-size: var(--font-sm);
+      font-weight: 600;
     }
   }
 }
@@ -160,8 +173,8 @@
 
 .countryText {
   font-size: var(--font-xs);
-  font-weight: 500;
-  color: var(--gray-350);
+  font-weight: 300;
+  color: var(--gray-300);
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -223,7 +236,7 @@
 
 .formLabel {
   font-size: var(--font-sm);
-  font-weight: 500;
+  font-weight: 400;
   flex: 1;
   padding: 0.5rem;
 }
@@ -248,7 +261,7 @@
   box-sizing: border-box;
   color: var(--gray-800);
   font-size: var(--font-sm);
-  font-family: 'overpass', sans-serif;
+  font-family: 'Overpass', sans-serif;
   font-weight: 400;
   min-width: 5rem;
   max-width: 5rem;

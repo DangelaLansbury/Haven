@@ -1,6 +1,6 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
-import { Country, Entity, Countries } from '../types';
+import { Country } from '../types';
 
 interface FormTableCellInputProps {
   value: string;
@@ -90,6 +90,7 @@ export function CountrySelector({ country, onChange, options }: CountrySelectorP
 
 interface FormTableRowProps {
   key?: string;
+  formIndex: string;
   label?: string;
   value?: string;
   onChange?: (value: string) => void;
@@ -97,83 +98,39 @@ interface FormTableRowProps {
   valueNote?: string;
 }
 
-export function FormTableRow({ key, label, value, onChange, decorator, valueNote }: FormTableRowProps) {
+export function FormTableRow({ key, formIndex, label, value, onChange, decorator, valueNote }: FormTableRowProps) {
   const id = label ? label.toLowerCase().replace(/\s+/g, '-') : key || 'row';
 
   return (
     <div className={formStyles.formTableRow}>
+      {formIndex && (
+        <div className={formStyles.formTableCell} style={{ width: '1.75rem' }}>
+          <span className={formStyles.formIndex} data-id={`${id}-form-index`}>
+            {formIndex}
+          </span>
+        </div>
+      )}
       <div className={formStyles.formTableCell}>
-        <span className={formStyles.cellValue} data-id={`${id}-label`}>
+        <div className={formStyles.cellValue} data-id={`${id}-label`}>
+          {/* {formIndex ? <span className={formStyles.formIndex}>{formIndex}</span> : null} */}
           {label}
-        </span>
+        </div>
         {decorator && (
-          <span className={`${formStyles.cellValue} ${formStyles.decorator}`} data-id={`${id}-decorator`}>
+          <div className={`${formStyles.cellValue} ${formStyles.decorator}`} data-id={`${id}-decorator`}>
             {decorator}
-          </span>
+          </div>
         )}
       </div>
-      <div className={formStyles.formTableCell}>
-        <span className={`${formStyles.cellValue} ${formStyles.mainValue} ${formStyles.rightAligned}`} data-id={`${id}-value`}>
+      <div className={`${formStyles.formTableCell} ${formStyles.mainValue}`}>
+        <div className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id={`${id}-value`}>
           {value}
-        </span>
+        </div>
         {valueNote && (
-          <span className={`${formStyles.cellValue} ${formStyles.subValue} ${formStyles.rightAligned}`} data-id={`${id}-value-note`}>
+          <div className={`${formStyles.cellValue} ${formStyles.subValue} ${formStyles.rightAligned}`} data-id={`${id}-value-note`}>
             {valueNote}
-          </span>
+          </div>
         )}
       </div>
-      {/* <div className={formStyles.formTableCell} style={{ flex: 1 }}>
-        <span className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id={`${id}-rate`}>
-          {newRate !== '' ? newRate : entity.default_country.tax_rate}
-        </span>
-      </div> */}
-      {/* <FormTableCellInput
-        name={`${id}-rate`}
-        value={newRate !== '' ? newRate : entity.default_country.tax_rate}
-        onChange={onRateChange}
-        placeholder="0.0%"
-        className={`${formStyles.cellInput} ${formStyles.rate}`}
-        data-id={`${id}-rate`}
-        readOnly={readOnly}
-      /> */}
     </div>
   );
 }
-
-// interface FormInputProps {
-//   label?: string;
-//   type?: string;
-//   value: string;
-//   onChange: (value: string) => void;
-//   placeholder?: string;
-//   className?: string;
-//   disabled?: boolean;
-//   readonly?: boolean;
-//   onBlur?: () => void;
-//   onFocus?: () => void;
-//   onKeyDown?: (event: React.KeyboardEvent) => void;
-//   onKeyUp?: (event: React.KeyboardEvent) => void;
-//   onKeyPress?: (event: React.KeyboardEvent) => void;
-// }
-
-// export function FormInput({ label, type = 'text', value, onChange, placeholder, className, disabled, readonly, onBlur, onFocus, onKeyDown, onKeyUp, onKeyPress }: FormInputProps) {
-//   return (
-//     <div className={`${formStyles.formGroup} ${className}`}>
-//       {label && <label className={formStyles.formLabel}>{label}</label>}
-//       <input
-//         type={type}
-//         value={value}
-//         onChange={(e) => onChange(e.target.value)}
-//         placeholder={placeholder}
-//         className={formStyles.formInput}
-//         disabled={disabled}
-//         onBlur={onBlur}
-//         onFocus={onFocus}
-//         onKeyDown={onKeyDown}
-//         onKeyUp={onKeyUp}
-//         onKeyPress={onKeyPress}
-//         readOnly={readonly}
-//       />
-//     </div>
-//   );
-// }
