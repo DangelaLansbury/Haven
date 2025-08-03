@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormFields, Countries } from 'src/types';
-import chartStyles from '../css/Chart.module.css';
+import chartStyles from '../css/Explorer.module.css';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 
 const HOME_TAX_RATE = 12.5 / 100;

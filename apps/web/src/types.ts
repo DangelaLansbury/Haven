@@ -154,7 +154,7 @@ export const Entities: Record<string, Entity> = {
   parent: {
     role: 'parent',
     display_role: 'Parent Company',
-    default_name: 'Acme Corp',
+    default_name: 'Acme Corporation',
     description: 'Owns and controls all entities',
     default_country: Countries.USA,
     countries: Countries,
