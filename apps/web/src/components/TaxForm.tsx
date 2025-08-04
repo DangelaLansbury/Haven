@@ -67,7 +67,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
               </div>
             </div>
             <div className={formStyles.formTableRows}>
-              <FormTableRow key="revenue" formIndex="1a" label="Revenue" value={formData.revenue || '$10,000,000'} />
+              <FormTableRow key="revenue" formIndex="1a" label="Revenue" value={formData.revenue || '$500,000,000'} />
               <FormTableRow key="royalty_rate" formIndex="1b" label={'Royalties & IP Fees'} value={formData.royalty_rate || '90%'} valueNote="of revenue" />
             </div>
           </div>

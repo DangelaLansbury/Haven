@@ -10,7 +10,7 @@ import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
-import { Entities, FormFields } from './types';
+import { Entities, FormFields, DefaultFormFields, Countries } from './types';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -19,9 +19,10 @@ const App = () => {
   const [formData, setFormData] = useState<FormFields>({
     revenue: '',
     royalty_rate: '',
-    operating_rate: '',
-    conduit_rate: '',
-    licensor_rate: '',
+    operating_country: '',
+    // operating_rate: '',
+    // conduit_rate: '',
+    // licensor_rate: '',
   });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
@@ -48,16 +49,16 @@ const App = () => {
     sock.on('ocrRoyalty', ({ royalty_rate }): void => {
       setFormData((prev: FormFields) => ({ ...prev, royalty_rate }));
     });
-    sock.on('ocrOperating', ({ operating_rate }): void => {
-      setFormData((prev: FormFields) => ({ ...prev, operating_rate }));
+    sock.on('ocrOperating', ({ operating_country }): void => {
+      setFormData((prev: FormFields) => ({ ...prev, operating_country }));
     });
-    sock.on('ocrConduit', ({ conduit_rate }): void => {
-      setFormData((prev: FormFields) => ({ ...prev, conduit_rate }));
-    });
-    sock.on('ocrLicensor', ({ licensor_rate }): void => {
-      setFormData((prev: FormFields) => ({ ...prev, licensor_rate }));
-    });
-    setSocket(sock);
+    // sock.on('ocrConduit', ({ conduit_rate }): void => {
+    //   setFormData((prev: FormFields) => ({ ...prev, conduit_rate }));
+    // });
+    // sock.on('ocrLicensor', ({ licensor_rate }): void => {
+    //   setFormData((prev: FormFields) => ({ ...prev, licensor_rate }));
+    // });
+    // setSocket(sock);
 
     return () => sock.disconnect();
   }, []);
@@ -118,27 +119,40 @@ const App = () => {
       return null;
     }
 
+    function checkCountryExists(keyword: string): boolean {
+      return Object.values(Countries).some((country) => country.name.toLowerCase() === keyword.toLowerCase());
+    }
+
     const extractedRevenue = findTextInline(data.lines, 'revenue', '1a') || '';
     const extractedRoyaltyRate = findTextInline(data.lines, 'royalties', '1b') || '';
-    const extractedOperatingRate = findTextInline(data.lines, Entities.operating.OCRKeyword, Entities.operating.formIndex) || '';
-    const extractedConduitRate = findTextInline(data.lines, Entities.conduit.OCRKeyword, Entities.conduit.formIndex) || '';
-    const extractedLicensorRate = findTextInline(data.lines, Entities.licensor.OCRKeyword, Entities.licensor.formIndex) || '';
+    const extractedOperatingCountry = findTextInline(data.lines, 'operating', Entities.operating.formIndex) || '';
+
+    if (extractedOperatingCountry !== '' && !checkCountryExists(extractedOperatingCountry)) {
+      console.warn('[OCR] Operating country not found:', extractedOperatingCountry);
+      setFormData((prev: FormFields) => ({ ...prev, operating_country: '' }));
+      return;
+    }
+    // const extractedOperatingRate = findTextInline(data.lines, Entities.operating.OCRKeyword, Entities.operating.formIndex) || '';
+    // const extractedConduitRate = findTextInline(data.lines, Entities.conduit.OCRKeyword, Entities.conduit.formIndex) || '';
+    // const extractedLicensorRate = findTextInline(data.lines, Entities.licensor.OCRKeyword, Entities.licensor.formIndex) || '';
 
     setFormData((prev: FormFields) => ({
       ...prev,
       revenue_rate: extractedRevenue,
       royalty_rate: extractedRoyaltyRate,
-      operating_rate: extractedOperatingRate,
-      conduit_rate: extractedConduitRate,
-      licensor_rate: extractedLicensorRate,
+      operating_country: extractedOperatingCountry,
+      // operating_rate: extractedOperatingRate,
+      // conduit_rate: extractedConduitRate,
+      // licensor_rate: extractedLicensorRate,
     }));
 
     if (socket && socket.connected) {
       socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
       socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyaltyRate });
-      socket.emit('ocrOperating', { sessionId, operating_rate: extractedOperatingRate });
-      socket.emit('ocrConduit', { sessionId, conduit_rate: extractedConduitRate });
-      socket.emit('ocrLicensor', { sessionId, licensor_rate: extractedLicensorRate });
+      socket.emit('ocrOperating', { sessionId, operating_country: extractedOperatingCountry });
+      // socket.emit('ocrOperating', { sessionId, operating_rate: extractedOperatingRate });
+      // socket.emit('ocrConduit', { sessionId, conduit_rate: extractedConduitRate });
+      // socket.emit('ocrLicensor', { sessionId, licensor_rate: extractedLicensorRate });
     } else {
       console.warn('[Socket.IO] socket not ready for gross income emit');
     }
@@ -151,9 +165,9 @@ const App = () => {
         data: data.text,
         revenue: extractedRevenue,
         royalty_rate: extractedRoyaltyRate,
-        operating_rate: extractedOperatingRate,
-        conduit_rate: extractedConduitRate,
-        licensor_rate: extractedLicensorRate,
+        // operating_rate: extractedOperatingRate,
+        // conduit_rate: extractedConduitRate,
+        // licensor_rate: extractedLicensorRate,
       }),
     });
     console.log('[API] /api/submit status=', res.status);
@@ -179,28 +193,32 @@ const App = () => {
         console.log('[Polling] royalty_rate updated:', json.royalty_rate);
         setFormData((prev: FormFields) => ({ ...prev, royalty_rate: json.royalty_rate }));
       }
-      if (json.operating_rate && json.operating_rate !== formData.operating_rate) {
-        console.log('[Polling] operating_rate updated:', json.operating_rate);
-        setFormData((prev: FormFields) => ({ ...prev, operating_rate: json.operating_rate }));
+      if (json.operating_country && json.operating_country !== formData.operating_country) {
+        console.log('[Polling] operating_country updated:', json.operating_country);
+        setFormData((prev: FormFields) => ({ ...prev, operating_country: json.operating_country }));
       }
-      if (json.conduit_rate && json.conduit_rate !== formData.conduit_rate) {
-        console.log('[Polling] conduit_rate updated:', json.conduit_rate);
-        setFormData((prev: FormFields) => ({ ...prev, conduit_rate: json.conduit_rate }));
-      }
-      if (json.licensor_rate && json.licensor_rate !== formData.licensor_rate) {
-        console.log('[Polling] licensor_rate updated:', json.licensor_rate);
-        setFormData((prev: FormFields) => ({ ...prev, licensor_rate: json.licensor_rate }));
-      }
-      if (json.revenue || json.royalty_rate || json.operating_rate || json.conduit_rate || json.licensor_rate) {
-        setOCRReady(true);
-      }
+      // if (json.operating_rate && json.operating_rate !== formData.operating_rate) {
+      //   console.log('[Polling] operating_rate updated:', json.operating_rate);
+      //   setFormData((prev: FormFields) => ({ ...prev, operating_rate: json.operating_rate }));
+      // }
+      // if (json.conduit_rate && json.conduit_rate !== formData.conduit_rate) {
+      //   console.log('[Polling] conduit_rate updated:', json.conduit_rate);
+      //   setFormData((prev: FormFields) => ({ ...prev, conduit_rate: json.conduit_rate }));
+      // }
+      // if (json.licensor_rate && json.licensor_rate !== formData.licensor_rate) {
+      //   console.log('[Polling] licensor_rate updated:', json.licensor_rate);
+      //   setFormData((prev: FormFields) => ({ ...prev, licensor_rate: json.licensor_rate }));
+      // }
+      // if (json.revenue || json.royalty_rate || json.operating_rate || json.conduit_rate || json.licensor_rate) {
+      //   setOCRReady(true);
+      // }
     }, 3000);
 
     return () => clearInterval(interval);
   }, [sessionId, isUpload, OCRReady]);
 
   const resetFormData = () => {
-    setFormData({ revenue: '', royalty_rate: '', operating_rate: '', conduit_rate: '', licensor_rate: '' });
+    setFormData({ revenue: '', royalty_rate: '', operating_country: '' });
   };
 
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {
@@ -212,11 +230,7 @@ const App = () => {
       resetFormData();
       setFormData((prev: FormFields) => ({
         ...prev,
-        revenue: '100000',
-        royalty_rate: '90',
-        operating_rate: '12.5',
-        conduit_rate: '0.0',
-        licensor_rate: '0.0',
+        ...DefaultFormFields,
       }));
     }
     if (newScreen === 'initial') {

@@ -3,10 +3,22 @@ export interface FormFields {
   data: string;
   revenue: string;
   royalty_rate: string;
-  operating_rate: string;
-  conduit_rate: string;
-  licensor_rate: string;
+  operating_country: string;
+  // operating_rate: string;
+  // conduit_rate: string;
+  // licensor_rate: string;
 }
+
+export const DefaultFormFields: FormFields = {
+  sessionId: '',
+  data: '',
+  revenue: '$100,000,000',
+  royalty_rate: '95',
+  operating_country: 'IRELAND',
+  // operating_rate: '12.5',
+  // conduit_rate: '0',
+  // licensor_rate: '0',
+};
 
 export interface Country {
   name: string;
@@ -20,7 +32,7 @@ export const TaxHavens: Record<string, Country> = {
   BERMUDA: {
     name: 'Bermuda',
     flag: '/assets/images/flags/bermuda.svg',
-    tax_rate: '0.0%',
+    tax_rate: '0.0',
     note: 'Manage business from here with no corporate tax',
     code: 'BM',
   },
@@ -48,7 +60,7 @@ export const Conduits: Record<string, Country> = {
   NETHERLANDS: {
     name: 'Netherlands',
     flag: '/assets/images/flags/netherlands.svg',
-    tax_rate: '0.0%',
+    tax_rate: '0.0',
     note: 'Allows tax-free flow of royalties out of country',
     code: 'NL',
   },
@@ -76,7 +88,7 @@ export const OperatingBases: Record<string, Country> = {
   IRELAND: {
     name: 'Ireland',
     flag: '/assets/images/flags/ireland.svg',
-    tax_rate: '12.5%',
+    tax_rate: '12.5',
     note: 'Relatively low corporate tax',
     code: 'IE',
   },
@@ -107,11 +119,13 @@ export const Countries: Record<string, Country> = {
   USA: {
     name: 'United States',
     flag: '/assets/images/flags/usa.svg',
-    tax_rate: '21.0%',
+    tax_rate: '21.0',
     note: 'Federal corporate tax rate',
     code: 'US',
   },
 };
+
+export const HOME_TAX_RATE = parseFloat(Countries.USA.tax_rate) / 100 || 0.21;
 
 export interface Entity {
   role: string;
