@@ -63,7 +63,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
                 <span className={formStyles.section} style={{ width: '1rem' }}>
                   {'§1'}
                 </span>
-                {'Earnings and Expenditures'}
+                {'EARNINGS & EXPENDITURES'}
               </div>
             </div>
             <div className={formStyles.formTableRows}>
@@ -77,24 +77,13 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
                 <span className={formStyles.section} style={{ width: '1rem' }}>
                   {'§2'}
                 </span>
-                {'Entities'}
-              </div>
-              <div className={`${formStyles.formTableTh} ${formStyles.rightAligned}`} style={{ width: '30%' }}>
-                {'Corp. Tax Rate'}
+                {'ENTITIES'}
               </div>
             </div>
             <div className={formStyles.formTableRows}>
               {Object.keys(Entities).map((role) => {
                 const entity = Entities[role];
-                return (
-                  <FormTableRow
-                    key={role}
-                    formIndex={entity.formIndex}
-                    label={entity.display_role}
-                    value={entity.default_country.tax_rate}
-                    decorator={<CountryDecorator country={entity.default_country} text={`${entity.default_name} (${entity.default_country.code})`} />}
-                  />
-                );
+                return <FormTableRow key={role} formIndex={entity.formIndex} label={entity.display_role} value={entity.default_country.name} decorator={<CountryDecorator country={entity.default_country} text={entity.default_name} />} />;
               })}
             </div>
           </div>
