@@ -38,7 +38,7 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxes
             className={chartStyles.taxesPaidBar}
             animate={{ height: `${taxesPaidHeight}px` }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
-            style={{ backgroundColor: 'red', width: '100%', marginTop: '2px', borderBottom: '4px solid red' }}
+            style={{ backgroundColor: 'red', width: '100%', marginTop: '2px', borderBottom: '2px solid red' }}
           />
         </motion.div>
       </div>

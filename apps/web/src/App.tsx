@@ -19,7 +19,7 @@ const App = () => {
   const [formData, setFormData] = useState<FormFields>({
     revenue: '',
     royalty_rate: '',
-    operating_country: '',
+    // operating_country: '',
     // operating_rate: '',
     // conduit_rate: '',
     // licensor_rate: '',
@@ -49,16 +49,16 @@ const App = () => {
     sock.on('ocrRoyalty', ({ royalty_rate }): void => {
       setFormData((prev: FormFields) => ({ ...prev, royalty_rate }));
     });
-    sock.on('ocrOperating', ({ operating_country }): void => {
-      setFormData((prev: FormFields) => ({ ...prev, operating_country }));
-    });
+    // sock.on('ocrOperating', ({ operating_country }): void => {
+    //   setFormData((prev: FormFields) => ({ ...prev, operating_country }));
+    // });
     // sock.on('ocrConduit', ({ conduit_rate }): void => {
     //   setFormData((prev: FormFields) => ({ ...prev, conduit_rate }));
     // });
     // sock.on('ocrLicensor', ({ licensor_rate }): void => {
     //   setFormData((prev: FormFields) => ({ ...prev, licensor_rate }));
     // });
-    // setSocket(sock);
+    setSocket(sock);
 
     return () => sock.disconnect();
   }, []);
@@ -125,13 +125,13 @@ const App = () => {
 
     const extractedRevenue = findTextInline(data.lines, 'revenue', '1a') || '';
     const extractedRoyaltyRate = findTextInline(data.lines, 'royalties', '1b') || '';
-    const extractedOperatingCountry = findTextInline(data.lines, 'operating', Entities.operating.formIndex) || '';
+    // const extractedOperatingCountry = findTextInline(data.lines, 'operating', Entities.operating.formIndex) || '';
 
-    if (extractedOperatingCountry !== '' && !checkCountryExists(extractedOperatingCountry)) {
-      console.warn('[OCR] Operating country not found:', extractedOperatingCountry);
-      setFormData((prev: FormFields) => ({ ...prev, operating_country: '' }));
-      return;
-    }
+    // if (extractedOperatingCountry !== '' && !checkCountryExists(extractedOperatingCountry)) {
+    //   console.warn('[OCR] Operating country not found:', extractedOperatingCountry);
+    //   setFormData((prev: FormFields) => ({ ...prev, operating_country: '' }));
+    //   return;
+    // }
     // const extractedOperatingRate = findTextInline(data.lines, Entities.operating.OCRKeyword, Entities.operating.formIndex) || '';
     // const extractedConduitRate = findTextInline(data.lines, Entities.conduit.OCRKeyword, Entities.conduit.formIndex) || '';
     // const extractedLicensorRate = findTextInline(data.lines, Entities.licensor.OCRKeyword, Entities.licensor.formIndex) || '';
@@ -140,7 +140,7 @@ const App = () => {
       ...prev,
       revenue_rate: extractedRevenue,
       royalty_rate: extractedRoyaltyRate,
-      operating_country: extractedOperatingCountry,
+      // operating_country: extractedOperatingCountry,
       // operating_rate: extractedOperatingRate,
       // conduit_rate: extractedConduitRate,
       // licensor_rate: extractedLicensorRate,
@@ -149,7 +149,7 @@ const App = () => {
     if (socket && socket.connected) {
       socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
       socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyaltyRate });
-      socket.emit('ocrOperating', { sessionId, operating_country: extractedOperatingCountry });
+      // socket.emit('ocrOperating', { sessionId, operating_country: extractedOperatingCountry });
       // socket.emit('ocrOperating', { sessionId, operating_rate: extractedOperatingRate });
       // socket.emit('ocrConduit', { sessionId, conduit_rate: extractedConduitRate });
       // socket.emit('ocrLicensor', { sessionId, licensor_rate: extractedLicensorRate });
@@ -193,10 +193,10 @@ const App = () => {
         console.log('[Polling] royalty_rate updated:', json.royalty_rate);
         setFormData((prev: FormFields) => ({ ...prev, royalty_rate: json.royalty_rate }));
       }
-      if (json.operating_country && json.operating_country !== formData.operating_country) {
-        console.log('[Polling] operating_country updated:', json.operating_country);
-        setFormData((prev: FormFields) => ({ ...prev, operating_country: json.operating_country }));
-      }
+      // if (json.operating_country && json.operating_country !== formData.operating_country) {
+      //   console.log('[Polling] operating_country updated:', json.operating_country);
+      //   setFormData((prev: FormFields) => ({ ...prev, operating_country: json.operating_country }));
+      // }
       // if (json.operating_rate && json.operating_rate !== formData.operating_rate) {
       //   console.log('[Polling] operating_rate updated:', json.operating_rate);
       //   setFormData((prev: FormFields) => ({ ...prev, operating_rate: json.operating_rate }));
@@ -209,16 +209,16 @@ const App = () => {
       //   console.log('[Polling] licensor_rate updated:', json.licensor_rate);
       //   setFormData((prev: FormFields) => ({ ...prev, licensor_rate: json.licensor_rate }));
       // }
-      // if (json.revenue || json.royalty_rate || json.operating_rate || json.conduit_rate || json.licensor_rate) {
-      //   setOCRReady(true);
-      // }
+      if (json.revenue || json.royalty_rate) {
+        setOCRReady(true);
+      }
     }, 3000);
 
     return () => clearInterval(interval);
   }, [sessionId, isUpload, OCRReady]);
 
   const resetFormData = () => {
-    setFormData({ revenue: '', royalty_rate: '', operating_country: '' });
+    setFormData({ revenue: '', royalty_rate: '' });
   };
 
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {

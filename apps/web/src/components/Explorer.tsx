@@ -13,13 +13,13 @@ interface ExplorerProps {
 const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerProps) => {
   const [revenue, setRevenue] = React.useState<number>(parseFloat(DefaultFormFields.revenue));
   const [royaltyRate, setRoyaltyRate] = React.useState<number>(parseFloat(DefaultFormFields.royalty_rate));
-  const [operatingCountry, setOperatingCountry] = React.useState<Country>(Countries.IRELAND);
+  // const [operatingCountry, setOperatingCountry] = React.useState<Country>(Countries.IRELAND);
   // const [operatingRate, setOperatingRate] = React.useState<number>(0);
 
   React.useEffect(() => {
     setRevenue(formData.revenue && parseFloat(formData.revenue));
     setRoyaltyRate(formData.royalty_rate && parseFloat(formData.royalty_rate));
-    setOperatingCountry(formData.operating_country && Countries[formData.operating_country]);
+    // setOperatingCountry(formData.operating_country && Countries[formData.operating_country]);
     // setOperatingRate(parseFloat(Countries[operatingCountry].tax_rate));
     // setOperatingRate(formData.operating_rate ? parseFloat(formData.operating_rate) : DefaultFormFields.operating_rate);
     // setLicensorRate(formData.licensor_rate ? parseFloat(formData.licensor_rate) : DefaultFormFields.licensor_rate);
@@ -27,7 +27,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
 
   const royaltyAmount = revenue * (royaltyRate / 100);
   const operatingProfit = revenue - royaltyAmount;
-  const operatingTaxPaid = operatingProfit * (parseFloat(operatingCountry.tax_rate) / 100);
+  const operatingTaxPaid = operatingProfit * (parseFloat(Countries.IRELAND.tax_rate) / 100);
 
   const totalProfit = royaltyAmount + operatingProfit - operatingTaxPaid;
 
@@ -60,7 +60,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
         </div>
         <div className={formStyles.formGroup}>
           <label htmlFor="royaltyRate">Royalty Rate</label>
-          <input id="royaltyRate" type="range" min={80} max={100} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
+          <input id="royaltyRate" type="range" min={0} max={100} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
         </div>
         <div className={explorerStyles.entitiesContainer}>
           {Object.entries(Entities).map(([key, entity]) => (
