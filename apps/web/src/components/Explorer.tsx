@@ -11,31 +11,29 @@ interface ExplorerProps {
 }
 
 const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerProps) => {
-  const [revenue, setRevenue] = React.useState<number>(parseFloat(DefaultFormFields.revenue));
-  const [royaltyRate, setRoyaltyRate] = React.useState<number>(parseFloat(DefaultFormFields.royalty_rate));
-  // const [operatingCountry, setOperatingCountry] = React.useState<Country>(Countries.IRELAND);
-  // const [operatingRate, setOperatingRate] = React.useState<number>(0);
+  const initialRevenue = formData.revenue && !isNaN(Number(formData.revenue)) ? parseFloat(formData.revenue) : parseFloat(DefaultFormFields.revenue);
+  const initialRoyaltyRate = formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? parseFloat(formData.royalty_rate) : parseFloat(DefaultFormFields.royalty_rate);
+  const [revenue, setRevenue] = React.useState<number>(initialRevenue);
+  const [royaltyRate, setRoyaltyRate] = React.useState<number>(initialRoyaltyRate);
 
   React.useEffect(() => {
-    setRevenue(formData.revenue && parseFloat(formData.revenue));
-    setRoyaltyRate(formData.royalty_rate && parseFloat(formData.royalty_rate));
-    // setOperatingCountry(formData.operating_country && Countries[formData.operating_country]);
-    // setOperatingRate(parseFloat(Countries[operatingCountry].tax_rate));
-    // setOperatingRate(formData.operating_rate ? parseFloat(formData.operating_rate) : DefaultFormFields.operating_rate);
-    // setLicensorRate(formData.licensor_rate ? parseFloat(formData.licensor_rate) : DefaultFormFields.licensor_rate);
+    setRevenue(formData.revenue && !isNaN(Number(formData.revenue)) ? parseFloat(formData.revenue) : parseFloat(DefaultFormFields.revenue));
+    setRoyaltyRate(formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? parseFloat(formData.royalty_rate) : parseFloat(DefaultFormFields.royalty_rate));
   }, [formData]);
 
-  const royaltyAmount = revenue * (royaltyRate / 100);
-  const operatingProfit = revenue - royaltyAmount;
+  const safeRevenue = revenue || parseFloat(DefaultFormFields.revenue);
+  const safeRoyaltyRate = royaltyRate || parseFloat(DefaultFormFields.royalty_rate);
+
+  const royaltyAmount = safeRevenue * (safeRoyaltyRate / 100);
+  const operatingProfit = safeRevenue - royaltyAmount;
   const operatingTaxPaid = operatingProfit * (parseFloat(Countries.IRELAND.tax_rate) / 100);
 
   const totalProfit = royaltyAmount + operatingProfit - operatingTaxPaid;
 
   const totalTaxPaid = operatingTaxPaid;
-  const effectiveTaxRate = (totalTaxPaid / revenue) * 100;
+  const effectiveTaxRate = (totalTaxPaid / safeRevenue) * 100;
 
-  const taxesDueAtHome = revenue * HOME_TAX_RATE;
-  const effectiveVsHomeTaxRate = (totalTaxPaid / taxesDueAtHome) * 100;
+  const taxesDueAtHome = safeRevenue * HOME_TAX_RATE;
 
   function handleRevenueChange(value: string) {
     setFormData((prev: FormFields) => ({
@@ -60,7 +58,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
         </div>
         <div className={formStyles.formGroup}>
           <label htmlFor="royaltyRate">Royalty Rate</label>
-          <input id="royaltyRate" type="range" min={0} max={100} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
+          <input id="royaltyRate" type="range" min={10} max={100} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
         </div>
         <div className={explorerStyles.entitiesContainer}>
           {Object.entries(Entities).map(([key, entity]) => (

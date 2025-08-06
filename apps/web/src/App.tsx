@@ -16,14 +16,15 @@ const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
-  const [formData, setFormData] = useState<FormFields>({
-    revenue: '',
-    royalty_rate: '',
-    // operating_country: '',
-    // operating_rate: '',
-    // conduit_rate: '',
-    // licensor_rate: '',
-  });
+  // const [formData, setFormData] = useState<FormFields>({
+  //   revenue: '',
+  //   royalty_rate: '',
+  //   // operating_country: '',
+  //   // operating_rate: '',
+  //   // conduit_rate: '',
+  //   // licensor_rate: '',
+  // });
+  const [formData, setFormData] = useState<FormFields>({ ...DefaultFormFields });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
   const [fileAdded, setFileAdded] = React.useState(false);
@@ -218,7 +219,7 @@ const App = () => {
   }, [sessionId, isUpload, OCRReady]);
 
   const resetFormData = () => {
-    setFormData({ revenue: '', royalty_rate: '' });
+    setFormData({ revenue: DefaultFormFields.revenue, royalty_rate: DefaultFormFields.royalty_rate });
   };
 
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {
@@ -228,10 +229,6 @@ const App = () => {
     }
     if (newScreen === 'manual') {
       resetFormData();
-      setFormData((prev: FormFields) => ({
-        ...prev,
-        ...DefaultFormFields,
-      }));
     }
     if (newScreen === 'initial') {
       resetFormData();

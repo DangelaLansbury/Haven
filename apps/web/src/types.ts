@@ -12,7 +12,7 @@ export interface FormFields {
 export const DefaultFormFields: FormFields = {
   sessionId: '',
   data: '',
-  revenue: '$100,000,000',
+  revenue: '25000000000',
   royalty_rate: '95',
   // operating_country: 'IRELAND',
   // operating_rate: '12.5',
