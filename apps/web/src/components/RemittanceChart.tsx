@@ -1,7 +1,6 @@
 import React from 'react';
-import { FormFields, Countries } from 'src/types';
 import chartStyles from '../css/Explorer.module.css';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface RemittanceChartProps {
   revenue: number;
@@ -23,7 +22,7 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxes
 
   return (
     <>
-      <div className={chartStyles.chartContainer} style={{ width: '140px', height: `${maxHeight + 2}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+      <div className={chartStyles.chartContainer} style={{ width: '140px', height: `${maxHeight}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'lightgray' }}>
         <motion.div className={chartStyles.revenueBar} animate={{ height: `${revenueHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           <motion.div
             className={chartStyles.profitBar}
@@ -32,7 +31,6 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxes
             style={{ backgroundColor: 'green', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
           ></motion.div>
           <motion.div className={chartStyles.homeProfitBar} animate={{ height: `${homeProfitHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: 'blue', width: '100%', marginTop: '2px' }} />
-          {/* <motion.div className={chartStyles.homeProfitBar} animate={{ height: `${homeProfitHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: 'blue', width: '100%', marginTop: '2px' }} /> */}
           <motion.div className={chartStyles.taxesDueAtHomeBar} animate={{ height: `${taxesDueAtHomeHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: 'orange', width: '100%', marginTop: '2px' }} />
           <motion.div
             className={chartStyles.taxesPaidBar}
@@ -45,15 +43,3 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxes
     </>
   );
 };
-
-{
-  /* <motion.div
-          className={chartStyles.revenueBar}
-          animate={{ height: `${revenueHeight}px` }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
-          style={{ backgroundColor: 'gray', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
-        >
-          
-          
-        </motion.div> */
-}

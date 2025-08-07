@@ -16,14 +16,6 @@ const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
-  // const [formData, setFormData] = useState<FormFields>({
-  //   revenue: '',
-  //   royalty_rate: '',
-  //   // operating_country: '',
-  //   // operating_rate: '',
-  //   // conduit_rate: '',
-  //   // licensor_rate: '',
-  // });
   const [formData, setFormData] = useState<FormFields>({ ...DefaultFormFields });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
@@ -50,15 +42,6 @@ const App = () => {
     sock.on('ocrRoyalty', ({ royalty_rate }): void => {
       setFormData((prev: FormFields) => ({ ...prev, royalty_rate }));
     });
-    // sock.on('ocrOperating', ({ operating_country }): void => {
-    //   setFormData((prev: FormFields) => ({ ...prev, operating_country }));
-    // });
-    // sock.on('ocrConduit', ({ conduit_rate }): void => {
-    //   setFormData((prev: FormFields) => ({ ...prev, conduit_rate }));
-    // });
-    // sock.on('ocrLicensor', ({ licensor_rate }): void => {
-    //   setFormData((prev: FormFields) => ({ ...prev, licensor_rate }));
-    // });
     setSocket(sock);
 
     return () => sock.disconnect();
@@ -126,34 +109,16 @@ const App = () => {
 
     const extractedRevenue = findTextInline(data.lines, 'revenue', '1a') || '';
     const extractedRoyaltyRate = findTextInline(data.lines, 'royalties', '1b') || '';
-    // const extractedOperatingCountry = findTextInline(data.lines, 'operating', Entities.operating.formIndex) || '';
-
-    // if (extractedOperatingCountry !== '' && !checkCountryExists(extractedOperatingCountry)) {
-    //   console.warn('[OCR] Operating country not found:', extractedOperatingCountry);
-    //   setFormData((prev: FormFields) => ({ ...prev, operating_country: '' }));
-    //   return;
-    // }
-    // const extractedOperatingRate = findTextInline(data.lines, Entities.operating.OCRKeyword, Entities.operating.formIndex) || '';
-    // const extractedConduitRate = findTextInline(data.lines, Entities.conduit.OCRKeyword, Entities.conduit.formIndex) || '';
-    // const extractedLicensorRate = findTextInline(data.lines, Entities.licensor.OCRKeyword, Entities.licensor.formIndex) || '';
 
     setFormData((prev: FormFields) => ({
       ...prev,
       revenue_rate: extractedRevenue,
       royalty_rate: extractedRoyaltyRate,
-      // operating_country: extractedOperatingCountry,
-      // operating_rate: extractedOperatingRate,
-      // conduit_rate: extractedConduitRate,
-      // licensor_rate: extractedLicensorRate,
     }));
 
     if (socket && socket.connected) {
       socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
       socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyaltyRate });
-      // socket.emit('ocrOperating', { sessionId, operating_country: extractedOperatingCountry });
-      // socket.emit('ocrOperating', { sessionId, operating_rate: extractedOperatingRate });
-      // socket.emit('ocrConduit', { sessionId, conduit_rate: extractedConduitRate });
-      // socket.emit('ocrLicensor', { sessionId, licensor_rate: extractedLicensorRate });
     } else {
       console.warn('[Socket.IO] socket not ready for gross income emit');
     }
@@ -166,9 +131,6 @@ const App = () => {
         data: data.text,
         revenue: extractedRevenue,
         royalty_rate: extractedRoyaltyRate,
-        // operating_rate: extractedOperatingRate,
-        // conduit_rate: extractedConduitRate,
-        // licensor_rate: extractedLicensorRate,
       }),
     });
     console.log('[API] /api/submit status=', res.status);
@@ -194,22 +156,6 @@ const App = () => {
         console.log('[Polling] royalty_rate updated:', json.royalty_rate);
         setFormData((prev: FormFields) => ({ ...prev, royalty_rate: json.royalty_rate }));
       }
-      // if (json.operating_country && json.operating_country !== formData.operating_country) {
-      //   console.log('[Polling] operating_country updated:', json.operating_country);
-      //   setFormData((prev: FormFields) => ({ ...prev, operating_country: json.operating_country }));
-      // }
-      // if (json.operating_rate && json.operating_rate !== formData.operating_rate) {
-      //   console.log('[Polling] operating_rate updated:', json.operating_rate);
-      //   setFormData((prev: FormFields) => ({ ...prev, operating_rate: json.operating_rate }));
-      // }
-      // if (json.conduit_rate && json.conduit_rate !== formData.conduit_rate) {
-      //   console.log('[Polling] conduit_rate updated:', json.conduit_rate);
-      //   setFormData((prev: FormFields) => ({ ...prev, conduit_rate: json.conduit_rate }));
-      // }
-      // if (json.licensor_rate && json.licensor_rate !== formData.licensor_rate) {
-      //   console.log('[Polling] licensor_rate updated:', json.licensor_rate);
-      //   setFormData((prev: FormFields) => ({ ...prev, licensor_rate: json.licensor_rate }));
-      // }
       if (json.revenue || json.royalty_rate) {
         setOCRReady(true);
       }
@@ -254,26 +200,16 @@ const App = () => {
             </>
           ) : screen === 'manual' ? (
             <>
-              {/* <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} /> */}
               <Explorer formData={formData} setFormData={setFormData} />
             </>
           ) : (
             <>
               {!OCRReady ? (
                 <>
-                  {/* <button onClick={() => handleSetScreen('initial')}>Back</button>
-                      <h1 className={commonStyles.header}>haven</h1>
-                      <p className={commonStyles.description}>Take a picture of your tax form. </p>
-                      <div className={formStyles.qrSection}>
-                        Scan this QR code:
-                        <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
-                        <p>Your tax details will appear here when you're done…</p>
-                      </div> */}
                   <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
                 </>
               ) : (
                 <>
-                  {/* <TaxForm title={'haven'} description={'Review your tax details for accuracy'} formData={formData} setFormData={setFormData} /> */}
                   <Explorer formData={formData} setFormData={setFormData} />
                 </>
               )}

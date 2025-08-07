@@ -3,10 +3,6 @@ export interface FormFields {
   data: string;
   revenue: string;
   royalty_rate: string;
-  // operating_country: string;
-  // operating_rate: string;
-  // conduit_rate: string;
-  // licensor_rate: string;
 }
 
 export const DefaultFormFields: FormFields = {
@@ -14,10 +10,6 @@ export const DefaultFormFields: FormFields = {
   data: '',
   revenue: '25000000000',
   royalty_rate: '95',
-  // operating_country: 'IRELAND',
-  // operating_rate: '12.5',
-  // conduit_rate: '0',
-  // licensor_rate: '0',
 };
 
 export interface Country {
