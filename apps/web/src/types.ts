@@ -8,8 +8,8 @@ export interface FormFields {
 export const DefaultFormFields: FormFields = {
   sessionId: '',
   data: '',
-  revenue: '25000000000',
-  royalty_rate: '95',
+  revenue: '$25,000,000,000',
+  royalty_rate: '95%',
 };
 
 export const DefaultExplorerData: FormFields = {
