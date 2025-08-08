@@ -3,7 +3,7 @@ import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
 import { CountryDecorator, FormTableRow } from './FormInput';
 import QRCode from 'qrcode.react';
-import { FormFields, Entities } from '../types';
+import { FormFields, Entities, DefaultFormFields } from '../types';
 import { motion } from 'framer-motion';
 
 // duration: 0.3, ease: [0.48, 0, 0.62, 1]
@@ -67,8 +67,8 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
               </div>
             </div>
             <div className={formStyles.formTableRows}>
-              <FormTableRow key="revenue" formIndex="1a" label="Revenue" value={formData.revenue || '$500,000,000'} />
-              <FormTableRow key="royalty_rate" formIndex="1b" label={'Royalties & IP Fees'} value={formData.royalty_rate || '90%'} valueNote="of revenue" />
+              <FormTableRow key="revenue" formIndex="1a" label="Revenue" value={DefaultFormFields.revenue} />
+              <FormTableRow key="royalty_rate" formIndex="1b" label={'Royalties & IP Fees'} value={DefaultFormFields.royalty_rate} valueNote="of revenue" />
             </div>
           </div>
           <div className={formStyles.formTable}>

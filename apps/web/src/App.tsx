@@ -10,13 +10,13 @@ import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
-import { Entities, FormFields, DefaultFormFields, Countries } from './types';
+import { Entities, FormFields, DefaultExplorerData, Countries } from './types';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
-  const [formData, setFormData] = useState<FormFields>({ ...DefaultFormFields });
+  const [formData, setFormData] = useState<FormFields>({ ...DefaultExplorerData });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
   const [fileAdded, setFileAdded] = React.useState(false);
@@ -165,7 +165,7 @@ const App = () => {
   }, [sessionId, isUpload, OCRReady]);
 
   const resetFormData = () => {
-    setFormData({ revenue: DefaultFormFields.revenue, royalty_rate: DefaultFormFields.royalty_rate });
+    setFormData({ revenue: DefaultExplorerData.revenue, royalty_rate: DefaultExplorerData.royalty_rate });
   };
 
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {

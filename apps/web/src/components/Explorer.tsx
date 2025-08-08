@@ -1,7 +1,7 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormFields, Entities, DefaultFormFields, HOME_TAX_RATE, Countries, Country } from '../types';
+import { FormFields, Entities, DefaultExplorerData, HOME_TAX_RATE, Countries, Country } from '../types';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
 
@@ -11,18 +11,18 @@ interface ExplorerProps {
 }
 
 const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerProps) => {
-  const initialRevenue = formData.revenue && !isNaN(Number(formData.revenue)) ? parseFloat(formData.revenue) : parseFloat(DefaultFormFields.revenue);
-  const initialRoyaltyRate = formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? parseFloat(formData.royalty_rate) : parseFloat(DefaultFormFields.royalty_rate);
+  const initialRevenue = formData.revenue && !isNaN(Number(formData.revenue)) ? parseFloat(formData.revenue) : parseFloat(DefaultExplorerData.revenue);
+  const initialRoyaltyRate = formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? parseFloat(formData.royalty_rate) : parseFloat(DefaultExplorerData.royalty_rate);
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
   const [royaltyRate, setRoyaltyRate] = React.useState<number>(initialRoyaltyRate);
 
   React.useEffect(() => {
-    setRevenue(formData.revenue && !isNaN(Number(formData.revenue)) ? parseFloat(formData.revenue) : parseFloat(DefaultFormFields.revenue));
-    setRoyaltyRate(formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? parseFloat(formData.royalty_rate) : parseFloat(DefaultFormFields.royalty_rate));
+    setRevenue(formData.revenue && !isNaN(Number(formData.revenue)) ? parseFloat(formData.revenue) : parseFloat(DefaultExplorerData.revenue));
+    setRoyaltyRate(formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? parseFloat(formData.royalty_rate) : parseFloat(DefaultExplorerData.royalty_rate));
   }, [formData]);
 
-  const safeRevenue = revenue || parseFloat(DefaultFormFields.revenue);
-  const safeRoyaltyRate = royaltyRate || parseFloat(DefaultFormFields.royalty_rate);
+  const safeRevenue = revenue || parseFloat(DefaultExplorerData.revenue);
+  const safeRoyaltyRate = royaltyRate || parseFloat(DefaultExplorerData.royalty_rate);
 
   const royaltyAmount = safeRevenue * (safeRoyaltyRate / 100);
   const operatingProfit = safeRevenue - royaltyAmount;

@@ -10,9 +10,9 @@ interface RemittanceChartProps {
 }
 
 export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxesDueAtHome, profit, taxesPaid }) => {
-  const maxHeight = 240;
-  const minHeight = 160;
-  const maxRevenue = 100000000000; // $100 billion
+  const maxHeight = 200;
+  const minHeight = 150;
+  const maxRevenue = 100000000000;
 
   const revenueHeight = (revenue / maxRevenue) * (maxHeight - minHeight) + minHeight;
   const taxesDueAtHomeHeight = (taxesDueAtHome / revenue) * revenueHeight;
@@ -22,7 +22,7 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxes
 
   return (
     <>
-      <div className={chartStyles.chartContainer} style={{ width: '140px', height: `${maxHeight}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'lightgray' }}>
+      <div className={chartStyles.chartContainer} style={{ width: '140px', height: `${maxHeight}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         <motion.div className={chartStyles.revenueBar} animate={{ height: `${revenueHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           <motion.div
             className={chartStyles.profitBar}

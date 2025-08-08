@@ -12,6 +12,13 @@ export const DefaultFormFields: FormFields = {
   royalty_rate: '95',
 };
 
+export const DefaultExplorerData: FormFields = {
+  sessionId: '',
+  data: '',
+  revenue: '50000000000',
+  royalty_rate: '90',
+};
+
 export interface Country {
   name: string;
   flag: string;
