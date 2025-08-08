@@ -11,7 +11,7 @@ interface RemittanceChartProps {
 
 export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxesDueAtHome, profit, taxesPaid }) => {
   const maxHeight = 200;
-  const minHeight = 150;
+  const minHeight = 120;
   const maxRevenue = 100000000000;
 
   const revenueHeight = (revenue / maxRevenue) * (maxHeight - minHeight) + minHeight;
@@ -28,15 +28,15 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxes
             className={chartStyles.profitBar}
             animate={{ height: `${profitHeight}px` }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
-            style={{ backgroundColor: 'green', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+            style={{ backgroundColor: '#639452', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
           ></motion.div>
-          <motion.div className={chartStyles.homeProfitBar} animate={{ height: `${homeProfitHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: 'blue', width: '100%', marginTop: '2px' }} />
-          <motion.div className={chartStyles.taxesDueAtHomeBar} animate={{ height: `${taxesDueAtHomeHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: 'orange', width: '100%', marginTop: '2px' }} />
+          <motion.div className={chartStyles.homeProfitBar} animate={{ height: `${homeProfitHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: '#74A762', width: '100%', marginTop: '2px' }} />
+          <motion.div className={chartStyles.taxesDueAtHomeBar} animate={{ height: `${taxesDueAtHomeHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: '#C6A66A', width: '100%', marginTop: '2px' }} />
           <motion.div
             className={chartStyles.taxesPaidBar}
             animate={{ height: `${taxesPaidHeight}px` }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
-            style={{ backgroundColor: 'red', width: '100%', marginTop: '2px', borderBottom: '2px solid red' }}
+            style={{ backgroundColor: '#783D5C', width: '100%', marginTop: '2px', borderBottom: '2px solid #783D5C' }}
           />
         </motion.div>
       </div>

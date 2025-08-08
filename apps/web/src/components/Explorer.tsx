@@ -54,11 +54,11 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
       <div className={commonStyles.leftSide} style={{ flex: 2, maxWidth: '560px' }}>
         <div className={formStyles.formGroup}>
           <label htmlFor="revenue">Revenue</label>
-          <input id="revenue" type="range" min={100000000} max={100000000000} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} />
+          <input id="revenue" type="range" min={10000000} max={100000000000} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} />
         </div>
         <div className={formStyles.formGroup}>
           <label htmlFor="royaltyRate">Royalty Rate</label>
-          <input id="royaltyRate" type="range" min={10} max={100} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
+          <input id="royaltyRate" type="range" min={3} max={100} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
         </div>
         <div className={explorerStyles.entitiesContainer}>
           {Object.entries(Entities).map(([key, entity]) => (
