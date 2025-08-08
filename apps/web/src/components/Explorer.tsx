@@ -17,8 +17,8 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
   const [royaltyRate, setRoyaltyRate] = React.useState<number>(initialRoyaltyRate);
 
   React.useEffect(() => {
-    setRevenue(formData.revenue && !isNaN(Number(formData.revenue)) ? parseFloat(formData.revenue) : parseFloat(DefaultExplorerData.revenue));
-    setRoyaltyRate(formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? parseFloat(formData.royalty_rate) : parseFloat(DefaultExplorerData.royalty_rate));
+    setRevenue(formData.revenue && !isNaN(Number(formData.revenue)) ? Math.max(10000000, Math.min(parseFloat(formData.revenue), 100000000000)) : parseFloat(DefaultExplorerData.revenue));
+    setRoyaltyRate(formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? Math.max(3, Math.min(parseFloat(formData.royalty_rate), 100)) : parseFloat(DefaultExplorerData.royalty_rate));
   }, [formData]);
 
   const safeRevenue = revenue || parseFloat(DefaultExplorerData.revenue);
