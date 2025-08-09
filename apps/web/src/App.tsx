@@ -103,10 +103,6 @@ const App = () => {
       return null;
     }
 
-    function checkCountryExists(keyword: string): boolean {
-      return Object.values(Countries).some((country) => country.name.toLowerCase() === keyword.toLowerCase());
-    }
-
     const extractedRevenue = findTextInline(data.lines, 'revenue', '1a') || '';
     const extractedRoyaltyRate = findTextInline(data.lines, 'royalties', '1b') || '';
 
