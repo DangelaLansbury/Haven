@@ -30,9 +30,9 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxes
             transition={{ duration: 0.5, ease: 'easeInOut' }}
             style={{ backgroundColor: '#639452', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
           >
-            <motion.div className={chartStyles.barLabel} whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }} style={{ backgroundColor: '#639452', color: 'white', padding: '2px 4px', fontSize: '0.75rem' }}>
+            {/* <motion.div className={chartStyles.barLabel} whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }} style={{ backgroundColor: '#639452', color: 'white', padding: '2px 4px', fontSize: '0.75rem' }}>
               Profit ${profit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-            </motion.div>
+            </motion.div> */}
           </motion.div>
           <motion.div className={chartStyles.homeProfitBar} animate={{ height: `${homeProfitHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: '#74A762', width: '100%', marginTop: '2px' }} />
           <motion.div className={chartStyles.taxesDueAtHomeBar} animate={{ height: `${taxesDueAtHomeHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ backgroundColor: '#C6A66A', width: '100%', marginTop: '2px' }} />

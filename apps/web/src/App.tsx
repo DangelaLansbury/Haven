@@ -31,7 +31,13 @@ const App = () => {
     setSessionId(id);
 
     // connect Socket.IO
-    const sock = io({ query: { sessionId: id } });
+    const sock = io({
+      query: { sessionId: id },
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 3000,
+    });
     sock.on('connect', () => console.log('[Socket.IO] connected, id=', sock.id));
     sock.on('ocrResult', (data: string) => {
       setOcrText(data);
@@ -56,104 +62,127 @@ const App = () => {
     setFileAdded(true);
 
     // hook into Tesseract progress
-    const worker = createWorker({
-      logger: (m) => console.log('[Tesseract]', m),
-    });
+    let worker: ReturnType<typeof createWorker> | null = null;
+    try {
+      worker = createWorker({ logger: (m) => console.log('[Tesseract]', m) });
 
-    // load into canvas, fix orientation & downscale
-    const canvas: HTMLCanvasElement = await new Promise((resolve, reject) => {
-      loadImage(
-        file,
-        (imgOrCanvas: HTMLImageElement | HTMLCanvasElement) => {
-          if (imgOrCanvas instanceof HTMLCanvasElement) resolve(imgOrCanvas);
-          else reject(new Error('Could not get canvas'));
-        },
-        { canvas: true, orientation: true, maxWidth: 1024 }
-      );
-    });
+      // load into canvas, fix orientation & downscale
+      const canvas: HTMLCanvasElement = await new Promise((resolve, reject) => {
+        loadImage(
+          file,
+          (imgOrCanvas: HTMLImageElement | HTMLCanvasElement) => {
+            if (imgOrCanvas instanceof HTMLCanvasElement) resolve(imgOrCanvas);
+            else reject(new Error('Could not get canvas'));
+          },
+          { canvas: true, orientation: true, maxWidth: 1024 }
+        );
+      });
 
-    await worker.load();
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
+      await worker.load();
+      await worker.loadLanguage('eng');
+      await worker.initialize('eng');
 
-    const { data } = await worker.recognize(canvas);
+      const { data } = await worker.recognize(canvas);
 
-    const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
-    function matchText(lineText: string, keyword: string): string | null {
-      if (!normalize(lineText).includes(keyword)) return null;
+      function matchText(lineText: string, keyword: string): string | null {
+        if (!normalize(lineText).includes(keyword)) return null;
 
-      const percentMatch = lineText.match(/[\d,.]+%/);
-      if (percentMatch) {
-        return percentMatch[0].replace(/[^0-9.,]/g, '');
-      }
-
-      const words = lineText.trim().split(/\s+/);
-      const lastWord = words.length > 0 ? words[words.length - 1] : null;
-      return lastWord ? lastWord.replace(/[^0-9.,]/g, '') : null;
-    }
-
-    function findTextInline(lines: Tesseract.Line[], keyword: string, formIndex?: string): string | null {
-      for (const line of lines) {
-        if (normalize(line.text).includes(keyword)) {
-          const match = matchText(line.text, keyword) || matchText(line.text, formIndex || '');
-          if (match) return match;
+        const percentMatch = lineText.match(/[\d,.]+%/);
+        if (percentMatch) {
+          return percentMatch[0].replace(/[^0-9.,]/g, '');
         }
+
+        const words = lineText.trim().split(/\s+/);
+        const lastWord = words.length > 0 ? words[words.length - 1] : null;
+        return lastWord ? lastWord.replace(/[^0-9.,]/g, '') : null;
       }
-      return null;
-    }
 
-    const extractedRevenue = findTextInline(data.lines, 'revenue', '1a') || '';
-    const extractedRoyaltyRate = findTextInline(data.lines, 'royalties', '1b') || '';
+      function findTextInline(lines: Tesseract.Line[], keyword: string, formIndex?: string): string | null {
+        for (const line of lines) {
+          if (normalize(line.text).includes(keyword)) {
+            const match = matchText(line.text, keyword) || matchText(line.text, formIndex || '');
+            if (match) return match;
+          }
+        }
+        return null;
+      }
 
-    setFormData((prev: FormFields) => ({
-      ...prev,
-      revenue_rate: extractedRevenue,
-      royalty_rate: extractedRoyaltyRate,
-    }));
+      const extractedRevenue = findTextInline(data.lines, 'revenue', '1a') || '';
+      const extractedRoyaltyRate = findTextInline(data.lines, 'royalties', '1b') || '';
 
-    if (socket && socket.connected) {
-      socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
-      socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyaltyRate });
-    } else {
-      console.warn('[Socket.IO] socket not ready for gross income emit');
-    }
-
-    const res = await fetch('/api/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId,
-        data: data.text,
-        revenue: extractedRevenue,
+      setFormData((prev: FormFields) => ({
+        ...prev,
+        revenue_rate: extractedRevenue,
         royalty_rate: extractedRoyaltyRate,
-      }),
-    });
-    console.log('[API] /api/submit status=', res.status);
-    console.log('ocrText:', data.text);
+      }));
 
-    await worker.terminate();
+      if (socket && socket.connected) {
+        socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
+        socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyaltyRate });
+      } else {
+        console.warn('[Socket.IO] socket not ready for gross income emit');
+      }
+
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          data: data.text,
+          revenue: extractedRevenue,
+          royalty_rate: extractedRoyaltyRate,
+        }),
+      });
+      console.log('[API] /api/submit status=', res.status);
+      console.log('ocrText:', data.text);
+
+      await worker.terminate();
+    } catch (err) {
+      console.error('[OCR] failed:', err);
+      // setBanner({ kind: 'error', text: 'We couldn’t read that image. Try better lighting and retake the photo.' });
+    } finally {
+      if (worker) {
+        try {
+          await (await worker).terminate();
+        } catch {}
+      }
+    }
   };
 
   useEffect(() => {
     if (screen === 'manual') return;
 
     const interval = setInterval(async () => {
-      const res = await fetch(`/api/session-data?sessionId=${sessionId}`);
-      const json = await res.json();
+      try {
+        const res = await fetch(`/api/session-data?sessionId=${sessionId}`, {
+          headers: { Accept: 'application/json' },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+          const preview = (await res.text()).slice(0, 80);
+          throw new Error(`Expected JSON, got "${ct}". Preview: ${preview}`);
+        }
+        const json = await res.json();
 
-      if (!json) return;
+        if (!json) return;
 
-      if (json.revenue && json.revenue !== formData.revenue) {
-        console.log('[Polling] revenue updated:', json.revenue);
-        setFormData((prev: FormFields) => ({ ...prev, revenue: json.revenue }));
-      }
-      if (json.royalty_rate && json.royalty_rate !== formData.royalty_rate) {
-        console.log('[Polling] royalty_rate updated:', json.royalty_rate);
-        setFormData((prev: FormFields) => ({ ...prev, royalty_rate: json.royalty_rate }));
-      }
-      if (json.revenue || json.royalty_rate) {
-        setOCRReady(true);
+        if (json.revenue && json.revenue !== formData.revenue) {
+          console.log('[Polling] revenue updated:', json.revenue);
+          setFormData((prev: FormFields) => ({ ...prev, revenue: json.revenue }));
+        }
+        if (json.royalty_rate && json.royalty_rate !== formData.royalty_rate) {
+          console.log('[Polling] royalty_rate updated:', json.royalty_rate);
+          setFormData((prev: FormFields) => ({ ...prev, royalty_rate: json.royalty_rate }));
+        }
+        if (json.revenue || json.royalty_rate) {
+          setOCRReady(true);
+        }
+      } catch (err) {
+        console.warn('[Polling] session-data fetch failed:', err);
+        // setBanner({ kind: 'warning', text: 'Having trouble syncing. We’ll keep retrying…' });
       }
     }, 3000);
 
