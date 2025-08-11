@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
-import QRCode from 'qrcode.react';
 import Tesseract, { createWorker } from 'tesseract.js';
 import loadImage from 'blueimp-load-image';
 import '../../web/index.css';
-import formStyles from './css/Form.module.css';
 import commonStyles from './css/Common.module.css';
 import TaxForm from './components/TaxForm';
 import InitialScreen from './components/InitialScreen';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
-import { Entities, FormFields, DefaultExplorerData, Countries } from './types';
+import { FormFields, DefaultExplorerData } from './types';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -20,6 +18,7 @@ const App = () => {
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
   const [fileAdded, setFileAdded] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   useEffect(() => {
     // generate or read sessionId
@@ -141,7 +140,7 @@ const App = () => {
       await worker.terminate();
     } catch (err) {
       console.error('[OCR] failed:', err);
-      // setBanner({ kind: 'error', text: 'We couldn’t read that image. Try better lighting and retake the photo.' });
+      setError('Something went wrong. Please try again. If the problem persists, try refreshing the page.');
     } finally {
       if (worker) {
         try {
@@ -182,7 +181,7 @@ const App = () => {
         }
       } catch (err) {
         console.warn('[Polling] session-data fetch failed:', err);
-        // setBanner({ kind: 'warning', text: 'Having trouble syncing. We’ll keep retrying…' });
+        setError("We're having trouble syncing. Retrying now…");
       }
     }, 3000);
 
@@ -215,7 +214,7 @@ const App = () => {
       </div>
       {isUpload ? (
         <>
-          <Camera onCapture={handleFile} OCRReady={OCRReady} fileAdded={fileAdded} />
+          <Camera onCapture={handleFile} OCRReady={OCRReady} fileAdded={fileAdded} error={error} />
         </>
       ) : (
         <>

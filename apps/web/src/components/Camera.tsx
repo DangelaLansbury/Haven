@@ -7,12 +7,14 @@ interface CameraProps {
   onCapture: (imageSrc: string) => void;
   OCRReady: boolean;
   fileAdded?: boolean;
+  error?: string;
 }
 
-function Camera({ onCapture, OCRReady, fileAdded }: CameraProps) {
+function Camera({ onCapture, OCRReady, fileAdded, error }: CameraProps) {
   return (
     <div className={cameraStyles.cameraContainer}>
       <div className={cameraStyles.overlay}>
+        <>{error && <div className={commonStyles.error}>{error}</div>}</>
         {!OCRReady ? (
           <>
             {!fileAdded ? (
