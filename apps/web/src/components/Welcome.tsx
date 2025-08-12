@@ -3,12 +3,11 @@ import formStyles from '../css/Form.module.css';
 import { motion } from 'framer-motion';
 import commonStyles from '../css/Common.module.css';
 
-interface InitialScreenProps {
-  title: string;
+interface WelcomeProps {
   setScreen: (screen: 'manual' | 'ocr') => void;
 }
 
-const InitialScreen: React.FC<InitialScreenProps> = ({ title, setScreen }) => {
+const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
   const [isExiting, setIsExiting] = React.useState(false);
 
   const handleExitToOCR = () => {
@@ -46,15 +45,15 @@ const InitialScreen: React.FC<InitialScreenProps> = ({ title, setScreen }) => {
         }}
       >
         <div className={commonStyles.headerContainer}>
-          <h1 className={commonStyles.header}>{title || 'haven'}</h1>
+          <h1 className={commonStyles.header}>Welcome to Haven</h1>
+          <div className={commonStyles.subtitle}>Understanding the mechanisms behind the "Double Irish & a Dutch Sandwich" tax avoidance scheme.</div>
         </div>
-        <p className={commonStyles.subtitle}>How do you want to enter your tax information?</p>
         <div className={formStyles.formTypeSelectionContainer}>
-          <div className={formStyles.formTypeSelector} onClick={() => setScreen('manual')}>
-            Enter it manually
-          </div>
           <div className={formStyles.formTypeSelector} onClick={handleExitToOCR}>
-            Take a picture
+            Capture tax form
+          </div>
+          <div className={formStyles.formTypeSelector} onClick={() => setScreen('manual')}>
+            Skip to results
           </div>
         </div>
       </motion.div>
@@ -62,4 +61,4 @@ const InitialScreen: React.FC<InitialScreenProps> = ({ title, setScreen }) => {
   );
 };
 
-export default InitialScreen;
+export default WelcomeScreen;

@@ -5,7 +5,7 @@ import loadImage from 'blueimp-load-image';
 import '../../web/index.css';
 import commonStyles from './css/Common.module.css';
 import TaxForm from './components/TaxForm';
-import InitialScreen from './components/InitialScreen';
+import WelcomeScreen from './components/Welcome';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
 import { FormFields, DefaultExplorerData } from './types';
@@ -220,7 +220,7 @@ const App = () => {
         <>
           {screen === 'initial' ? (
             <>
-              <InitialScreen title="haven" setScreen={handleSetScreen} />
+              <WelcomeScreen setScreen={handleSetScreen} />
             </>
           ) : screen === 'manual' ? (
             <>

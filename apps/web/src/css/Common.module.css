@@ -44,9 +44,12 @@
 .headerContainer {
   align-items: center;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 0.5rem;
   justify-content: flex-start;
+  margin: 2rem 0;
+  max-width: 372px;
+  padding: 0.5rem 0;
   width: 100%;
 }
 
@@ -55,6 +58,14 @@
   line-height: 1.5rem;
   font-weight: 900;
   margin: 0;
+}
+
+.subtitle {
+  font-size: var(--font-sm);
+  line-height: 1.25rem;
+  color: var(--gray-600);
+  margin: 0;
+  text-align: center;
 }
 
 .logoContainer {
