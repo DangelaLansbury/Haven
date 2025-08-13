@@ -22,7 +22,7 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxes
 
   return (
     <>
-      <div className={chartStyles.chartContainer} style={{ width: '40px', height: `${maxHeight}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+      <div className={chartStyles.barChart} style={{ width: '100px', height: `${maxHeight}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         <motion.div className={chartStyles.revenueBar} animate={{ height: `${revenueHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           <motion.div
             className={chartStyles.profitBar}

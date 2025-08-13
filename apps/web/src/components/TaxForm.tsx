@@ -45,9 +45,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
   return (
     <div className={commonStyles.pageContainer}>
       <motion.div variants={sideCardVariants} initial="initial" animate="animate" className={formStyles.sideCard}>
-        <div className={commonStyles.headerContainer}>
-          <h1 className={commonStyles.header}>{'Take a picture.'}</h1>
-        </div>
+        <h1 className={commonStyles.header}>{'Take a picture'}</h1>
         <p className={commonStyles.description}>Capture your tax form using your device's camera.</p>
         <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
       </motion.div>

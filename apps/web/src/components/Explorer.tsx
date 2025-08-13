@@ -49,6 +49,17 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
     }));
   }
 
+  const formatDollars = (amount: number): string => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
+  const formatPercentage = (value: number): string => {
+    return `${value.toFixed(2)}%`;
+  };
+
   return (
     <div className={commonStyles.pageContainer}>
       <div className={commonStyles.leftSide} style={{ flex: 2, maxWidth: '560px' }}>
@@ -74,14 +85,8 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
       </div>
       <div className={commonStyles.rightSide} style={{ flex: 1, maxWidth: '240px' }}>
         <RemittanceChart revenue={revenue} taxesDueAtHome={taxesDueAtHome} profit={totalProfit} taxesPaid={totalTaxPaid} />
-        <h2>Preview</h2>
-        <p>Revenue: {formData.revenue}</p>
-        <p>Royalties: {formData.royalty_rate}</p>
-        <p>Taxes Paid: {totalTaxPaid}</p>
-        <p>Taxes Due if Home Tax Rate Applied: {taxesDueAtHome}</p>
-        <p>Profit with double irish: {totalProfit}</p>
-        <p>Profit without double irish: {totalProfit - taxesDueAtHome}</p>
-        <p>Effective Tax Rate: {effectiveTaxRate}</p>
+        <p>Effective Tax Rate: {formatPercentage(effectiveTaxRate)}</p>
+        <p>Extra Profit Kept: {formatDollars(taxesDueAtHome)}</p>
       </div>
     </div>
   );
