@@ -66,6 +66,7 @@
   color: var(--gray-600);
   margin: 0;
   text-align: center;
+  text-wrap: balance;
 }
 
 .logoContainer {
