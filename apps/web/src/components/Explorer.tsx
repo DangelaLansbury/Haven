@@ -97,8 +97,10 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
       </div>
       <div className={explorerStyles.rightSide} style={{ flex: 1, maxWidth: '240px' }}>
         <RemittanceChart revenue={revenue} taxesDueAtHome={taxesDueAtHome} profit={totalProfit} taxesPaid={totalTaxPaid} />
-        <p>Effective Tax Rate: {formatPercentage(effectiveTaxRate)}</p>
-        <p>Extra Profit Kept: {formatDollars(taxesDueAtHome)}</p>
+        <div style={{ fontSize: 'var(--font-lg)', fontWeight: 600, marginTop: '2rem' }}>{formatPercentage(effectiveTaxRate)}</div>
+        <div style={{ fontSize: 'var(--font-xs)' }}>Effective Tax Rate</div>
+        <div style={{ fontSize: 'var(--font-lg)', fontWeight: 600, marginTop: '1rem' }}>{formatDollars(taxesDueAtHome)}</div>
+        <div style={{ fontSize: 'var(--font-xs)' }}>Extra Profit Kept</div>
       </div>
     </motion.div>
   );
