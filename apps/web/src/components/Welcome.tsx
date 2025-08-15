@@ -14,7 +14,14 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
     setIsExiting(true);
     setTimeout(() => {
       setScreen('ocr');
-    }, 800);
+    }, 400);
+  };
+
+  const handleExitToManual = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setScreen('manual');
+    }, 400);
   };
 
   return (
@@ -22,7 +29,7 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
       <motion.div
         initial={{ y: '100%' }}
         animate={isExiting ? { y: '100%' } : { y: 0 }}
-        transition={{ duration: 0.8, ease: [0.42, 0, 0.58, 1] }}
+        transition={{ duration: 0.6, ease: [0.42, 0, 0.58, 1] }}
         style={{
           position: 'absolute',
           bottom: 0,
@@ -36,7 +43,7 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={isExiting ? { opacity: 0 } : { opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeInOut' }}
+        transition={{ duration: 0.4, ease: 'easeInOut' }}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -52,7 +59,7 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
           <div className={formStyles.formTypeSelector} onClick={handleExitToOCR}>
             Capture tax form
           </div>
-          <div className={formStyles.formTypeSelector} onClick={() => setScreen('manual')}>
+          <div className={formStyles.formTypeSelector} onClick={handleExitToManual}>
             Skip to results
           </div>
         </div>

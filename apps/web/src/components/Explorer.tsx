@@ -4,6 +4,7 @@ import commonStyles from '../css/Common.module.css';
 import { FormFields, Entities, DefaultExplorerData, HOME_TAX_RATE, Countries, Country } from '../types';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
+import { motion } from 'framer-motion';
 
 interface ExplorerProps {
   formData: FormFields;
@@ -61,8 +62,19 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
   };
 
   return (
-    <div className={commonStyles.pageContainer}>
-      <div className={commonStyles.leftSide} style={{ flex: 2, maxWidth: '560px' }}>
+    <motion.div
+      className={commonStyles.pageContainer}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        transition: {
+          opacity: { duration: 0.4, ease: [0.48, 0, 0.62, 1] },
+          y: { duration: 0.6, ease: [0.48, 0, 0.62, 1] },
+        },
+      }}
+    >
+      <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '30rem' }}>
         <div className={formStyles.formGroup}>
           <label htmlFor="revenue">Revenue</label>
           <input id="revenue" type="range" min={10000000} max={100000000000} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} />
@@ -83,12 +95,12 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
           ))}
         </div>
       </div>
-      <div className={commonStyles.rightSide} style={{ flex: 1, maxWidth: '240px' }}>
+      <div className={explorerStyles.rightSide} style={{ flex: 1, maxWidth: '240px' }}>
         <RemittanceChart revenue={revenue} taxesDueAtHome={taxesDueAtHome} profit={totalProfit} taxesPaid={totalTaxPaid} />
         <p>Effective Tax Rate: {formatPercentage(effectiveTaxRate)}</p>
         <p>Extra Profit Kept: {formatDollars(taxesDueAtHome)}</p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
