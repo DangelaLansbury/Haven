@@ -51,10 +51,26 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
   }
 
   const formatDollars = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+    if (amount > 1000000000) {
+      return (
+        new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(amount / 1000000000) + 'B'
+      );
+    } else if (amount > 1000000) {
+      return (
+        new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(amount / 1000000) + 'M'
+      );
+    } else {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(amount);
+    }
   };
 
   const formatPercentage = (value: number): string => {
@@ -64,7 +80,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
   return (
     <motion.div
       className={commonStyles.pageContainer}
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: -24 }}
       animate={{
         opacity: 1,
         y: 0,
