@@ -112,7 +112,6 @@ export function FormTableRow({ key, formIndex, label, value, onChange, decorator
       )}
       <div className={formStyles.formTableCell}>
         <div className={formStyles.cellValue} data-id={`${id}-label`}>
-          {/* {formIndex ? <span className={formStyles.formIndex}>{formIndex}</span> : null} */}
           {label}
         </div>
         {decorator && (

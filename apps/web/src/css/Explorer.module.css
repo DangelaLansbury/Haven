@@ -6,3 +6,38 @@
   width: 100%;
   height: 100%;
 }
+
+/* ----- CHART STYLES ----- */
+
+.barChart {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+}
+
+.revenueBar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.profitBar {
+  background-color: var(--haven-green-light);
+  width: 100%;
+}
+
+.taxesDueAtHomeBar {
+  background-color: var(--haven-green);
+  margin-top: 2px;
+  width: 100%;
+}
+
+.taxesPaidBar {
+  background-color: var(--haven-gold);
+  border-bottom: 2px solid var(--haven-gold);
+  margin-top: 2px;
+  width: 100%;
+}

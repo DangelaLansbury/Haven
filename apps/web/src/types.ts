@@ -8,14 +8,14 @@ export interface FormFields {
 export const DefaultFormFields: FormFields = {
   sessionId: '',
   data: '',
-  revenue: '$25,000,000,000',
+  revenue: '$250,000,000,000',
   royalty_rate: '95%',
 };
 
 export const DefaultExplorerData: FormFields = {
   sessionId: '',
   data: '',
-  revenue: '50000000000',
+  revenue: '150000000000',
   royalty_rate: '90',
 };
 
@@ -35,24 +35,6 @@ export const TaxHavens: Record<string, Country> = {
     note: 'Manage business from here with no corporate tax',
     code: 'BM',
   },
-  // CAYMAN_ISLANDS: {
-  //   name: 'Cayman Islands',
-  //   flag: '/assets/images/flags/cayman_islands.svg',
-  //   tax_rate: '0.0%',
-  //   note: 'No corporate tax, no capital gains tax',
-  // },
-  // BRITISH_VIRGIN_ISLANDS: {
-  //   name: 'British Virgin Islands',
-  //   flag: '/assets/images/flags/british_virgin_islands.svg',
-  //   tax_rate: '0.0%',
-  //   note: 'No corporate tax, no capital gains tax',
-  // },
-  // UNITED_ARAB_EMIRATES: {
-  //   name: 'United Arab Emirates',
-  //   flag: '/assets/images/flags/united_arab_emirates.svg',
-  //   tax_rate: '0.0%',
-  //   note: 'No corporate tax, no income tax',
-  // },
 };
 
 export const Conduits: Record<string, Country> = {
@@ -63,24 +45,6 @@ export const Conduits: Record<string, Country> = {
     note: 'Allows tax-free flow of royalties out of country',
     code: 'NL',
   },
-  // LUXEMBOURG: {
-  //   name: 'Luxembourg',
-  //   flag: '/assets/images/flags/luxembourg.svg',
-  //   tax_rate: '0.0%',
-  //   note: 'Favorable tax treaties, low effective tax rate',
-  // },
-  // SWITZERLAND: {
-  //   name: 'Switzerland',
-  //   flag: '/assets/images/flags/switzerland.svg',
-  //   tax_rate: '0.0%',
-  //   note: 'Low corporate tax rates, favorable tax treaties',
-  // },
-  // CYPRUS: {
-  //   name: 'Cyprus',
-  //   flag: '/assets/images/flags/cyprus.svg',
-  //   tax_rate: '0.0%',
-  //   note: 'Low corporate tax rate, no withholding tax on dividends',
-  // },
 };
 
 export const OperatingBases: Record<string, Country> = {
@@ -91,24 +55,6 @@ export const OperatingBases: Record<string, Country> = {
     note: 'Relatively low corporate tax',
     code: 'IE',
   },
-  // SINGAPORE: {
-  //   name: 'Singapore',
-  //   flag: '/assets/images/flags/singapore.svg',
-  //   tax_rate: '17.0%',
-  //   note: 'Rate often much lower with incentives',
-  // },
-  // HONG_KONG: {
-  //   name: 'Hong Kong',
-  //   flag: '/assets/images/flags/hong_kong.svg',
-  //   tax_rate: '16.5%',
-  //   note: 'No tax on foreign income, low effective rate',
-  // },
-  // MAURITIUS: {
-  //   name: 'Mauritius',
-  //   flag: '/assets/images/flags/mauritius.svg',
-  //   tax_rate: '15.0%',
-  //   note: 'Rate lowered with credits, no capital gains tax',
-  // },
 };
 
 export const Countries: Record<string, Country> = {
@@ -179,3 +125,8 @@ export const Entities: Record<string, Entity> = {
     OCRKeyword: 'parent',
   },
 };
+
+export const MIN_REVENUE = 10000000;
+export const MAX_REVENUE = 350000000000;
+export const MIN_ROYALTY_RATE = 3;
+export const MAX_ROYALTY_RATE = 100;

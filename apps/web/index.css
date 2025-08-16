@@ -82,11 +82,15 @@ a {
   --green-pure: rgba(59, 111, 65, 1);
   --green: rgba(59, 111, 65, 0.2);
 
+  --haven-green-light: #74a197;
+  --haven-green: #39796b;
+  --haven-gold: #c6a66a;
+
   --font-xs: 0.75rem;
   --font-sm: 0.875rem;
   --font-base: 1rem;
   --font-lg: 1.125rem;
-  --font-xl: 1.25rem;
+  --font-xl: 1.75rem;
 
   --app-header-height: 3.75rem;
 }

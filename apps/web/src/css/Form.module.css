@@ -77,7 +77,7 @@
       width: 100%;
     }
     & > .section {
-      color: var(--green-pure);
+      color: var(--haven-green);
       margin-right: 0.75rem;
     }
   }

@@ -1,10 +1,11 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormFields, Entities, DefaultExplorerData, HOME_TAX_RATE, Countries, Country } from '../types';
+import { FormFields, Entities, DefaultExplorerData, HOME_TAX_RATE, Countries, MIN_REVENUE, MAX_REVENUE, MIN_ROYALTY_RATE, MAX_ROYALTY_RATE } from '../types';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
+import { ExplorerEntity } from './ExplorerEntity';
 
 interface ExplorerProps {
   formData: FormFields;
@@ -18,8 +19,8 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
   const [royaltyRate, setRoyaltyRate] = React.useState<number>(initialRoyaltyRate);
 
   React.useEffect(() => {
-    setRevenue(formData.revenue && !isNaN(Number(formData.revenue)) ? Math.max(10000000, Math.min(parseFloat(formData.revenue), 100000000000)) : parseFloat(DefaultExplorerData.revenue));
-    setRoyaltyRate(formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? Math.max(3, Math.min(parseFloat(formData.royalty_rate), 100)) : parseFloat(DefaultExplorerData.royalty_rate));
+    setRevenue(formData.revenue && !isNaN(Number(formData.revenue)) ? Math.max(MIN_REVENUE, Math.min(parseFloat(formData.revenue), MAX_REVENUE)) : parseFloat(DefaultExplorerData.revenue));
+    setRoyaltyRate(formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? Math.max(MIN_ROYALTY_RATE, Math.min(parseFloat(formData.royalty_rate), MAX_ROYALTY_RATE)) : parseFloat(DefaultExplorerData.royalty_rate));
   }, [formData]);
 
   const safeRevenue = revenue || parseFloat(DefaultExplorerData.revenue);
@@ -93,29 +94,29 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
       <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '30rem' }}>
         <div className={formStyles.formGroup}>
           <label htmlFor="revenue">Revenue</label>
-          <input id="revenue" type="range" min={10000000} max={100000000000} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} />
+          <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} />
         </div>
         <div className={formStyles.formGroup}>
           <label htmlFor="royaltyRate">Royalty Rate</label>
-          <input id="royaltyRate" type="range" min={3} max={100} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
+          <input id="royaltyRate" type="range" min={MIN_ROYALTY_RATE} max={MAX_ROYALTY_RATE} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
         </div>
         <div className={explorerStyles.entitiesContainer}>
-          {Object.entries(Entities).map(([key, entity]) => (
+          <ExplorerEntity name={Entities.operating.display_role} country={Countries.IRELAND.name} keeps={formatDollars(operatingProfit) + ' profit'} pays={formatDollars(operatingTaxPaid) + ' tax paid'} />
+          <ExplorerEntity name={Entities.conduit.display_role} country={Countries.NETHERLANDS.name} keeps={'$0 retained'} pays={'$0 tax paid'} />
+          <ExplorerEntity name={Entities.licensor.display_role} country={Countries.BERMUDA.name} keeps={formatDollars(totalProfit) + ' profit'} pays={'$0 tax paid'} />
+          {/* {Object.entries(Entities).map(([key, entity]) => (
             <div key={key} className={explorerStyles.entityCard}>
-              {/* <div className={explorerStyles.entityStats}>
-
-              </div> */}
               <div>{entity.default_name}</div>
               <div>{entity.description}</div>
             </div>
-          ))}
+          ))} */}
         </div>
       </div>
       <div className={explorerStyles.rightSide} style={{ flex: 1, maxWidth: '240px' }}>
         <RemittanceChart revenue={revenue} taxesDueAtHome={taxesDueAtHome} profit={totalProfit} taxesPaid={totalTaxPaid} />
-        <div style={{ fontSize: 'var(--font-lg)', fontWeight: 600, marginTop: '2rem' }}>{formatPercentage(effectiveTaxRate)}</div>
+        <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600, marginTop: '1.5rem' }}>{formatPercentage(effectiveTaxRate)}</div>
         <div style={{ fontSize: 'var(--font-xs)' }}>Effective Tax Rate</div>
-        <div style={{ fontSize: 'var(--font-lg)', fontWeight: 600, marginTop: '1rem' }}>{formatDollars(taxesDueAtHome)}</div>
+        <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '1rem' }}>{formatDollars(taxesDueAtHome - totalTaxPaid)}</div>
         <div style={{ fontSize: 'var(--font-xs)' }}>Extra Profit Kept</div>
       </div>
     </motion.div>
