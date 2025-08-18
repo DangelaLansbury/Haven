@@ -31,7 +31,6 @@ const submitHandler = (req: Request, res: Response): void => {
       ...sessionData[sessionId],
       revenue,
       royalty_rate,
-      // operating_country,
     };
     res.json({ status: 'ok' });
   } else {

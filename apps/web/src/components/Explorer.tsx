@@ -13,18 +13,18 @@ interface ExplorerProps {
 }
 
 const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerProps) => {
-  const initialRevenue = formData.revenue && !isNaN(Number(formData.revenue)) ? parseFloat(formData.revenue) : parseFloat(DefaultExplorerData.revenue);
-  const initialRoyaltyRate = formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? parseFloat(formData.royalty_rate) : parseFloat(DefaultExplorerData.royalty_rate);
+  const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultExplorerData.revenue;
+  const initialRoyaltyRate = formData.royalty_rate && !isNaN(formData.royalty_rate) ? formData.royalty_rate : DefaultExplorerData.royalty_rate;
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
   const [royaltyRate, setRoyaltyRate] = React.useState<number>(initialRoyaltyRate);
 
   React.useEffect(() => {
-    setRevenue(formData.revenue && !isNaN(Number(formData.revenue)) ? Math.max(MIN_REVENUE, Math.min(parseFloat(formData.revenue), MAX_REVENUE)) : parseFloat(DefaultExplorerData.revenue));
-    setRoyaltyRate(formData.royalty_rate && !isNaN(Number(formData.royalty_rate)) ? Math.max(MIN_ROYALTY_RATE, Math.min(parseFloat(formData.royalty_rate), MAX_ROYALTY_RATE)) : parseFloat(DefaultExplorerData.royalty_rate));
+    setRevenue(formData.revenue && !isNaN(formData.revenue) ? Math.max(MIN_REVENUE, Math.min(formData.revenue, MAX_REVENUE)) : DefaultExplorerData.revenue);
+    setRoyaltyRate(formData.royalty_rate && !isNaN(formData.royalty_rate) ? Math.max(MIN_ROYALTY_RATE, Math.min(formData.royalty_rate, MAX_ROYALTY_RATE)) : DefaultExplorerData.royalty_rate);
   }, [formData]);
 
-  const safeRevenue = revenue || parseFloat(DefaultExplorerData.revenue);
-  const safeRoyaltyRate = royaltyRate || parseFloat(DefaultExplorerData.royalty_rate);
+  const safeRevenue = revenue || DefaultExplorerData.revenue;
+  const safeRoyaltyRate = royaltyRate || DefaultExplorerData.royalty_rate;
 
   const royaltyAmount = safeRevenue * (safeRoyaltyRate / 100);
   const operatingProfit = safeRevenue - royaltyAmount;
@@ -37,14 +37,14 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
 
   const taxesDueAtHome = safeRevenue * HOME_TAX_RATE;
 
-  function handleRevenueChange(value: string) {
+  function handleRevenueChange(value: number) {
     setFormData((prev: FormFields) => ({
       ...prev,
       revenue: value,
     }));
   }
 
-  function handleRoyaltyRateChange(value: string) {
+  function handleRoyaltyRateChange(value: number) {
     setFormData((prev: FormFields) => ({
       ...prev,
       royalty_rate: value,
@@ -81,35 +81,27 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
   return (
     <motion.div
       className={commonStyles.pageContainer}
-      initial={{ opacity: 0, y: -24 }}
+      initial={{ opacity: 0 }}
       animate={{
         opacity: 1,
-        y: 0,
         transition: {
           opacity: { duration: 0.4, ease: [0.48, 0, 0.62, 1] },
-          y: { duration: 0.6, ease: [0.48, 0, 0.62, 1] },
         },
       }}
     >
       <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '30rem' }}>
         <div className={formStyles.formGroup}>
-          <label htmlFor="revenue">Revenue</label>
+          <label htmlFor="revenue">Revenue: {formatDollars(revenue)}</label>
           <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} />
         </div>
         <div className={formStyles.formGroup}>
-          <label htmlFor="royaltyRate">Royalty Rate</label>
+          <label htmlFor="royaltyRate">Royalty Rate: {formatPercentage(royaltyRate)}</label>
           <input id="royaltyRate" type="range" min={MIN_ROYALTY_RATE} max={MAX_ROYALTY_RATE} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
         </div>
         <div className={explorerStyles.entitiesContainer}>
           <ExplorerEntity name={Entities.operating.display_role} country={Countries.IRELAND.name} keeps={formatDollars(operatingProfit) + ' profit'} pays={formatDollars(operatingTaxPaid) + ' tax paid'} />
           <ExplorerEntity name={Entities.conduit.display_role} country={Countries.NETHERLANDS.name} keeps={'$0 retained'} pays={'$0 tax paid'} />
-          <ExplorerEntity name={Entities.licensor.display_role} country={Countries.BERMUDA.name} keeps={formatDollars(totalProfit) + ' profit'} pays={'$0 tax paid'} />
-          {/* {Object.entries(Entities).map(([key, entity]) => (
-            <div key={key} className={explorerStyles.entityCard}>
-              <div>{entity.default_name}</div>
-              <div>{entity.description}</div>
-            </div>
-          ))} */}
+          <ExplorerEntity name={Entities.licensor.display_role} country={Countries.BERMUDA.name} keeps={formatDollars(royaltyAmount) + ' profit'} pays={'$0 tax paid'} />
         </div>
       </div>
       <div className={explorerStyles.rightSide} style={{ flex: 1, maxWidth: '240px' }}>
