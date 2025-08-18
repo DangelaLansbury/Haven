@@ -203,6 +203,79 @@
   margin-bottom: 1rem;
 }
 
+.rangeInputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.rangeInput {
+  appearance: none;
+  border-radius: 0;
+  height: 1rem;
+  overflow: hidden;
+  width: 300px;
+}
+
+::-webkit-slider-runnable-track {
+  background: var(--gray-200);
+}
+
+::-webkit-slider-thumb {
+  appearance: none;
+  background: var(--haven-green);
+  border: none;
+  border-radius: 0;
+  box-shadow: -300px 0 0 300px var(--haven-green);
+  height: 1rem;
+  width: 0;
+  cursor: pointer;
+}
+
+::-moz-range-track {
+  background: var(--gray-200);
+  height: 1rem;
+}
+
+::-moz-range-thumb {
+  appearance: none;
+  background: var(--haven-green);
+  border: none;
+  border-radius: 0;
+  box-shadow: -300px 0 0 300px var(--haven-green);
+  height: 1rem;
+  width: 0;
+  cursor: pointer;
+}
+
+::-ms-fill-lower {
+  background: var(--gray-200);
+}
+
+::-ms-thumb {
+  appearance: none;
+  background: var(--haven-green);
+  border: none;
+  border-radius: 0;
+  box-shadow: -300px 0 0 300px var(--haven-green);
+  height: 1rem;
+  width: 0;
+  cursor: pointer;
+}
+
+::-ms-ticks-after {
+  display: none;
+}
+
+::-ms-ticks-before {
+  display: none;
+}
+
+::-ms-tooltip {
+  display: none;
+}
+
 .formGroup {
   align-items: center;
   background-color: var(--paper);

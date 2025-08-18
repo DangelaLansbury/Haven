@@ -92,11 +92,11 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
       <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '30rem' }}>
         <div className={formStyles.formGroup}>
           <label htmlFor="revenue">Revenue: {formatDollars(revenue)}</label>
-          <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} />
+          <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} className={formStyles.rangeInput} />
         </div>
         <div className={formStyles.formGroup}>
           <label htmlFor="royaltyRate">Royalty Rate: {formatPercentage(royaltyRate)}</label>
-          <input id="royaltyRate" type="range" min={MIN_ROYALTY_RATE} max={MAX_ROYALTY_RATE} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} />
+          <input id="royaltyRate" type="range" min={MIN_ROYALTY_RATE} max={MAX_ROYALTY_RATE} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} className={formStyles.rangeInput} />
         </div>
         <div className={explorerStyles.entitiesContainer}>
           <ExplorerEntity name={Entities.operating.display_role} country={Countries.IRELAND.name} keeps={formatDollars(operatingProfit) + ' profit'} pays={formatDollars(operatingTaxPaid) + ' tax paid'} />
