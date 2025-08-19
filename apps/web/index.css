@@ -11,6 +11,7 @@ body {
   font-weight: 400;
   color: var(--gray-800);
   font-size: 16px;
+  line-height: 1.5;
   margin: 0;
   padding: 0;
   overscroll-behavior: none;
@@ -85,6 +86,7 @@ a {
   --haven-green-light: #74a197;
   --haven-green: #39796b;
   --haven-gold: #c6a66a;
+  --haven-gold-text: #b08a4e;
 
   --font-xs: 0.75rem;
   --font-sm: 0.875rem;

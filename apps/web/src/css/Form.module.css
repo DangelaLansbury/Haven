@@ -210,12 +210,19 @@
   gap: 0.25rem;
 }
 
+.rangeInputLabel {
+  font-size: var(--font-xs);
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
 .rangeInput {
   appearance: none;
   border-radius: 0;
+  cursor: ew-resize;
   height: 1rem;
   overflow: hidden;
-  width: 300px;
+  width: 240px;
 }
 
 ::-webkit-slider-runnable-track {
@@ -227,10 +234,9 @@
   background: var(--haven-green);
   border: none;
   border-radius: 0;
-  box-shadow: -300px 0 0 300px var(--haven-green);
+  box-shadow: -240px 0 0 240px var(--haven-green);
   height: 1rem;
   width: 0;
-  cursor: pointer;
 }
 
 ::-moz-range-track {
@@ -246,7 +252,6 @@
   box-shadow: -300px 0 0 300px var(--haven-green);
   height: 1rem;
   width: 0;
-  cursor: pointer;
 }
 
 ::-ms-fill-lower {
@@ -261,7 +266,6 @@
   box-shadow: -300px 0 0 300px var(--haven-green);
   height: 1rem;
   width: 0;
-  cursor: pointer;
 }
 
 ::-ms-ticks-after {

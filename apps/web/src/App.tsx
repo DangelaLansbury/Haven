@@ -9,6 +9,7 @@ import WelcomeScreen from './components/Welcome';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
 import { FormFields, DefaultExplorerData } from './types';
+import { findValueBelowByWordNextBand, findValueBelowByWord, findValueBelow } from './utils';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -83,37 +84,50 @@ const App = () => {
 
       const { data } = await worker.recognize(canvas);
 
-      const normalize = (text: string) => text.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      console.table(data.lines.map((l) => ({ t: l.text, y0: l.bbox.y0, y1: l.bbox.y1 })));
+      console.table(data.words.map((w) => ({ t: w.text, x0: w.bbox.x0, x1: w.bbox.x1, y0: w.bbox.y0, y1: w.bbox.y1 })));
 
-      function matchText(lineText: string, keyword: string): string | null {
-        if (!normalize(lineText).includes(keyword)) return null;
+      const extractedRevenue =
+        findValueBelowByWordNextBand(data.words as any, 'revenue', {
+          xPad: 16,
+          minXOverlap: 0.25,
+          rowSlackMult: 0.25,
+          rowHeightMult: 1.2,
+        }) ??
+        findValueBelowByWord(data.lines as any, data.words as any, 'revenue', {
+          xPad: 16,
+          minXOverlap: 0.25,
+          maxDyMult: 3,
+        }) ??
+        findValueBelow(data.lines as any, 'revenue', {
+          xPad: 16,
+          minXOverlap: 0.25,
+          maxDyMult: 3,
+        }) ??
+        '';
 
-        const percentMatch = lineText.match(/[\d,.]+%/);
-        if (percentMatch) {
-          return percentMatch[0].replace(/[^0-9.,]/g, '');
-        }
-
-        const words = lineText.trim().split(/\s+/);
-        const lastWord = words.length > 0 ? words[words.length - 1] : null;
-        return lastWord ? lastWord.replace(/[^0-9.,]/g, '') : null;
-      }
-
-      function findTextInline(lines: Tesseract.Line[], keyword: string, formIndex?: string): string | null {
-        for (const line of lines) {
-          if (normalize(line.text).includes(keyword)) {
-            const match = matchText(line.text, keyword) || matchText(line.text, formIndex || '');
-            if (match) return match;
-          }
-        }
-        return null;
-      }
-
-      const extractedRevenue = findTextInline(data.lines, 'revenue', '1a') || '';
-      const extractedRoyaltyRate = findTextInline(data.lines, 'royalties', '1b') || '';
+      const extractedRoyaltyRate =
+        findValueBelowByWordNextBand(data.words as any, 'royalties', {
+          xPad: 16,
+          minXOverlap: 0.25,
+          rowSlackMult: 0.25,
+          rowHeightMult: 1.2,
+        }) ??
+        findValueBelowByWord(data.lines as any, data.words as any, 'royalties', {
+          xPad: 16,
+          minXOverlap: 0.25,
+          maxDyMult: 3,
+        }) ??
+        findValueBelow(data.lines as any, 'royalties', {
+          xPad: 16,
+          minXOverlap: 0.2,
+          maxDyMult: 3.5,
+        }) ??
+        '';
 
       setFormData((prev: FormFields) => ({
         ...prev,
-        revenue_rate: extractedRevenue,
+        revenue: extractedRevenue,
         royalty_rate: extractedRoyaltyRate,
       }));
 
@@ -230,7 +244,7 @@ const App = () => {
             <>
               {!OCRReady ? (
                 <>
-                  <TaxForm title={'haven'} description={'Enter your tax info manually.'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
+                  <TaxForm title={'haven'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
                 </>
               ) : (
                 <>

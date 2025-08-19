@@ -7,8 +7,10 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@number-flow/react": "^0.5.10",
     "blueimp-load-image": "5.16.0",
     "framer-motion": "^12.23.9",
+    "fuzzball": "^2.2.3",
     "qrcode.react": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

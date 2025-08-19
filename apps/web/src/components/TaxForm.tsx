@@ -9,32 +9,31 @@ import { motion } from 'framer-motion';
 // duration: 0.3, ease: [0.48, 0, 0.62, 1]
 
 const mainCardVariants = {
-  initial: { opacity: 0, y: 24 },
+  initial: { opacity: 0, y: 20 },
   animate: {
     opacity: 1,
     y: 0,
     transition: {
-      opacity: { duration: 0.4, ease: [0.48, 0, 0.62, 1] },
-      y: { duration: 1.2, ease: [0.25, 1, 0.5, 1] },
+      opacity: { duration: 0.3, ease: [0.48, 0, 0.62, 1] },
+      y: { duration: 1, ease: [0.25, 1, 0.5, 1] },
     },
   },
 };
 
 const sideCardVariants = {
-  initial: { opacity: 0, y: 24 },
+  initial: { opacity: 0, y: 20 },
   animate: {
     opacity: 1,
     y: 0,
     transition: {
-      opacity: { duration: 0.4, ease: [0.48, 0, 0.62, 1] },
-      y: { duration: 0.6, ease: [0.48, 0, 0.62, 1] },
+      opacity: { duration: 0.3, ease: [0.48, 0, 0.62, 1] },
+      y: { duration: 0.4, ease: [0.48, 0, 0.62, 1] },
     },
   },
 };
 
 interface TaxFormProps {
   title?: string;
-  description?: string;
   sessionId?: string;
   formData: FormFields;
   setFormData: React.Dispatch<React.SetStateAction<FormFields>>;
@@ -65,8 +64,8 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
               </div>
             </div>
             <div className={formStyles.formTableRows}>
-              <FormTableRow key="revenue" formIndex="1a" label="Revenue" value={DefaultFormFields.revenue} />
-              <FormTableRow key="royalty_rate" formIndex="1b" label={'Royalties & IP Fees'} value={DefaultFormFields.royalty_rate} valueNote="of earnings" />
+              <FormTableRow key="revenue" formIndex="1" label="Revenue" value={DefaultFormFields.revenue} />
+              <FormTableRow key="royalty_rate" formIndex="2" label={'Royalties & IP Fees'} value={DefaultFormFields.royalty_rate} valueNote="of earnings" />
             </div>
           </div>
           <div className={formStyles.formTable}>

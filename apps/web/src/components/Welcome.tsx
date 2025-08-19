@@ -14,36 +14,22 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
     setIsExiting(true);
     setTimeout(() => {
       setScreen('ocr');
-    }, 400);
+    }, 300);
   };
 
   const handleExitToManual = () => {
     setIsExiting(true);
     setTimeout(() => {
       setScreen('manual');
-    }, 400);
+    }, 300);
   };
 
   return (
     <div style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
       <motion.div
-        initial={{ y: '100%' }}
-        animate={isExiting ? { y: '100%' } : { y: 0 }}
-        transition={{ duration: 0.6, ease: [0.42, 0, 0.58, 1] }}
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          height: '40%',
-          backgroundColor: 'var(--gray-800)',
-        }}
-      />
-
-      <motion.div
         initial={{ opacity: 0 }}
         animate={isExiting ? { opacity: 0 } : { opacity: 1 }}
-        transition={{ duration: 0.4, ease: 'easeInOut' }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
         style={{
           display: 'flex',
           flexDirection: 'column',

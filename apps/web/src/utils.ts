@@ -1,3 +1,5 @@
+import fuzz from 'fuzzball';
+
 // Parse a numeric-looking token ($, commas, %, decimals)
 export function parseNumeric(text: string): number | null {
   const m = text.match(/[-+]?\d{1,3}(?:,\d{3})*(?:\.\d+)?%?|\d+(?:\.\d+)?%?/);
@@ -14,9 +16,14 @@ export function overlapRatioX(a: { x0: number; x1: number }, b: { x0: number; x1
   return overlap / minWidth;
 }
 
-export function findValueBelow(lines: Array<{ text: string; bbox: { x0: number; y0: number; x1: number; y1: number } }>, keyword: string, opts?: { xPad?: number; minXOverlap?: number; maxDyMult?: number }): number | null {
-  const normalize = (t: string) => t.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-  const label = lines.find((l) => normalize(l.text).includes(keyword));
+export function findValueBelow(
+  lines: Array<{ text: string; bbox: { x0: number; y0: number; x1: number; y1: number } }>,
+  keyword: string,
+  opts?: { xPad?: number; minXOverlap?: number; maxDyMult?: number; similarityThreshold?: number }
+): number | null {
+  // const normalize = (t: string) => t.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+  const similarityThreshold = opts?.similarityThreshold ?? 80;
+  const label = lines.find((l) => fuzz.ratio(l.text, keyword) >= similarityThreshold);
   if (!label) return null;
 
   const kb = label.bbox;
@@ -69,7 +76,7 @@ export function findValueBelowByWord(
   const maxDy = (opts?.maxDyMult ?? 2.5) * medH;
 
   // Anchor on the specific label WORD (e.g., “revenue” or “royalties”)
-  const labelWord = words.find((w) => normalize(w.text).includes(keyword));
+  const labelWord = words.find((w) => fuzz.ratio(normalize(w.text), keyword) >= 80);
   if (!labelWord) return null;
 
   const kb = labelWord.bbox;
@@ -128,7 +135,7 @@ export function findValueBelowByWordNextBand(
   const normalize = (t: string) => t.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
   // 1) Find the label as a *word*
-  const labelWord = words.find((w) => normalize(w.text).includes(keyword));
+  const labelWord = words.find((w) => fuzz.ratio(normalize(w.text), keyword) >= 80);
   if (!labelWord) return null;
 
   const kb = labelWord.bbox;

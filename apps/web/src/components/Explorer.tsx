@@ -6,6 +6,7 @@ import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
 import { ExplorerEntity } from './ExplorerEntity';
+import NumberFlow from '@number-flow/react';
 
 interface ExplorerProps {
   formData: FormFields;
@@ -51,32 +52,31 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
     }));
   }
 
-  const formatDollars = (amount: number): string => {
+  const formatDollars = (amount: number): { value: number; suffix: string } => {
     if (amount > 1000000000) {
-      return (
-        new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(amount / 1000000000) + 'B'
-      );
+      return {
+        value: amount / 1000000000,
+        suffix: 'B',
+      };
     } else if (amount > 1000000) {
-      return (
-        new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-        }).format(amount / 1000000) + 'M'
-      );
+      return {
+        value: amount / 1000000,
+        suffix: 'M',
+      };
     } else {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount);
+      return {
+        value: amount,
+        suffix: '',
+      };
     }
   };
 
-  const formatPercentage = (value: number): string => {
-    return `${value.toFixed(2)}%`;
+  const formatPercentage = (value: number): number => {
+    return Math.round(value * 100) / 100;
   };
+
+  const effTax = effectiveTaxRate;
+  const extraProfitKept = taxesDueAtHome - totalTaxPaid;
 
   return (
     <motion.div
@@ -91,7 +91,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
     >
       <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '30rem' }}>
         <div className={formStyles.formGroup}>
-          <label htmlFor="revenue">Revenue: {formatDollars(revenue)}</label>
+          <label htmlFor="revenue">Revenue: {formatDollars(revenue).value}</label>
           <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} className={formStyles.rangeInput} />
         </div>
         <div className={formStyles.formGroup}>
@@ -99,16 +99,20 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
           <input id="royaltyRate" type="range" min={MIN_ROYALTY_RATE} max={MAX_ROYALTY_RATE} value={royaltyRate} onChange={(e): void => handleRoyaltyRateChange(e.target.value)} className={formStyles.rangeInput} />
         </div>
         <div className={explorerStyles.entitiesContainer}>
-          <ExplorerEntity name={Entities.operating.display_role} country={Countries.IRELAND.name} keeps={formatDollars(operatingProfit) + ' profit'} pays={formatDollars(operatingTaxPaid) + ' tax paid'} />
+          <ExplorerEntity name={Entities.operating.display_role} country={Countries.IRELAND.name} keeps={formatDollars(operatingProfit).value + ' profit'} pays={formatDollars(operatingTaxPaid).value + ' tax paid'} />
           <ExplorerEntity name={Entities.conduit.display_role} country={Countries.NETHERLANDS.name} keeps={'$0 retained'} pays={'$0 tax paid'} />
-          <ExplorerEntity name={Entities.licensor.display_role} country={Countries.BERMUDA.name} keeps={formatDollars(royaltyAmount) + ' profit'} pays={'$0 tax paid'} />
+          <ExplorerEntity name={Entities.licensor.display_role} country={Countries.BERMUDA.name} keeps={formatDollars(royaltyAmount).value + ' profit'} pays={'$0 tax paid'} />
         </div>
       </div>
-      <div className={explorerStyles.rightSide} style={{ flex: 1, maxWidth: '240px' }}>
+      <div className={explorerStyles.rightSide}>
         <RemittanceChart revenue={revenue} taxesDueAtHome={taxesDueAtHome} profit={totalProfit} taxesPaid={totalTaxPaid} />
-        <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600, marginTop: '1.5rem' }}>{formatPercentage(effectiveTaxRate)}</div>
+        <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600, marginTop: '1.5rem' }}>
+          <NumberFlow value={effTax} suffix="%" duration={300} format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
+        </div>
         <div style={{ fontSize: 'var(--font-xs)' }}>Effective Tax Rate</div>
-        <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '1rem' }}>{formatDollars(taxesDueAtHome - totalTaxPaid)}</div>
+        <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '1rem' }}>
+          <NumberFlow value={formatDollars(extraProfitKept).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(extraProfitKept).suffix} />
+        </div>
         <div style={{ fontSize: 'var(--font-xs)' }}>Extra Profit Kept</div>
       </div>
     </motion.div>
