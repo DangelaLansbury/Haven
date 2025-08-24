@@ -1,4 +1,4 @@
-import fuzz from 'fuzzball';
+import * as fuzz from 'fuzzball';
 
 // Parse a numeric-looking token ($, commas, %, decimals)
 export function parseNumeric(text: string): number | null {
@@ -16,170 +16,91 @@ export function overlapRatioX(a: { x0: number; x1: number }, b: { x0: number; x1
   return overlap / minWidth;
 }
 
-export function findValueBelow(
-  lines: Array<{ text: string; bbox: { x0: number; y0: number; x1: number; y1: number } }>,
-  keyword: string,
-  opts?: { xPad?: number; minXOverlap?: number; maxDyMult?: number; similarityThreshold?: number }
+export function extractBelow(
+  words: Array<{ text: string; bbox: { x0: number; y0: number; x1: number; y1: number } }>,
+  labelKeyword: string,
+  opts?: {
+    xPad?: number; // widen label's column window
+    minXOverlap?: number; // how much x-overlap to require (0..1)
+    rowSlackMult?: number; // expand the row band upward (in word-heights)
+    rowHeightMult?: number; // thickness of the row band (in word-heights)
+    similarityThreshold?: number; // fuzzy match threshold for label
+  }
 ): number | null {
-  // const normalize = (t: string) => t.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+  const normalize = (t: string) => t.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+
+  // 1) anchor on the specific label WORD (handles multiple labels on one line)
   const similarityThreshold = opts?.similarityThreshold ?? 80;
-  const label = lines.find((l) => fuzz.ratio(l.text, keyword) >= similarityThreshold);
+  const label = words.find((w) => fuzz.ratio(normalize(w.text), labelKeyword) >= similarityThreshold);
   if (!label) return null;
 
   const kb = label.bbox;
-
-  // Estimate a typical line height to define the “directly below” band
-  const heights = lines.map((l) => l.bbox.y1 - l.bbox.y0).filter((h) => h > 0);
-  const sorted = [...heights].sort((a, b) => a - b);
-  const medH = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 16;
-
-  const xPad = opts?.xPad ?? 8; // small horizontal tolerance
-  const minXOverlap = opts?.minXOverlap ?? 0.4; // require 40% overlap with label’s x-window
-  const maxDy = (opts?.maxDyMult ?? 2) * medH; // within ~2 line-heights below
-
-  const colWindow = { x0: kb.x0 - xPad, x1: kb.x1 + xPad };
-
-  // Candidates: below the label, within the first row band, overlapping its column
-  const candidates = lines.filter((l) => {
-    const lb = l.bbox;
-    const dy = lb.y0 - kb.y1;
-    if (dy <= 0 || dy > maxDy) return false;
-    return overlapRatioX(colWindow, lb) >= minXOverlap;
-  });
-
-  if (!candidates.length) return null;
-
-  // Choose the nearest by dy; tie-break by left-most
-  candidates.sort((a, b) => {
-    const ady = a.bbox.y0 - kb.y1;
-    const bdy = b.bbox.y0 - kb.y1;
-    if (ady !== bdy) return ady - bdy;
-    return a.bbox.x0 - b.bbox.x0;
-  });
-
-  return parseNumeric(candidates[0].text.trim());
-}
-
-export function findValueBelowByWord(
-  lines: Array<{ text: string; bbox: { x0: number; y0: number; x1: number; y1: number } }>,
-  words: Array<{ text: string; bbox: { x0: number; y0: number; x1: number; y1: number } }>,
-  keyword: string,
-  opts?: { xPad?: number; minXOverlap?: number; maxDyMult?: number }
-): number | null {
-  const normalize = (t: string) => t.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-  const xPad = opts?.xPad ?? 12;
-  const minXOverlap = opts?.minXOverlap ?? 0.25;
-
-  const heights = lines.map((l) => l.bbox.y1 - l.bbox.y0).filter((h) => h > 0);
-  const sorted = [...heights].sort((a, b) => a - b);
-  const medH = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 16;
-  const maxDy = (opts?.maxDyMult ?? 2.5) * medH;
-
-  // Anchor on the specific label WORD (e.g., “revenue” or “royalties”)
-  const labelWord = words.find((w) => fuzz.ratio(normalize(w.text), keyword) >= 80);
-  if (!labelWord) return null;
-
-  const kb = labelWord.bbox;
-  const colWindow = { x0: kb.x0 - xPad, x1: kb.x1 + xPad };
-
-  // First line “directly below”
-  const candidateLines = lines
-    .map((l) => ({ l, dy: l.bbox.y0 - kb.y1 }))
-    .filter(({ dy }) => dy > 0 && dy <= maxDy)
-    .sort((a, b) => a.dy - b.dy);
-
-  if (candidateLines.length === 0) return null;
-  const row = candidateLines[0].l;
-
-  // Words in that row
-  const rowWords = words.filter((w) => w.bbox.y0 >= row.bbox.y0 && w.bbox.y1 <= row.bbox.y1 + 1);
-
-  console.log('findValueBelowByWordRow: ', row.text);
-
-  // Prefer numeric word overlapping the label's column window
-  const aligned = rowWords
-    .filter((w) => overlapRatioX(colWindow, w.bbox) >= minXOverlap)
-    .map((w) => ({ w, n: parseNumeric(w.text) }))
-    .filter((x) => x.n != null) as Array<{ w: (typeof words)[number]; n: number }>;
-
-  if (aligned.length > 0) {
-    aligned.sort((a, b) => a.w.bbox.x0 - b.w.bbox.x0);
-    return aligned[0].n!;
-  }
-
-  // Fallback: any numeric in the row (leftmost)
-  const anyNumeric = rowWords.map((w) => ({ w, n: parseNumeric(w.text) })).filter((x) => x.n != null) as Array<{ w: (typeof words)[number]; n: number }>;
-
-  if (anyNumeric.length > 0) {
-    anyNumeric.sort((a, b) => a.w.bbox.x0 - b.w.bbox.x0);
-    return anyNumeric[0].n!;
-  }
-
-  return null;
-}
-
-/**
- * Word-anchored "next band" extractor.
- * Anchors on a label WORD (e.g., "revenue"), then:
- *   1) finds the first row by *words* below the label (smallest y0 > label.y1),
- *   2) builds a vertical band around that y using median word height,
- *   3) returns the left-most numeric token in that band whose x overlaps
- *      the label's column window (label.x +/- xPad).
- * Falls back to any numeric token in the band if no aligned numeric is found.
- */
-export function findValueBelowByWordNextBand(
-  words: Array<{ text: string; bbox: { x0: number; y0: number; x1: number; y1: number } }>,
-  keyword: string,
-  opts?: { xPad?: number; minXOverlap?: number; rowSlackMult?: number; rowHeightMult?: number }
-): number | null {
-  const normalize = (t: string) => t.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-
-  // 1) Find the label as a *word*
-  const labelWord = words.find((w) => fuzz.ratio(normalize(w.text), keyword) >= 80);
-  if (!labelWord) return null;
-
-  const kb = labelWord.bbox;
   const xPad = opts?.xPad ?? 16;
   const minXOverlap = opts?.minXOverlap ?? 0.25;
 
-  // Typical word height → size the row band
-  const wordHeights = words.map((w) => w.bbox.y1 - w.bbox.y0).filter((h) => h > 0);
-  const sorted = [...wordHeights].sort((a, b) => a - b);
-  const medH = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 16;
+  // estimate typical word height
+  const hs = words
+    .map((w) => w.bbox.y1 - w.bbox.y0)
+    .filter((h) => h > 0)
+    .sort((a, b) => a - b);
+  const medH = hs.length ? hs[Math.floor(hs.length / 2)] : 16;
 
-  // 2) Next band: centered on the first word just below the label
+  // 2) find the first word *below* the label → defines the row’s y
   const below = words.filter((w) => w.bbox.y0 > kb.y1);
-  if (below.length === 0) return null;
+  if (!below.length) return null;
   const firstY0 = Math.min(...below.map((w) => w.bbox.y0));
 
-  const rowSlackMult = opts?.rowSlackMult ?? 0.25; // expand upward a little to catch jitter
-  const rowHeightMult = opts?.rowHeightMult ?? 1.2; // band thickness in multiples of medH
+  const rowSlackMult = opts?.rowSlackMult ?? 0.25; // a little cushion upward
+  const rowHeightMult = opts?.rowHeightMult ?? 1.2; // band thickness
   const rowTop = firstY0 - rowSlackMult * medH;
   const rowBottom = firstY0 + rowHeightMult * medH;
 
   const colWindow = { x0: kb.x0 - xPad, x1: kb.x1 + xPad };
 
-  // 3) Words in that band
+  // 3) restrict to words in that row band
   const rowWords = words.filter((w) => w.bbox.y0 >= rowTop && w.bbox.y0 <= rowBottom);
 
-  // Prefer numeric tokens that overlap the label's column window
-  const aligned = rowWords
+  // 4) prefer numeric tokens that overlap the label’s column
+  const alignedNums = rowWords
     .filter((w) => overlapRatioX(colWindow, w.bbox) >= minXOverlap)
     .map((w) => ({ w, n: parseNumeric(w.text) }))
     .filter((x) => x.n != null) as Array<{ w: (typeof words)[number]; n: number }>;
 
-  if (aligned.length > 0) {
-    aligned.sort((a, b) => a.w.bbox.x0 - b.w.bbox.x0);
-    return aligned[0].n!;
+  if (alignedNums.length) {
+    alignedNums.sort((a, b) => a.w.bbox.x0 - b.w.bbox.x0); // left-most
+    return alignedNums[0].n!;
   }
 
-  // Fallback: any numeric token in the band (left-most)
-  const anyNumeric = rowWords.map((w) => ({ w, n: parseNumeric(w.text) })).filter((x) => x.n != null) as Array<{ w: (typeof words)[number]; n: number }>;
+  // 5) fallback: any numeric in the row band (left-most)
+  const anyNums = rowWords.map((w) => ({ w, n: parseNumeric(w.text) })).filter((x) => x.n != null) as Array<{ w: (typeof words)[number]; n: number }>;
 
-  if (anyNumeric.length > 0) {
-    anyNumeric.sort((a, b) => a.w.bbox.x0 - b.w.bbox.x0);
-    return anyNumeric[0].n!;
+  if (anyNums.length) {
+    anyNums.sort((a, b) => a.w.bbox.x0 - b.w.bbox.x0);
+    return anyNums[0].n!;
   }
 
   return null;
 }
+
+export const formatDollars = (amount: number): { value: number; suffix: string } => {
+  if (amount > 1000000000) {
+    return {
+      value: amount / 1000000000,
+      suffix: 'B',
+    };
+  } else if (amount > 1000000) {
+    return {
+      value: amount / 1000000,
+      suffix: 'M',
+    };
+  } else {
+    return {
+      value: amount,
+      suffix: '',
+    };
+  }
+};
+
+export const formatPercentage = (value: number): number => {
+  return Math.round(value * 100) / 100;
+};

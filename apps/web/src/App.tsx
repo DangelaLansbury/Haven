@@ -9,7 +9,7 @@ import WelcomeScreen from './components/Welcome';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
 import { FormFields, DefaultExplorerData } from './types';
-import { findValueBelowByWordNextBand, findValueBelowByWord, findValueBelow } from './utils';
+import { extractBelow } from './utils';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -87,53 +87,18 @@ const App = () => {
       console.table(data.lines.map((l) => ({ t: l.text, y0: l.bbox.y0, y1: l.bbox.y1 })));
       console.table(data.words.map((w) => ({ t: w.text, x0: w.bbox.x0, x1: w.bbox.x1, y0: w.bbox.y0, y1: w.bbox.y1 })));
 
-      const extractedRevenue =
-        findValueBelowByWordNextBand(data.words as any, 'revenue', {
-          xPad: 16,
-          minXOverlap: 0.25,
-          rowSlackMult: 0.25,
-          rowHeightMult: 1.2,
-        }) ??
-        findValueBelowByWord(data.lines as any, data.words as any, 'revenue', {
-          xPad: 16,
-          minXOverlap: 0.25,
-          maxDyMult: 3,
-        }) ??
-        findValueBelow(data.lines as any, 'revenue', {
-          xPad: 16,
-          minXOverlap: 0.25,
-          maxDyMult: 3,
-        }) ??
-        '';
-
-      const extractedRoyaltyRate =
-        findValueBelowByWordNextBand(data.words as any, 'royalties', {
-          xPad: 16,
-          minXOverlap: 0.25,
-          rowSlackMult: 0.25,
-          rowHeightMult: 1.2,
-        }) ??
-        findValueBelowByWord(data.lines as any, data.words as any, 'royalties', {
-          xPad: 16,
-          minXOverlap: 0.25,
-          maxDyMult: 3,
-        }) ??
-        findValueBelow(data.lines as any, 'royalties', {
-          xPad: 16,
-          minXOverlap: 0.2,
-          maxDyMult: 3.5,
-        }) ??
-        '';
+      const extractedRevenue = extractBelow(data.words, 'revenue') ?? '';
+      const extractedRoyalties = extractBelow(data.words, 'royalties') ?? '';
 
       setFormData((prev: FormFields) => ({
         ...prev,
         revenue: extractedRevenue,
-        royalty_rate: extractedRoyaltyRate,
+        royalty_rate: extractedRoyalties,
       }));
 
       if (socket && socket.connected) {
         socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
-        socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyaltyRate });
+        socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyalties });
       } else {
         console.warn('[Socket.IO] socket not ready for gross income emit');
       }
@@ -145,7 +110,7 @@ const App = () => {
           sessionId,
           data: data.text,
           revenue: extractedRevenue,
-          royalty_rate: extractedRoyaltyRate,
+          royalty_rate: extractedRoyalties,
         }),
       });
       console.log('[API] /api/submit status=', res.status);
