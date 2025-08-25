@@ -1,4 +1,5 @@
 import * as fuzz from 'fuzzball';
+import { GILTI_RATE } from './types';
 
 // Parse a numeric-looking token ($, commas, %, decimals)
 export function parseNumeric(text: string): number | null {
@@ -103,4 +104,11 @@ export const formatDollars = (amount: number): { value: number; suffix: string }
 
 export const formatPercentage = (value: number): number => {
   return Math.round(value * 100) / 100;
+};
+
+export const calcTotalETR = (ftr: number): { ftc: number; topUp: number; etr: number } => {
+  const ftc = ftr * 0.8;
+  const topUp = Math.max(GILTI_RATE - ftc, 0);
+  const etr = ftr + topUp;
+  return { ftc, topUp, etr };
 };

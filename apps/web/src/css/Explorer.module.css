@@ -12,8 +12,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
   width: 100%;
-  max-width: 15rem;
+  max-width: calc(200px + 2rem);
 }
 
 /* ----- CHART STYLES ----- */
@@ -48,6 +49,30 @@
   width: 100%;
 }
 
+.ineff {
+  background-color: violet;
+  height: 100%;
+  width: 100%;
+}
+
+.topoff {
+  background-color: red;
+  height: 100%;
+  width: 100%;
+}
+
+.ftr {
+  background-color: chocolate;
+  height: 100%;
+  width: 100%;
+}
+
+.ftc {
+  background-color: brown;
+  height: 100%;
+  width: 100%;
+}
+
 .taxesDueAtHomeBar {
   background-color: var(--haven-green);
   height: 100%;
@@ -68,6 +93,7 @@
   align-items: center;
   font-size: var(--font-xs);
   justify-content: flex-start;
+  opacity: 0;
   text-align: left;
   width: 100%;
 }

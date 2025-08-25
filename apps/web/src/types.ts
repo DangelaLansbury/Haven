@@ -2,21 +2,21 @@ export interface FormFields {
   sessionId: string;
   data: string;
   revenue: number;
-  royalty_rate: number;
+  ftr: number;
 }
 
 export const DefaultFormFields = {
   sessionId: '',
   data: '',
   revenue: '$250,000,000,000', // $250 billion
-  royalty_rate: '95%',
+  ftr: '13.125%',
 };
 
 export const DefaultExplorerData: FormFields = {
   sessionId: '',
   data: '',
   revenue: 150000000000, // $150 billion
-  royalty_rate: 90,
+  ftr: 0.13125, // 13.125%
 };
 
 export interface Country {
@@ -128,5 +128,8 @@ export const Entities: Record<string, Entity> = {
 
 export const MIN_REVENUE = 500000000; // $500 million
 export const MAX_REVENUE = 350000000000; // $350 billion
-export const MIN_ROYALTY_RATE = 3; // 3%
-export const MAX_ROYALTY_RATE = 100; // 100%
+export const MIN_FTR = 0; // 0%
+export const MAX_FTR = 1; // 100%
+
+export const GILTI_RATE = 0.105; // 10.5%
+export const EFF_GILTI_RATE = 0.13125; // 13.125%

@@ -45,8 +45,8 @@ const App = () => {
     sock.on('ocrRevenue', ({ revenue }): void => {
       setFormData((prev: FormFields) => ({ ...prev, revenue }));
     });
-    sock.on('ocrRoyalty', ({ royalty_rate }): void => {
-      setFormData((prev: FormFields) => ({ ...prev, royalty_rate }));
+    sock.on('ocrFTR', ({ ftr }): void => {
+      setFormData((prev: FormFields) => ({ ...prev, ftr }));
     });
     setSocket(sock);
 
@@ -88,19 +88,19 @@ const App = () => {
       console.table(data.words.map((w) => ({ t: w.text, x0: w.bbox.x0, x1: w.bbox.x1, y0: w.bbox.y0, y1: w.bbox.y1 })));
 
       const extractedRevenue = extractBelow(data.words, 'revenue') ?? '';
-      const extractedRoyalties = extractBelow(data.words, 'royalties') ?? '';
+      const extractedForeignTaxRate = extractBelow(data.words, 'foreigntaxrate') ?? '';
 
       setFormData((prev: FormFields) => ({
         ...prev,
         revenue: extractedRevenue,
-        royalty_rate: extractedRoyalties,
+        ftr: extractedForeignTaxRate,
       }));
 
       if (socket && socket.connected) {
         socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
-        socket.emit('ocrRoyalty', { sessionId, royalty_rate: extractedRoyalties });
+        socket.emit('ocrFTR', { sessionId, ftr: extractedForeignTaxRate });
       } else {
-        console.warn('[Socket.IO] socket not ready for gross income emit');
+        console.warn('[Socket.IO] socket not ready for emit');
       }
 
       const res = await fetch('/api/submit', {
@@ -110,7 +110,7 @@ const App = () => {
           sessionId,
           data: data.text,
           revenue: extractedRevenue,
-          royalty_rate: extractedRoyalties,
+          ftr: extractedForeignTaxRate,
         }),
       });
       console.log('[API] /api/submit status=', res.status);
@@ -151,11 +151,11 @@ const App = () => {
           console.log('[Polling] revenue updated:', json.revenue);
           setFormData((prev: FormFields) => ({ ...prev, revenue: json.revenue }));
         }
-        if (json.royalty_rate && json.royalty_rate !== formData.royalty_rate) {
-          console.log('[Polling] royalty_rate updated:', json.royalty_rate);
-          setFormData((prev: FormFields) => ({ ...prev, royalty_rate: json.royalty_rate }));
+        if (json.ftr && json.ftr !== formData.ftr) {
+          console.log('[Polling] ftr updated:', json.ftr);
+          setFormData((prev: FormFields) => ({ ...prev, ftr: json.ftr }));
         }
-        if (json.revenue || json.royalty_rate) {
+        if (json.revenue || json.ftr) {
           setOCRReady(true);
         }
       } catch (err) {
@@ -168,7 +168,7 @@ const App = () => {
   }, [sessionId, isUpload, OCRReady]);
 
   const resetFormData = () => {
-    setFormData({ revenue: DefaultExplorerData.revenue, royalty_rate: DefaultExplorerData.royalty_rate });
+    setFormData({ revenue: DefaultExplorerData.revenue, ftr: DefaultExplorerData.ftr });
   };
 
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {

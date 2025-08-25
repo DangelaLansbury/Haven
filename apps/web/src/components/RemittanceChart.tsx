@@ -1,39 +1,43 @@
 import React from 'react';
 import chartStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
-import { MAX_REVENUE } from '../types';
+import { MAX_REVENUE, GILTI_RATE, EFF_GILTI_RATE } from '../types';
 
 interface RemittanceChartProps {
-  revenue: number;
-  taxesDueAtHome: number;
-  profit: number;
-  taxesPaid: number;
+  ftr: number;
 }
 
-export const RemittanceChart: React.FC<RemittanceChartProps> = ({ revenue, taxesDueAtHome, profit, taxesPaid }) => {
-  const MAX_HEIGHT = 200;
-  const MIN_HEIGHT = 50;
+export const RemittanceChart: React.FC<RemittanceChartProps> = ({ ftr = EFF_GILTI_RATE }) => {
+  const TOTAL_HEIGHT = 1440;
+  const PARENT_HEIGHT = 0.15 * TOTAL_HEIGHT;
+  const EFF_GILTI_HEIGHT = EFF_GILTI_RATE * TOTAL_HEIGHT;
 
-  const revenueHeight = (revenue / MAX_REVENUE) * (MAX_HEIGHT - MIN_HEIGHT) + MIN_HEIGHT;
-  const taxesPaidHeight = (taxesPaid / revenue) * revenueHeight;
-  const extraKeptHeight = (taxesDueAtHome / revenue) * revenueHeight - taxesPaidHeight;
-  const profitHeight = (profit / revenue) * revenueHeight - extraKeptHeight;
+  const ftrHeight = ftr * TOTAL_HEIGHT;
+  const ftcHeight = 0.8 * ftrHeight;
+  const topoffHeight = Math.max((EFF_GILTI_HEIGHT - ftrHeight) * TOTAL_HEIGHT);
+  const ineffHeight = Math.max((ftr - 0.15) * TOTAL_HEIGHT, 0);
 
   return (
     <>
-      <div className={chartStyles.barChart} style={{ width: '200px', height: `${MAX_HEIGHT}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-        <motion.div className={chartStyles.revenueBar} animate={{ height: `${revenueHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-          <motion.div className={chartStyles.barSection} animate={{ height: `${profitHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
-            <div className={chartStyles.profitBar}></div>
+      <div className={chartStyles.barChart} style={{ width: '100%', height: `${PARENT_HEIGHT}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
+        {ineffHeight !== 0 && (
+          <motion.div className={chartStyles.barSection} animate={{ height: `${ineffHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
+            <div className={chartStyles.ineff}></div>
             <div className={chartStyles.barLabel}></div>
           </motion.div>
-          <motion.div className={chartStyles.barSection} animate={{ height: `${extraKeptHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
-            <div className={chartStyles.taxesDueAtHomeBar}></div>
-            <div className={chartStyles.barLabel}>Extra Kept</div>
-          </motion.div>
-          <motion.div className={chartStyles.barSection} animate={{ height: `${taxesPaidHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
-            <div className={chartStyles.taxesPaidBar}></div>
-            <div className={chartStyles.barLabel}></div>
+        )}
+        <motion.div className={chartStyles.effGILTI} animate={{ height: `${EFF_GILTI_HEIGHT}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          {ftr < EFF_GILTI_RATE && (
+            <motion.div className={chartStyles.barSection} animate={{ height: `${topoffHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} style={{ marginBottom: 'auto' }}>
+              <div className={chartStyles.topoff}></div>
+              <div className={chartStyles.barLabel}>GILTI Top-off</div>
+            </motion.div>
+          )}
+          <motion.div className={chartStyles.barSection} animate={{ height: `${ftrHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
+            <div className={chartStyles.ftr} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+              <motion.div className={chartStyles.ftc} animate={{ height: `${ftcHeight}px` }} transition={{ duration: 0.5, ease: 'easeInOut' }} />
+            </div>
+            <div className={chartStyles.barLabel}>Blended Foreign Tax Rate</div>
           </motion.div>
         </motion.div>
       </div>
