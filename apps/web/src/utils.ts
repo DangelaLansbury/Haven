@@ -1,87 +1,9 @@
 import * as fuzz from 'fuzzball';
-import { EFF_GILTI_RATE, GILTI_RATE } from './types';
+import { EFF_GILTI_RATE, GILTI_RATE, CountryNames, Countries, BlendingResult, DefaultMockData } from './types';
 
-// Parse a numeric-looking token ($, commas, %, decimals)
-export function parseNumeric(text: string): number | null {
-  const m = text.match(/[-+]?\d{1,3}(?:,\d{3})*(?:\.\d+)?%?|\d+(?:\.\d+)?%?/);
-  if (!m) return null;
-  const raw = m[0].replace(/[%,$\s]/g, '').replace(/,/g, '');
-  const n = parseFloat(raw);
-  return Number.isFinite(n) ? n : null;
-}
-
-// Horizontal overlap ratio relative to the narrower box (0..1)
-export function overlapRatioX(a: { x0: number; x1: number }, b: { x0: number; x1: number }) {
-  const overlap = Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0));
-  const minWidth = Math.max(1, Math.min(a.x1 - a.x0, b.x1 - b.x0));
-  return overlap / minWidth;
-}
-
-export function extractBelow(
-  words: Array<{ text: string; bbox: { x0: number; y0: number; x1: number; y1: number } }>,
-  labelKeyword: string,
-  opts?: {
-    xPad?: number; // widen label's column window
-    minXOverlap?: number; // how much x-overlap to require (0..1)
-    rowSlackMult?: number; // expand the row band upward (in word-heights)
-    rowHeightMult?: number; // thickness of the row band (in word-heights)
-    similarityThreshold?: number; // fuzzy match threshold for label
-  }
-): number | null {
-  const normalize = (t: string) => t.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-
-  // 1) anchor on the specific label WORD (handles multiple labels on one line)
-  const similarityThreshold = opts?.similarityThreshold ?? 80;
-  const label = words.find((w) => fuzz.ratio(normalize(w.text), labelKeyword) >= similarityThreshold);
-  if (!label) return null;
-
-  const kb = label.bbox;
-  const xPad = opts?.xPad ?? 16;
-  const minXOverlap = opts?.minXOverlap ?? 0.25;
-
-  // estimate typical word height
-  const hs = words
-    .map((w) => w.bbox.y1 - w.bbox.y0)
-    .filter((h) => h > 0)
-    .sort((a, b) => a - b);
-  const medH = hs.length ? hs[Math.floor(hs.length / 2)] : 16;
-
-  // 2) find the first word *below* the label → defines the row’s y
-  const below = words.filter((w) => w.bbox.y0 > kb.y1);
-  if (!below.length) return null;
-  const firstY0 = Math.min(...below.map((w) => w.bbox.y0));
-
-  const rowSlackMult = opts?.rowSlackMult ?? 0.25; // a little cushion upward
-  const rowHeightMult = opts?.rowHeightMult ?? 1.2; // band thickness
-  const rowTop = firstY0 - rowSlackMult * medH;
-  const rowBottom = firstY0 + rowHeightMult * medH;
-
-  const colWindow = { x0: kb.x0 - xPad, x1: kb.x1 + xPad };
-
-  // 3) restrict to words in that row band
-  const rowWords = words.filter((w) => w.bbox.y0 >= rowTop && w.bbox.y0 <= rowBottom);
-
-  // 4) prefer numeric tokens that overlap the label’s column
-  const alignedNums = rowWords
-    .filter((w) => overlapRatioX(colWindow, w.bbox) >= minXOverlap)
-    .map((w) => ({ w, n: parseNumeric(w.text) }))
-    .filter((x) => x.n != null) as Array<{ w: (typeof words)[number]; n: number }>;
-
-  if (alignedNums.length) {
-    alignedNums.sort((a, b) => a.w.bbox.x0 - b.w.bbox.x0); // left-most
-    return alignedNums[0].n!;
-  }
-
-  // 5) fallback: any numeric in the row band (left-most)
-  const anyNums = rowWords.map((w) => ({ w, n: parseNumeric(w.text) })).filter((x) => x.n != null) as Array<{ w: (typeof words)[number]; n: number }>;
-
-  if (anyNums.length) {
-    anyNums.sort((a, b) => a.w.bbox.x0 - b.w.bbox.x0);
-    return anyNums[0].n!;
-  }
-
-  return null;
-}
+export const formatPercentage = (value: number): number => {
+  return Math.round(value * 100) / 100;
+};
 
 export const formatDollars = (amount: number): { value: number; suffix: string } => {
   if (amount > 1000000000) {
@@ -102,10 +24,6 @@ export const formatDollars = (amount: number): { value: number; suffix: string }
   }
 };
 
-export const formatPercentage = (value: number): number => {
-  return Math.round(value * 100) / 100;
-};
-
 export const calcTotalETR = (ftr: number): { ftc: number; topUp: number; etr: number } => {
   const ftc = ftr * 0.8;
   const topUp = Math.max(GILTI_RATE - ftc, 0);
@@ -119,3 +37,165 @@ export const calcNetUSTaxOwed = (revenue: number, etr: number): number => {
   const netUSTaxOwed = netRate * revenue;
   return netUSTaxOwed;
 };
+
+export function matchToCountryEnum(countryString: string): CountryNames | null {
+  const normString = countryString.trim().toLowerCase();
+  const threshold = 80;
+  for (const key of Object.keys(CountryNames)) {
+    const enumValue = CountryNames[key as keyof typeof CountryNames];
+    const match = fuzz.ratio(enumValue, normString);
+    if (match >= threshold) {
+      return enumValue as CountryNames;
+    }
+  }
+  return null;
+}
+
+export const optimizeBlend = (juris: CountryNames[], revenue: number, giltiFloor = EFF_GILTI_RATE): BlendingResult => {
+  if (juris.length === 0 || revenue <= 0) {
+    console.warn('No valid jurisdictions or revenue provided');
+    return makeDefaultBlend();
+  }
+
+  const blendComposition: Record<string, number> = Object.keys(Countries).reduce((acc, key) => {
+    acc[key] = 0;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Step 2: Extract only selected country tax rates
+  const taxRates = juris.map((key) => Countries[key].rate);
+
+  // Step 3: Sort by descending rate
+  const indexedRates = taxRates.map((rate, i) => ({ rate, index: i }));
+  indexedRates.sort((a, b) => b.rate - a.rate);
+
+  let allocations = new Array(taxRates.length).fill(0);
+  let totalTaxPaid = 0;
+  let remainingRevenue = revenue;
+
+  indexedRates.sort((a, b) => b.rate - a.rate);
+
+  for (const { rate, index } of indexedRates) {
+    if (remainingRevenue <= 0) break;
+
+    const maxAtThisRate = Math.max(0, (giltiFloor * revenue - totalTaxPaid) / rate);
+    const incomeHere = Math.min(remainingRevenue, maxAtThisRate);
+
+    allocations[index] = incomeHere;
+    totalTaxPaid += incomeHere * rate;
+    remainingRevenue -= incomeHere;
+  }
+
+  if (remainingRevenue > 0) {
+    const lowest = indexedRates[indexedRates.length - 1].index;
+    allocations[lowest] += remainingRevenue;
+    totalTaxPaid += remainingRevenue * taxRates[lowest];
+  }
+
+  const actualETR = totalTaxPaid / revenue;
+  if (Math.abs(actualETR - giltiFloor) > 0.001) {
+    console.warn('Blend failed to converge to GILTI floor. Got:', actualETR);
+  }
+
+  // Add to blendComposition
+  allocations.forEach((amt, i) => {
+    const countryKey = juris[i];
+    blendComposition[countryKey] = amt / revenue;
+  });
+
+  const totalETR = totalTaxPaid / revenue;
+  const netUSTaxOwed = calcNetUSTaxOwed(revenue, totalETR);
+
+  return {
+    blendComposition,
+    totalETR,
+    totalTaxPaid,
+    netUSTaxOwed,
+  };
+};
+
+export const makeDefaultBlend = (): BlendingResult => {
+  const countries = DefaultMockData.countries;
+  const revenue = DefaultMockData.revenue;
+  const defaultBlend: BlendingResult = optimizeBlend(countries, revenue);
+  return defaultBlend;
+};
+
+// ----- Commented old optimizeBlend function -----
+
+// export const optimizeBlend = (countries: string[], revenue: number): BlendingResult => {
+//   const verifiedCountries = checkIfCountryName(countries);
+
+//   // Get tax rates from verified enum keys
+//   const taxRates = verifiedCountries.map((c) => Countries[c]?.rate ?? 0);
+
+//   // Sort countries by descending rate
+//   const indexedRates = taxRates.map((rate, i) => ({ rate, index: i }));
+//   indexedRates.sort((a, b) => b.rate - a.rate);
+
+//   const blend: BlendingResult = {
+//     shares: [],
+//     totalETR: 0,
+//     totalTaxPaid: 0,
+//     netUSTaxOwed: 0,
+//   };
+
+//   let remainingIncome = revenue;
+//   let totalTaxPaid = 0;
+
+//   for (const { rate, index } of indexedRates) {
+//     if (remainingIncome <= 0) break;
+
+//     const maxAllowedAtThisRate = Math.max(0, (EFF_GILTI_RATE * revenue - totalTaxPaid) / rate);
+//     const incomeHere = Math.min(remainingIncome, maxAllowedAtThisRate);
+//     const incomeHerePct = incomeHere / revenue;
+
+//     const countryKey = verifiedCountries[index];
+//     const countryName = Countries[countryKey]?.name ?? 'Unknown';
+
+//     blend.shares.push({ country: countryName, pct: incomeHerePct });
+//     totalTaxPaid += incomeHere * rate;
+//     remainingIncome -= incomeHere;
+//   }
+
+//   // Dump any remaining income into the lowest-tax country
+//   if (remainingIncome > 0) {
+//     const lowestIndex = indexedRates[indexedRates.length - 1].index;
+//     const countryKey = verifiedCountries[lowestIndex];
+//     const countryName = Countries[countryKey]?.name ?? 'Unknown';
+
+//     blend.shares.push({ country: countryName, pct: remainingIncome / revenue });
+//     totalTaxPaid += remainingIncome * Countries[countryKey]?.rate;
+//   }
+
+//   blend.totalETR = totalTaxPaid / revenue;
+//   blend.totalTaxPaid = totalTaxPaid;
+//   blend.netUSTaxOwed = calcNetUSTaxOwed(revenue, blend.totalETR);
+
+//   // console.log('OPTIMIZED BLEND', blend);
+
+//   return blend;
+// };
+
+// ---- separate function from old optimizeBlend -----
+
+// // If no valid blend, fallback to greedy
+// if (!foundValidBlend) {
+//   for (const { rate, index } of indexedRates) {
+//     const maxAllowed = Math.max(0, (giltiFloor * revenue - totalTaxPaid) / rate);
+//     const incomeHere = Math.min(remainingIncome, maxAllowed);
+
+//     allocations[index] = incomeHere;
+//     totalTaxPaid += incomeHere * rate;
+//     remainingIncome -= incomeHere;
+
+//     if (remainingIncome <= 0) break;
+//   }
+
+//   // Dump remainder into lowest-tax country
+//   if (remainingIncome > 0) {
+//     const lowest = indexedRates[indexedRates.length - 1].index;
+//     allocations[lowest] += remainingIncome;
+//     totalTaxPaid += remainingIncome * taxRates[lowest];
+//   }
+// }
