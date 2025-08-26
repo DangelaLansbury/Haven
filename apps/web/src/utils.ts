@@ -1,5 +1,5 @@
 import * as fuzz from 'fuzzball';
-import { GILTI_RATE } from './types';
+import { EFF_GILTI_RATE, GILTI_RATE } from './types';
 
 // Parse a numeric-looking token ($, commas, %, decimals)
 export function parseNumeric(text: string): number | null {
@@ -111,4 +111,11 @@ export const calcTotalETR = (ftr: number): { ftc: number; topUp: number; etr: nu
   const topUp = Math.max(GILTI_RATE - ftc, 0);
   const etr = ftr + topUp;
   return { ftc, topUp, etr };
+};
+
+export const calcNetUSTaxOwed = (revenue: number, etr: number): number => {
+  if (revenue <= 0 || etr <= 0) return 0;
+  const netRate = EFF_GILTI_RATE - etr;
+  const netUSTaxOwed = netRate * revenue;
+  return netUSTaxOwed;
 };

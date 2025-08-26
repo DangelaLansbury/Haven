@@ -17,7 +17,7 @@ app.use(bodyParser.json({ limit: '1mb' }));
 app.use(express.static(path.resolve(__dirname, '../../web/dist')));
 
 const submitHandler = (req: Request, res: Response): void => {
-  const { sessionId, data, revenue, ftr } = req.body as FormFields;
+  const { sessionId, data, revenue, countries } = req.body as FormFields;
   if (!sessionId || !/^[a-z0-9]+$/.test(sessionId)) {
     return res.status(400).json({ status: 'invalid sessionId' });
   }
@@ -30,7 +30,7 @@ const submitHandler = (req: Request, res: Response): void => {
     sessionData[sessionId] = {
       ...sessionData[sessionId],
       revenue,
-      ftr,
+      countries,
     };
     res.json({ status: 'ok' });
   } else {

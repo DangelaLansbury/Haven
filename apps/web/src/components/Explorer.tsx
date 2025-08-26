@@ -2,7 +2,7 @@ import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
 import { FormFields, DefaultExplorerData, HOME_TAX_RATE, MIN_REVENUE, MAX_REVENUE, MIN_FTR, MAX_FTR, GILTI_RATE } from '../types';
-import { calcTotalETR, formatPercentage } from '../utils';
+import { calcTotalETR, calcNetUSTaxOwed } from '../utils';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
@@ -11,9 +11,10 @@ import NumberFlow from '@number-flow/react';
 interface ExplorerProps {
   formData: FormFields;
   setFormData: React.Dispatch<React.SetStateAction<FormFields>>;
+  setNetUSTaxOwed?: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerProps) => {
+const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, setNetUSTaxOwed }: ExplorerProps) => {
   const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultExplorerData.revenue;
   const initialFTR = formData.ftr && !isNaN(formData.ftr) ? formData.ftr : DefaultExplorerData.ftr;
   const initialETR = calcTotalETR(initialFTR).etr;
@@ -25,7 +26,8 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
     setRevenue(formData.revenue && !isNaN(formData.revenue) ? Math.max(MIN_REVENUE, Math.min(formData.revenue, MAX_REVENUE)) : DefaultExplorerData.revenue);
     setForeignTaxRate(formData.ftr && !isNaN(formData.ftr) ? Math.max(MIN_FTR, Math.min(formData.ftr, MAX_FTR)) : DefaultExplorerData.ftr);
     setEffectiveTaxRate(calcTotalETR(foreignTaxRate).etr);
-  }, [formData, effectiveTaxRate, foreignTaxRate]);
+    setNetUSTaxOwed(calcNetUSTaxOwed(revenue, effectiveTaxRate));
+  }, [formData, effectiveTaxRate, foreignTaxRate, revenue]);
 
   const revenue_safe = revenue || DefaultExplorerData.revenue;
   const ftr_safe = foreignTaxRate || DefaultExplorerData.ftr;
@@ -154,10 +156,16 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData }: ExplorerPr
           <div style={{ fontSize: 'var(--font-xs)' }}>Effective Tax Rate</div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%' }}>
-          <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '1rem' }}>
+          <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
             <NumberFlow value={formatDollars(extraProfitKept).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(extraProfitKept).suffix} />
           </div>
           <div style={{ fontSize: 'var(--font-xs)' }}>Extra Profit Kept</div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%' }}>
+          <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
+            <NumberFlow value={formatDollars(extraProfitKept).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(extraProfitKept).suffix} />
+          </div>
+          <div style={{ fontSize: 'var(--font-xs)' }}>You owe</div>
         </div>
       </div>
     </motion.div>

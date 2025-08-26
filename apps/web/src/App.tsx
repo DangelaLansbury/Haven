@@ -8,18 +8,23 @@ import TaxForm from './components/TaxForm';
 import WelcomeScreen from './components/Welcome';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
-import { FormFields, DefaultExplorerData } from './types';
-import { extractBelow } from './utils';
+import { FormFields, DefaultMockData, CountryNames, BlendingResult, DefaultFormFields } from './types';
+import { makeDefaultBlend, matchToCountryEnum } from './utils';
+import { extractBelow, extractTextColumnBelow } from './ocrHelpers';
+import * as fuzz from 'fuzzball';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
-  const [formData, setFormData] = useState<FormFields>({ ...DefaultExplorerData });
+  const [formData, setFormData] = useState<FormFields>({ ...DefaultMockData });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
   const [fileAdded, setFileAdded] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [netUSTaxOwed, setNetUSTaxOwed] = React.useState<number | null>(null);
+  const defaultBlend = makeDefaultBlend();
+  const [blend, setBlend] = React.useState<BlendingResult>(defaultBlend);
 
   useEffect(() => {
     // generate or read sessionId
@@ -45,8 +50,8 @@ const App = () => {
     sock.on('ocrRevenue', ({ revenue }): void => {
       setFormData((prev: FormFields) => ({ ...prev, revenue }));
     });
-    sock.on('ocrFTR', ({ ftr }): void => {
-      setFormData((prev: FormFields) => ({ ...prev, ftr }));
+    sock.on('ocrCountries', ({ countries }): void => {
+      setFormData((prev: FormFields) => ({ ...prev, countries }));
     });
     setSocket(sock);
 
@@ -87,18 +92,31 @@ const App = () => {
       console.table(data.lines.map((l) => ({ t: l.text, y0: l.bbox.y0, y1: l.bbox.y1 })));
       console.table(data.words.map((w) => ({ t: w.text, x0: w.bbox.x0, x1: w.bbox.x1, y0: w.bbox.y0, y1: w.bbox.y1 })));
 
-      const extractedRevenue = extractBelow(data.words, 'revenue') ?? '';
-      const extractedForeignTaxRate = extractBelow(data.words, 'foreigntaxrate') ?? '';
+      // const extractedRevenue = extractBelow(data.words, 'revenue') ?? '';
+      // const extractedForeignTaxRate = extractBelow(data.words, 'foreign') ?? '';
+      // numeric
+      const extractedRevenue = extractBelow(data.words, 'revenue', { xPad: 16, minXOverlap: 0.25 });
+
+      const extractedForeignTaxRate = extractBelow(data.words, 'foreign', { xPad: 16, minXOverlap: 0.25 });
+
+      const extractedCountries = extractTextColumnBelow(data.words, ['country', 'countries'], {
+        // count: DefaultFormFields.countries.length,
+        stopWords: ['total', 'notes'],
+        xPad: 20,
+        minXOverlap: 0.2,
+      });
+
+      const cleanedCountries = extractedCountries.map((c) => matchToCountryEnum(c)).filter((c): c is CountryNames => c !== null);
 
       setFormData((prev: FormFields) => ({
         ...prev,
         revenue: extractedRevenue,
-        ftr: extractedForeignTaxRate,
+        countries: cleanedCountries,
       }));
 
       if (socket && socket.connected) {
         socket.emit('ocrRevenue', { sessionId, revenue: extractedRevenue });
-        socket.emit('ocrFTR', { sessionId, ftr: extractedForeignTaxRate });
+        socket.emit('ocrCountries', { sessionId, countries: cleanedCountries });
       } else {
         console.warn('[Socket.IO] socket not ready for emit');
       }
@@ -110,7 +128,7 @@ const App = () => {
           sessionId,
           data: data.text,
           revenue: extractedRevenue,
-          ftr: extractedForeignTaxRate,
+          countries: cleanedCountries,
         }),
       });
       console.log('[API] /api/submit status=', res.status);
@@ -132,7 +150,11 @@ const App = () => {
   useEffect(() => {
     if (screen === 'manual') return;
 
+    let pollingActive = true;
+
     const interval = setInterval(async () => {
+      if (!pollingActive) return;
+
       try {
         const res = await fetch(`/api/session-data?sessionId=${sessionId}`, {
           headers: { Accept: 'application/json' },
@@ -151,12 +173,16 @@ const App = () => {
           console.log('[Polling] revenue updated:', json.revenue);
           setFormData((prev: FormFields) => ({ ...prev, revenue: json.revenue }));
         }
-        if (json.ftr && json.ftr !== formData.ftr) {
-          console.log('[Polling] ftr updated:', json.ftr);
-          setFormData((prev: FormFields) => ({ ...prev, ftr: json.ftr }));
+        if (json.countries && json.countries !== formData.countries) {
+          console.log('[Polling] countries updated:', json.countries);
+          setFormData((prev: FormFields) => ({ ...prev, countries: json.countries }));
         }
-        if (json.revenue || json.ftr) {
+
+        // Stop polling if all data is fetched
+        if (json.revenue && json.countries) {
           setOCRReady(true);
+          pollingActive = false;
+          clearInterval(interval);
         }
       } catch (err) {
         console.warn('[Polling] session-data fetch failed:', err);
@@ -164,11 +190,14 @@ const App = () => {
       }
     }, 3000);
 
-    return () => clearInterval(interval);
-  }, [sessionId, isUpload, OCRReady]);
+    return () => {
+      pollingActive = false;
+      clearInterval(interval);
+    };
+  }, [sessionId, OCRReady]);
 
   const resetFormData = () => {
-    setFormData({ revenue: DefaultExplorerData.revenue, ftr: DefaultExplorerData.ftr });
+    setFormData({ revenue: DefaultMockData.revenue, countries: DefaultMockData.countries });
   };
 
   const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {
@@ -203,7 +232,7 @@ const App = () => {
             </>
           ) : screen === 'manual' ? (
             <>
-              <Explorer formData={formData} setFormData={setFormData} />
+              <Explorer formData={formData} setFormData={setFormData} blend={blend} setBlend={setBlend} />
             </>
           ) : (
             <>
@@ -213,7 +242,7 @@ const App = () => {
                 </>
               ) : (
                 <>
-                  <Explorer formData={formData} setFormData={setFormData} />
+                  <Explorer formData={formData} setFormData={setFormData} blend={blend} setBlend={setBlend} />
                 </>
               )}
             </>
