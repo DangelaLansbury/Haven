@@ -2,7 +2,6 @@ export interface FormFields {
   sessionId: string;
   data: string;
   revenue: number;
-  ftr: number;
   countries?: CountryNames[];
 }
 
@@ -49,7 +48,6 @@ export const DefaultFormFields = {
   sessionId: '',
   data: '',
   revenue: '$250,000,000,000', // $250 billion
-  ftr: '13.125%',
   countries: [CountryNames.switzerland, CountryNames.australia],
 };
 
@@ -57,7 +55,6 @@ export const DefaultMockData: FormFields = {
   sessionId: '',
   data: '',
   revenue: 150000000000, // $150 billion
-  ftr: 0.13125, // 13.125%
   countries: [
     CountryNames.ireland,
     CountryNames.germany,

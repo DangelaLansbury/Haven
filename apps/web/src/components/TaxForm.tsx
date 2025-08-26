@@ -3,7 +3,7 @@ import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
 import { CountryDecorator, FormTableRow } from './FormInput';
 import QRCode from 'qrcode.react';
-import { FormFields, Entities, DefaultFormFields } from '../types';
+import { FormFields, DefaultFormFields } from '../types';
 import { motion } from 'framer-motion';
 
 // duration: 0.3, ease: [0.48, 0, 0.62, 1]
@@ -38,15 +38,18 @@ interface TaxFormProps {
   formData: FormFields;
   setFormData: React.Dispatch<React.SetStateAction<FormFields>>;
   handleBack?: (screen: string) => void;
+  handleNext?: (screen: string) => void;
 }
 
-const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, sessionId }) => {
+const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, handleNext, sessionId }) => {
   return (
     <div className={commonStyles.pageContainer}>
       <motion.div variants={sideCardVariants} initial="initial" animate="animate" className={formStyles.sideCard}>
-        <h1 className={commonStyles.header}>{'Take a picture'}</h1>
-        <p className={commonStyles.description}>Capture your tax form using your device's camera.</p>
-        <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#4b4447'} bgColor={'#fefcf6'} />
+        <div className={commonStyles.header}>{'Scan the QR code'}</div>
+        <div className={commonStyles.description}>We'll populate your tax details automatically.</div>
+        <div style={{ padding: '0.5rem' }}>
+          <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#151515'} bgColor={'#fffefb'} />
+        </div>
       </motion.div>
 
       <motion.div variants={mainCardVariants} initial="initial" animate="animate" className={formStyles.mainCard}>
@@ -65,7 +68,6 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
             </div>
             <div className={formStyles.formTableRows}>
               <FormTableRow key="revenue" formIndex="1" label="Revenue" value={DefaultFormFields.revenue} />
-              <FormTableRow key="royalty_rate" formIndex="2" label={'Royalties & IP Fees'} value={DefaultFormFields.royalty_rate} valueNote="of earnings" />
             </div>
           </div>
           <div className={formStyles.formTable}>
@@ -77,12 +79,6 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
                 {'ENTITIES'}
               </div>
             </div>
-            <div className={formStyles.formTableRows}>
-              {Object.keys(Entities).map((role) => {
-                const entity = Entities[role];
-                return <FormTableRow key={role} formIndex={entity.formIndex} label={entity.display_role} value={entity.default_country.name} decorator={<CountryDecorator country={entity.default_country} text={entity.default_name} />} />;
-              })}
-            </div>
           </div>
         </form>
       </motion.div>
@@ -90,5 +86,3 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, se
   );
 };
 export default TaxForm;
-
-// entity={entity} newRate={formData[`${role}_rate`] || ''} onRateChange={(rate) => setFormData({ ...formData, [`${role}_rate`]: rate })}
