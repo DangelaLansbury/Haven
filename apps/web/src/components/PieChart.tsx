@@ -135,3 +135,88 @@ export const RadialTaxBlendChart: React.FC<Props> = ({ blend, size = 400 }) => {
 
   return <svg ref={ref}></svg>;
 };
+
+interface Props {
+  blend: BlendingResult;
+  size?: number; // Optional, default = 500
+}
+
+export const TaxBlendDonut: React.FC<Props> = ({ blend, size = 500 }) => {
+  const ref = useRef<SVGSVGElement>(null);
+
+  useEffect(() => {
+    if (!blend) return;
+
+    const radius = size / 2;
+    const innerRadius = radius * 0.4;
+    const outerRadius = radius * 0.9;
+
+    const svg = d3.select(ref.current).attr('width', size).attr('height', size).attr('viewBox', `0 0 ${size} ${size}`).style('font-family', 'sans-serif');
+
+    svg.selectAll('*').remove(); // Clear previous render
+
+    const data = Object.entries(blend.blendComposition)
+      .filter(([_, pct]) => (pct as number) > 0.005)
+      .map(([key, pct]) => {
+        const country = Countries[key as CountryNames];
+        return {
+          key,
+          name: country.name,
+          percent: pct,
+          taxRate: country.rate,
+          color: '#ccc',
+        };
+      });
+
+    const pie = d3
+      .pie<CountrySlice>()
+      .value((d) => d.percent)
+      .sort(null);
+
+    const arc = d3.arc<d3.PieArcDatum<CountrySlice>>().innerRadius(innerRadius).outerRadius(outerRadius);
+
+    const g = svg.append('g').attr('transform', `translate(${radius},${radius})`);
+
+    const arcs = g
+      .selectAll('path')
+      .data(pie(data))
+      .enter()
+      .append('path')
+      .attr('d', arc)
+      .attr('fill', (d) => d.data.color)
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 1)
+      .on('mouseover', function (_, d) {
+        d3.select(this).attr('stroke-width', 3);
+        tooltip.style('display', 'block').html(`
+            <strong>${matchToCountryEnum(d.data.name)}</strong><br>
+            ${Math.round(d.data.percent * 100)}% of income<br>
+            ${Math.round(d.data.taxRate * 1000) / 10}% tax rate
+          `);
+      })
+      .on('mousemove', function (event) {
+        tooltip.style('left', event.pageX + 10 + 'px').style('top', event.pageY - 28 + 'px');
+      })
+      .on('mouseout', function () {
+        d3.select(this).attr('stroke-width', 1);
+        tooltip.style('display', 'none');
+      });
+
+    // Tooltip div
+    const tooltip = d3
+      .select('body')
+      .append('div')
+      .attr('class', 'd3-tooltip')
+      .style('position', 'absolute')
+      .style('background', 'white')
+      .style('padding', '6px 10px')
+      .style('border', '1px solid #ccc')
+      .style('border-radius', '4px')
+      .style('pointer-events', 'none')
+      .style('display', 'none')
+      .style('font-size', '12px')
+      .style('z-index', '1000');
+  }, [blend, size]);
+
+  return <svg ref={ref}></svg>;
+};
