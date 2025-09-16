@@ -104,7 +104,7 @@ export const optimizeBlend = (juris: CountryNames[], revenue: number, giltiFloor
   });
 
   const totalETR = totalTaxPaid / revenue;
-  const netUSTaxOwed = calcNetUSTaxOwed(revenue, totalETR);
+  const netUSTaxOwed = Math.max(calcNetUSTaxOwed(revenue, totalETR), 0);
 
   return {
     blendComposition,
@@ -120,82 +120,3 @@ export const makeDefaultBlend = (): BlendingResult => {
   const defaultBlend: BlendingResult = optimizeBlend(countries, revenue);
   return defaultBlend;
 };
-
-// ----- Commented old optimizeBlend function -----
-
-// export const optimizeBlend = (countries: string[], revenue: number): BlendingResult => {
-//   const verifiedCountries = checkIfCountryName(countries);
-
-//   // Get tax rates from verified enum keys
-//   const taxRates = verifiedCountries.map((c) => Countries[c]?.rate ?? 0);
-
-//   // Sort countries by descending rate
-//   const indexedRates = taxRates.map((rate, i) => ({ rate, index: i }));
-//   indexedRates.sort((a, b) => b.rate - a.rate);
-
-//   const blend: BlendingResult = {
-//     shares: [],
-//     totalETR: 0,
-//     totalTaxPaid: 0,
-//     netUSTaxOwed: 0,
-//   };
-
-//   let remainingIncome = revenue;
-//   let totalTaxPaid = 0;
-
-//   for (const { rate, index } of indexedRates) {
-//     if (remainingIncome <= 0) break;
-
-//     const maxAllowedAtThisRate = Math.max(0, (EFF_GILTI_RATE * revenue - totalTaxPaid) / rate);
-//     const incomeHere = Math.min(remainingIncome, maxAllowedAtThisRate);
-//     const incomeHerePct = incomeHere / revenue;
-
-//     const countryKey = verifiedCountries[index];
-//     const countryName = Countries[countryKey]?.name ?? 'Unknown';
-
-//     blend.shares.push({ country: countryName, pct: incomeHerePct });
-//     totalTaxPaid += incomeHere * rate;
-//     remainingIncome -= incomeHere;
-//   }
-
-//   // Dump any remaining income into the lowest-tax country
-//   if (remainingIncome > 0) {
-//     const lowestIndex = indexedRates[indexedRates.length - 1].index;
-//     const countryKey = verifiedCountries[lowestIndex];
-//     const countryName = Countries[countryKey]?.name ?? 'Unknown';
-
-//     blend.shares.push({ country: countryName, pct: remainingIncome / revenue });
-//     totalTaxPaid += remainingIncome * Countries[countryKey]?.rate;
-//   }
-
-//   blend.totalETR = totalTaxPaid / revenue;
-//   blend.totalTaxPaid = totalTaxPaid;
-//   blend.netUSTaxOwed = calcNetUSTaxOwed(revenue, blend.totalETR);
-
-//   // console.log('OPTIMIZED BLEND', blend);
-
-//   return blend;
-// };
-
-// ---- separate function from old optimizeBlend -----
-
-// // If no valid blend, fallback to greedy
-// if (!foundValidBlend) {
-//   for (const { rate, index } of indexedRates) {
-//     const maxAllowed = Math.max(0, (giltiFloor * revenue - totalTaxPaid) / rate);
-//     const incomeHere = Math.min(remainingIncome, maxAllowed);
-
-//     allocations[index] = incomeHere;
-//     totalTaxPaid += incomeHere * rate;
-//     remainingIncome -= incomeHere;
-
-//     if (remainingIncome <= 0) break;
-//   }
-
-//   // Dump remainder into lowest-tax country
-//   if (remainingIncome > 0) {
-//     const lowest = indexedRates[indexedRates.length - 1].index;
-//     allocations[lowest] += remainingIncome;
-//     totalTaxPaid += remainingIncome * taxRates[lowest];
-//   }
-// }

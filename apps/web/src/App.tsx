@@ -92,15 +92,11 @@ const App = () => {
       console.table(data.lines.map((l) => ({ t: l.text, y0: l.bbox.y0, y1: l.bbox.y1 })));
       console.table(data.words.map((w) => ({ t: w.text, x0: w.bbox.x0, x1: w.bbox.x1, y0: w.bbox.y0, y1: w.bbox.y1 })));
 
-      // const extractedRevenue = extractBelow(data.words, 'revenue') ?? '';
-      // const extractedForeignTaxRate = extractBelow(data.words, 'foreign') ?? '';
-      // numeric
-      const extractedRevenue = extractBelow(data.words, 'revenue', { xPad: 16, minXOverlap: 0.25 });
+      const extractedRevenue = extractBelow(data.words, 'income', { xPad: 16, minXOverlap: 0.25 });
 
-      const extractedForeignTaxRate = extractBelow(data.words, 'foreign', { xPad: 16, minXOverlap: 0.25 });
+      // const extractedForeignTaxRate = extractBelow(data.words, 'foreign', { xPad: 16, minXOverlap: 0.25 });
 
       const extractedCountries = extractTextColumnBelow(data.words, ['country', 'countries'], {
-        // count: DefaultFormFields.countries.length,
         stopWords: ['total', 'notes'],
         xPad: 20,
         minXOverlap: 0.2,
