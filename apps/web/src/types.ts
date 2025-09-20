@@ -47,7 +47,7 @@ export const Countries: Record<string, Country> = {
 export const DefaultFormFields = {
   sessionId: '',
   data: '',
-  revenue: '$250,000,000,000', // $250 billion
+  revenue: '250,000,000,000.00', // $250 billion
   countries: [CountryNames.switzerland, CountryNames.australia],
 };
 
