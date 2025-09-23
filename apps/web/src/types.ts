@@ -74,10 +74,14 @@ export interface BlendingResult {
   blendComposition: Record<CountryNames, number>;
   totalETR: number;
   totalTaxPaid: number;
-  netUSTaxOwed: number;
 }
 
-export const HOME_TAX_RATE = Countries[CountryNames.unitedstates].rate;
+export const US_TAX_RATE = Countries[CountryNames.unitedstates].rate;
+
+export interface DollarValue {
+  value: number;
+  suffix: string;
+}
 
 export const MIN_REVENUE = 500000000; // $500 million
 export const MAX_REVENUE = 350000000000; // $350 billion

@@ -8,8 +8,8 @@ import TaxForm from './components/TaxForm';
 import WelcomeScreen from './components/Welcome';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
-import { FormFields, DefaultMockData, CountryNames, BlendingResult, DefaultFormFields } from './types';
-import { makeDefaultBlend, matchToCountryEnum } from './utils';
+import { FormFields, DefaultMockData, CountryNames, BlendingResult, DefaultFormFields, DollarValue } from './types';
+import { formatDollars, makeDefaultBlend, matchToCountryEnum } from './utils';
 import { extractBelow, extractTextColumnBelow } from './ocrHelpers';
 import * as fuzz from 'fuzzball';
 
@@ -20,11 +20,11 @@ const App = () => {
   const [formData, setFormData] = useState<FormFields>({ ...DefaultMockData });
   const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
-  const [fileAdded, setFileAdded] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [netUSTaxOwed, setNetUSTaxOwed] = React.useState<number | null>(null);
+  const [fileAdded, setFileAdded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const defaultBlend = makeDefaultBlend();
-  const [blend, setBlend] = React.useState<BlendingResult>(defaultBlend);
+  const [blend, setBlend] = useState<BlendingResult>(defaultBlend);
+  const [optLevel, setOptLevel] = useState<'optimal' | 'inefficient' | 'topup' | 'none'>('optimal');
 
   useEffect(() => {
     // generate or read sessionId
@@ -228,7 +228,7 @@ const App = () => {
             </>
           ) : screen === 'manual' ? (
             <>
-              <Explorer formData={formData} setFormData={setFormData} blend={blend} setBlend={setBlend} />
+              <Explorer formData={formData} setFormData={setFormData} blend={blend} setBlend={setBlend} optLevel={optLevel} setOptLevel={setOptLevel} />
             </>
           ) : (
             <>
@@ -238,7 +238,7 @@ const App = () => {
                 </>
               ) : (
                 <>
-                  <Explorer formData={formData} setFormData={setFormData} blend={blend} setBlend={setBlend} />
+                  <Explorer formData={formData} setFormData={setFormData} blend={blend} setBlend={setBlend} optLevel={optLevel} setOptLevel={setOptLevel} />
                 </>
               )}
             </>
