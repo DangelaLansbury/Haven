@@ -1,10 +1,11 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { CountryDecorator, FormTableRow } from './FormInput';
+import { FormTableRow } from './FormInput';
 import QRCode from 'qrcode.react';
 import { FormFields, DefaultFormFields } from '../types';
 import { motion } from 'framer-motion';
+import { matchToCountryEnum } from '../utils';
 
 // duration: 0.3, ease: [0.48, 0, 0.62, 1]
 
@@ -60,14 +61,14 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, ha
           <div className={formStyles.formTable}>
             <div className={formStyles.formTableHeader}>
               <div className={formStyles.formTableTh}>
-                <span className={formStyles.section} style={{ width: '1rem' }}>
+                <span className={formStyles.section} style={{ width: '1rem', textAlign: 'center' }}>
                   {'§1'}
                 </span>
-                {'EARNINGS & EXPENDITURES'}
+                {'INCOME'}
               </div>
             </div>
             <div className={formStyles.formTableRows}>
-              <FormTableRow key="revenue" formIndex="1" label="Revenue" value={DefaultFormFields.revenue} />
+              <FormTableRow key="income" formIndex="$" label="Income" value={DefaultFormFields.revenue} />
             </div>
           </div>
           <div className={formStyles.formTable}>
@@ -76,8 +77,13 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, ha
                 <span className={formStyles.section} style={{ width: '1rem' }}>
                   {'§2'}
                 </span>
-                {'ENTITIES'}
+                {'COUNTRIES OF OPERATION'}
               </div>
+            </div>
+            <div className={formStyles.formTableRows}>
+              {DefaultFormFields.countries.map((country, index) => (
+                <FormTableRow key={`${matchToCountryEnum(country)}`} formIndex={`${index + 1}`} value={`${matchToCountryEnum(country)}`} />
+              ))}
             </div>
           </div>
         </form>

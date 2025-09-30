@@ -138,10 +138,10 @@ export const RadialTaxBlendChart: React.FC<Props> = ({ blend, size = 400 }) => {
 
 interface Props {
   blend: BlendingResult;
-  size?: number; // Optional, default = 500
+  size?: number; // Optional, default = 200
 }
 
-export const TaxBlendDonut: React.FC<Props> = ({ blend, size = 500 }) => {
+export const TaxBlendDonut: React.FC<Props> = ({ blend, size = 200 }) => {
   const ref = useRef<SVGSVGElement>(null);
 
   useEffect(() => {

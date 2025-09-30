@@ -129,6 +129,13 @@
       font-weight: 500;
     }
   }
+  & .formIndex {
+    color: var(--gray-800);
+    font-size: var(--font-sm);
+    font-weight: 600;
+    text-align: center;
+    width: 1rem;
+  }
   & .cellValue {
     align-items: center;
     display: flex;
@@ -153,11 +160,13 @@
       font-size: var(--font-sm);
       font-weight: 500;
     }
-    & .formIndex {
+    /* & .formIndex {
       color: var(--gray-800);
       font-size: var(--font-sm);
       font-weight: 600;
-    }
+      text-align: center;
+      width: 1rem;
+    } */
   }
 }
 

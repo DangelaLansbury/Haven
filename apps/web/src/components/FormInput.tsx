@@ -55,17 +55,17 @@ interface CountryDecoratorProps {
 export function CountryDecorator({ country, text, rightAligned }: CountryDecoratorProps) {
   return (
     <div className={formStyles.countryDecorator} style={{ textAlign: rightAligned ? 'right' : 'left' }}>
-      {!rightAligned && (
+      {/* {!rightAligned && (
         <div className={formStyles.flagContainer}>
           <img src={country.flag} alt={`${country.name} flag`} className={formStyles.flag} />
         </div>
-      )}
+      )} */}
       <span className={formStyles.countryText}>{text || country.name}</span>
-      {rightAligned && (
+      {/* {rightAligned && (
         <div className={formStyles.flagContainer}>
           <img src={country.flag} alt={`${country.name} flag`} className={formStyles.flag} />
         </div>
-      )}
+      )} */}
     </div>
   );
 }
@@ -111,24 +111,12 @@ export function FormTableRow({ key, formIndex, label, value, onChange, decorator
         </div>
       )}
       <div className={formStyles.formTableCell}>
-        <div className={formStyles.cellValue} data-id={`${id}-label`}>
+        {/* <div className={formStyles.cellLabel} data-id={`${id}-label`}>
           {label}
-        </div>
-        {decorator && (
-          <div className={`${formStyles.cellValue} ${formStyles.decorator}`} data-id={`${id}-decorator`}>
-            {decorator}
-          </div>
-        )}
-      </div>
-      <div className={`${formStyles.formTableCell} ${formStyles.mainValue}`}>
-        <div className={`${formStyles.cellValue} ${formStyles.rightAligned}`} data-id={`${id}-value`}>
+        </div> */}
+        <div className={formStyles.cellValue} data-id={`${id}-value`}>
           {value}
         </div>
-        {valueNote && (
-          <div className={`${formStyles.cellValue} ${formStyles.subValue} ${formStyles.rightAligned}`} data-id={`${id}-value-note`}>
-            {valueNote}
-          </div>
-        )}
       </div>
     </div>
   );
