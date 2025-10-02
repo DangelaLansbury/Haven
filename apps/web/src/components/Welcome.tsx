@@ -38,7 +38,7 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
         }}
       >
         <div className={commonStyles.headerContainer}>
-          <h1 className={commonStyles.header}>Welcome to Haven</h1>
+          <h1 className={commonStyles.header}>{`Welcome to Haven — Still in Development`}</h1>
           <div className={commonStyles.subtitle}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
         </div>
         <div className={formStyles.formTypeSelectionContainer}>
