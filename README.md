@@ -1,3 +1,3 @@
 # Haven
 
-Using the "Double Irish with a Dutch Sandwich" scheme to explore multi-device OCR workflows.
+Using international tax optimization to explore multi-device OCR design.
