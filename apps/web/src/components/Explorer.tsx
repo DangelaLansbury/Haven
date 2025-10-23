@@ -1,7 +1,7 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormFields, DefaultMockData, MIN_REVENUE, MAX_REVENUE, BlendingResult, DollarValue } from '../types';
+import { FormFields, DefaultMockData, MIN_REVENUE, MAX_REVENUE, BlendingResult, DollarValue, EFF_GILTI_RATE } from '../types';
 import { optimizeBlend, formatDollars } from '../utils';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
@@ -129,7 +129,20 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
             <NumberFlow value={formatDollars(blend.totalTaxPaid).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(blend.totalTaxPaid).suffix} />
           </div>
-          <div style={{ fontSize: 'var(--font-xs)' }}>You owe</div>
+          <div style={{ fontSize: 'var(--font-xs)' }}>You pay</div>
+          {blend.totalETR < EFF_GILTI_RATE && (
+            <>
+              <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
+                <NumberFlow
+                  value={formatDollars((EFF_GILTI_RATE - blend.totalETR) * revenue).value}
+                  format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
+                  duration={300}
+                  suffix={formatDollars((EFF_GILTI_RATE - blend.totalETR) * revenue).suffix}
+                />
+              </div>
+              <div style={{ fontSize: 'var(--font-xs)' }}>Top-up penalty</div>
+            </>
+          )}
         </div>
       </div>
     </motion.div>
