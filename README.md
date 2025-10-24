@@ -1,3 +1,3 @@
 # Haven
 
-Using international tax optimization to explore multi-device OCR design.
+Exploring multi-device OCR design with multi-national tax optimization.
