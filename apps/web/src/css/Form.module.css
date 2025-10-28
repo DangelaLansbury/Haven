@@ -78,7 +78,7 @@
     }
     & > .section {
       color: var(--haven-green);
-      margin-right: 0.75rem;
+      margin-right: 1rem;
     }
   }
 }
