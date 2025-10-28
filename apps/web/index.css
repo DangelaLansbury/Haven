@@ -88,7 +88,8 @@ a {
   --haven-gold: #c6a66a;
   --haven-gold-text: #b08a4e;
 
-  --font-xs: 0.75rem;
+  --font-xxs: 0.688rem;
+  --font-xs: 0.781rem;
   --font-sm: 0.875rem;
   --font-base: 1rem;
   --font-lg: 1.125rem;
