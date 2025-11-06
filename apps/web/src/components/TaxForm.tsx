@@ -55,7 +55,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, ha
 
       <motion.div variants={mainCardVariants} initial="initial" animate="animate" className={formStyles.mainCard}>
         <div className={commonStyles.header} style={{ padding: '0 0.75rem 0.75rem 0.75rem' }}>
-          {'Form 8890-A'}
+          {'Form 1313-D'}
         </div>
         <form className={`${formStyles.taxFormContainer} `}>
           <div className={formStyles.formTable}>
