@@ -143,9 +143,9 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
                   className={explorerStyles.topupPenalty}
                 />
               </div>
-              <div style={{ fontSize: 'var(--font-xs)' }}>Tax paid + top-up penalty</div>
-              <div style={{ fontSize: 'var(--font-xxs)', fontStyle: 'italic' }}>
-                {`Top-up penalties cover any gap between FETR and the eff. GILTI rate (13.125%). Unlike foreign taxes, they are not creditable against U.S. tax liability, with no ability to recover, defer, or carry forward.`}
+              <div style={{ fontSize: 'var(--font-xs)' }}>Tax paid + top-up penalty*</div>
+              <div style={{ fontSize: 'var(--font-xxs)', fontStyle: 'italic', marginTop: '1rem' }}>
+                {`*Top-up penalties cover any gap between FETR and the eff. GILTI rate (13.125%). Unlike foreign taxes, they are not creditable against U.S. tax liability, with no ability to recover, defer, or carry forward.`}
               </div>
             </>
           ) : (
