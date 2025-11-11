@@ -126,21 +126,34 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           <div style={{ fontSize: 'var(--font-xs)' }}>Effective Tax Rate</div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%' }}>
-          <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
+          {/* <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
             <NumberFlow value={formatDollars(blend.totalTaxPaid).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(blend.totalTaxPaid).suffix} />
           </div>
-          <div style={{ fontSize: 'var(--font-xs)' }}>You pay</div>
-          {blend.totalETR < EFF_GILTI_RATE && (
+          <div style={{ fontSize: 'var(--font-xs)' }}>You pay</div> */}
+          {blend.totalETR < EFF_GILTI_RATE ? (
             <>
               <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
+                <NumberFlow value={formatDollars(blend.totalTaxPaid).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(blend.totalTaxPaid).suffix} />
+                <span className={explorerStyles.topupPenalty}>{' + '}</span>
                 <NumberFlow
                   value={formatDollars((EFF_GILTI_RATE - blend.totalETR) * revenue).value}
                   format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
                   duration={300}
                   suffix={formatDollars((EFF_GILTI_RATE - blend.totalETR) * revenue).suffix}
+                  className={explorerStyles.topupPenalty}
                 />
               </div>
-              <div style={{ fontSize: 'var(--font-xs)' }}>Top-up penalty</div>
+              <div style={{ fontSize: 'var(--font-xs)' }}>Tax paid + top-up penalty</div>
+              <div style={{ fontSize: 'var(--font-xxs)', fontStyle: 'italic' }}>
+                {`Top-up penalties cover any gap between FETR and the eff. GILTI rate (13.125%). Unlike foreign taxes, they are not creditable against U.S. tax liability, with no ability to recover, defer, or carry forward.`}
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
+                <NumberFlow value={formatDollars(blend.totalTaxPaid).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(blend.totalTaxPaid).suffix} />
+              </div>
+              <div style={{ fontSize: 'var(--font-xs)' }}>Total tax paid</div>
             </>
           )}
         </div>

@@ -17,6 +17,12 @@
   max-width: calc(200px + 2rem);
 }
 
+/* ----- FONT STYLES ----- */
+
+.topupPenalty {
+  color: red;
+}
+
 /* ----- CHART STYLES ----- */
 
 .barChart {
