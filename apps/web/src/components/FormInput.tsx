@@ -104,16 +104,11 @@ export function FormTableRow({ key, formIndex, label, value, onChange, decorator
   return (
     <div className={formStyles.formTableRow}>
       {formIndex && (
-        <div className={formStyles.formTableCell} style={{ width: '1.75rem' }}>
-          <span className={formStyles.formIndex} data-id={`${id}-form-index`}>
-            {formIndex}
-          </span>
+        <div className={`${formStyles.formTableCell} ${formStyles.formIndex}`}>
+          <span data-id={`${id}-form-index`}>{formIndex}</span>
         </div>
       )}
       <div className={formStyles.formTableCell}>
-        {/* <div className={formStyles.cellLabel} data-id={`${id}-label`}>
-          {label}
-        </div> */}
         <div className={formStyles.cellValue} data-id={`${id}-value`}>
           {value}
         </div>

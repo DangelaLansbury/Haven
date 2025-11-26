@@ -31,20 +31,6 @@ export const calcTotalETR = (ftr: number): { ftc: number; topUp: number; etr: nu
   return { ftc, topUp, etr };
 };
 
-// export const calcNetUSTaxOwed = (revenue: number, etr: number): number => {
-//   if (revenue <= 0 || etr <= 0) return 0;
-//   const netRate = EFF_GILTI_RATE - etr;
-//   const netUSTaxOwed = netRate * revenue;
-//   return netUSTaxOwed;
-// };
-
-// export const calcExtraTaxOwed = (revenue: number, etr: number, rateToUse: number): number => {
-//   if (revenue <= 0 || etr <= 0) return 0;
-//   const netRate = rateToUse - etr;
-//   const extraTaxOwed = netRate * revenue;
-//   return extraTaxOwed;
-// };
-
 export function matchToCountryEnum(countryString: string): CountryNames | null {
   const normString = countryString.trim().toLowerCase();
   const threshold = 80;

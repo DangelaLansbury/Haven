@@ -118,23 +118,17 @@
   gap: 0.125rem;
   box-sizing: border-box;
   justify-content: flex-start;
-  padding: 0.625rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   text-align: left;
   width: 100%;
-  &.mainValue {
-    width: 40%;
-    & .cellValue {
-      color: var(--gray-900);
-      font-size: var(--font-sm);
-      font-weight: 500;
-    }
-  }
-  & .formIndex {
+  &.formIndex {
+    align-items: center;
     color: var(--gray-800);
     font-size: var(--font-sm);
     font-weight: 600;
+    padding-left: 0.875rem;
     text-align: center;
-    width: 1rem;
+    width: 2rem;
   }
   & .cellValue {
     align-items: center;
@@ -155,18 +149,6 @@
       font-weight: 300;
       color: var(--gray-300);
     }
-    &.mainValue {
-      color: var(--gray-900);
-      font-size: var(--font-sm);
-      font-weight: 500;
-    }
-    /* & .formIndex {
-      color: var(--gray-800);
-      font-size: var(--font-sm);
-      font-weight: 600;
-      text-align: center;
-      width: 1rem;
-    } */
   }
 }
 
