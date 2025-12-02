@@ -2,6 +2,7 @@ import React from 'react';
 import formStyles from '../css/Form.module.css';
 import { motion } from 'framer-motion';
 import commonStyles from '../css/Common.module.css';
+import welcomStyles from '../css/Welcome.module.css';
 
 interface WelcomeProps {
   setScreen: (screen: 'manual' | 'ocr') => void;
@@ -35,9 +36,11 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
           flexDirection: 'column',
           alignItems: 'center',
           height: '100%',
+          paddingTop: '4rem',
+          boxSizing: 'border-box',
         }}
       >
-        <div className={commonStyles.mainSelectorCard}>
+        <div className={welcomStyles.initCard}>
           <div className={commonStyles.headerContainer}>
             <h1 className={commonStyles.header}>{`Welcome to Haven — Still in Development`}</h1>
             <div className={commonStyles.subtitle}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
