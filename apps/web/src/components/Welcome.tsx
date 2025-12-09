@@ -2,7 +2,7 @@ import React from 'react';
 import formStyles from '../css/Form.module.css';
 import { motion } from 'framer-motion';
 import commonStyles from '../css/Common.module.css';
-import welcomStyles from '../css/Welcome.module.css';
+import welcomeStyles from '../css/Welcome.module.css';
 
 interface WelcomeProps {
   setScreen: (screen: 'manual' | 'ocr') => void;
@@ -40,16 +40,16 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
           boxSizing: 'border-box',
         }}
       >
-        <div className={welcomStyles.initCard}>
+        <div className={welcomeStyles.initCard}>
           <div className={commonStyles.headerContainer}>
             <h1 className={commonStyles.header}>{`Welcome to Haven — Still in Development`}</h1>
             <div className={commonStyles.subtitle}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
           </div>
-          <div className={formStyles.formTypeSelectionContainer}>
-            <div className={formStyles.formTypeSelector} onClick={handleExitToOCR}>
+          <div className={welcomeStyles.formTypeSelectionContainer}>
+            <div className={welcomeStyles.formTypeSelector} onClick={handleExitToOCR}>
               Capture tax form
             </div>
-            <div className={formStyles.formTypeSelector} onClick={handleExitToManual}>
+            <div className={welcomeStyles.formTypeSelector} onClick={handleExitToManual}>
               Skip to results
             </div>
           </div>
