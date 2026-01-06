@@ -15,10 +15,11 @@
 
 .formTypeSelectionContainer {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 1rem;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .formTypeSelector {
@@ -26,14 +27,18 @@
   background-color: var(--gray-025);
   border: 1px solid var(--gray-150);
   border-radius: 4px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 8rem;
   justify-content: center;
   padding: 0.75rem 1rem;
-  width: 9rem;
   cursor: pointer;
   transition: all ease-in-out 0.2s;
+  width: 100%;
+  &.primary {
+    background-color: var(--green);
+    border-color: var(--green-pure);
+  }
   &:hover {
     background-color: var(--green);
     border-color: var(--green-pure);
