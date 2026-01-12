@@ -5,7 +5,7 @@ import commonStyles from '../css/Common.module.css';
 import welcomeStyles from '../css/Welcome.module.css';
 
 interface WelcomeProps {
-  setScreen: (screen: 'manual' | 'ocr') => void;
+  setScreen: (screen: 'explorer' | 'ocr') => void;
 }
 
 const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
@@ -18,10 +18,10 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
     }, 300);
   };
 
-  const handleExitToManual = () => {
+  const handleExitToExplorer = () => {
     setIsExiting(true);
     setTimeout(() => {
-      setScreen('manual');
+      setScreen('explorer');
     }, 300);
   };
 
@@ -47,11 +47,11 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
           </div>
           <div className={welcomeStyles.formTypeSelectionContainer}>
             <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToOCR}>
-              Capture tax form
+              Get started
             </div>
-            <div className={welcomeStyles.formTypeSelector} onClick={handleExitToManual}>
+            {/* <div className={welcomeStyles.formTypeSelector} onClick={handleExitToExplorer}>
               Skip to results
-            </div>
+            </div> */}
           </div>
         </div>
       </motion.div>

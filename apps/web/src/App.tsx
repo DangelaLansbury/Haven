@@ -18,7 +18,7 @@ const App = () => {
   const [socket, setSocket] = useState<any>(null);
   const [ocrText, setOcrText] = useState(''); // Not really using this guy, but keeping for debugging
   const [formData, setFormData] = useState<FormFields>({ ...DefaultMockData });
-  const [screen, setScreen] = useState<'manual' | 'ocr' | 'initial'>('initial');
+  const [screen, setScreen] = useState<'explorer' | 'ocr' | 'initial'>('initial');
   const [OCRReady, setOCRReady] = useState(false);
   const [fileAdded, setFileAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -144,7 +144,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (screen === 'manual') return;
+    if (screen === 'explorer') return;
 
     let pollingActive = true;
 
@@ -196,12 +196,12 @@ const App = () => {
     setFormData({ revenue: DefaultMockData.revenue, countries: DefaultMockData.countries });
   };
 
-  const handleSetScreen = (newScreen: 'manual' | 'ocr' | 'initial') => {
+  const handleSetScreen = (newScreen: 'explorer' | 'ocr' | 'initial') => {
     setScreen(newScreen);
     if (newScreen === 'ocr') {
       setOCRReady(false);
     }
-    if (newScreen === 'manual') {
+    if (newScreen === 'explorer') {
       resetFormData();
     }
     if (newScreen === 'initial') {
@@ -226,7 +226,7 @@ const App = () => {
             <>
               <WelcomeScreen setScreen={handleSetScreen} />
             </>
-          ) : screen === 'manual' ? (
+          ) : screen === 'explorer' ? (
             <>
               <Explorer formData={formData} setFormData={setFormData} blend={blend} setBlend={setBlend} optLevel={optLevel} setOptLevel={setOptLevel} />
             </>
@@ -234,7 +234,7 @@ const App = () => {
             <>
               {!OCRReady ? (
                 <>
-                  <TaxForm title={'haven'} formData={formData} setFormData={setFormData} handleBack={handleSetScreen} sessionId={sessionId} />
+                  <TaxForm title={'haven'} formData={formData} setFormData={setFormData} setScreen={handleSetScreen} sessionId={sessionId} />
                 </>
               ) : (
                 <>

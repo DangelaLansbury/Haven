@@ -38,11 +38,10 @@ interface TaxFormProps {
   sessionId?: string;
   formData: FormFields;
   setFormData: React.Dispatch<React.SetStateAction<FormFields>>;
-  handleBack?: (screen: string) => void;
-  handleNext?: (screen: string) => void;
+  setScreen?: (screen: string) => void;
 }
 
-const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, handleNext, sessionId }) => {
+const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, setScreen, sessionId }) => {
   return (
     <div className={commonStyles.pageContainer}>
       <motion.div variants={sideCardVariants} initial="initial" animate="animate" className={formStyles.sideCard}>
@@ -50,6 +49,11 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, handleBack, ha
         <div className={commonStyles.description}>We'll populate your tax details automatically.</div>
         <div style={{ padding: '0.5rem' }}>
           <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#151515'} bgColor={'#fffefb'} />
+        </div>
+        <div>
+          <button className={commonStyles.secondaryButton} style={{ width: '100%' }} onClick={() => setScreen && setScreen('explorer')}>
+            Skip to results
+          </button>
         </div>
       </motion.div>
 
