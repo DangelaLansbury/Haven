@@ -47,8 +47,8 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, setScreen, ses
       <motion.div variants={sideCardVariants} initial="initial" animate="animate" className={formStyles.sideCard}>
         <div className={commonStyles.header}>{'Scan the QR code'}</div>
         <div className={commonStyles.description}>We'll populate your tax details automatically.</div>
-        <div style={{ padding: '0.5rem' }}>
-          <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#151515'} bgColor={'#fffefb'} />
+        <div style={{ padding: '2rem 0.25rem' }}>
+          <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#151515'} bgColor={'#fffefb'} size={144} />
         </div>
         <div>
           <button className={commonStyles.secondaryButton} style={{ width: '100%' }} onClick={() => setScreen && setScreen('explorer')}>
