@@ -55,10 +55,10 @@ export const DefaultFormFields = {
     CountryNames.ireland,
     CountryNames.germany,
     CountryNames.unitedkingdom,
-    CountryNames.singapore,
-    CountryNames.hungary,
     CountryNames.luxembourg,
     CountryNames.barbados,
+    CountryNames.caymanislands,
+    CountryNames.netherlands,
   ],
 };
 
