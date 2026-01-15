@@ -10,13 +10,16 @@
     "@number-flow/react": "^0.5.10",
     "blueimp-load-image": "5.16.0",
     "d3": "^7.9.0",
+    "d3-geo": "^3.1.1",
     "framer-motion": "^12.23.9",
     "fuzzball": "^2.2.3",
     "qrcode.react": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "socket.io-client": "^4.5.0",
-    "tesseract.js": "^2.1.5"
+    "tesseract.js": "^2.1.5",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
