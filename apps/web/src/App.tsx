@@ -165,15 +165,19 @@ const App = () => {
 
         if (json.revenue && json.revenue !== formData.revenue) {
           console.log('[Polling] revenue updated:', json.revenue);
-          setFormData((prev: FormFields) => ({ ...prev, revenue: json.revenue }));
+          if (json.revenue !== DefaultFormFields.revenue) {
+            setFormData((prev: FormFields) => ({ ...prev, revenue: DefaultFormFields.revenue }));
+          }
         }
         if (json.countries && json.countries !== formData.countries) {
           console.log('[Polling] countries updated:', json.countries);
-          setFormData((prev: FormFields) => ({ ...prev, countries: json.countries }));
+          if (json.countries !== DefaultFormFields.countries) {
+            setFormData((prev: FormFields) => ({ ...prev, countries: DefaultFormFields.countries }));
+          }
         }
 
-        // Stop polling if all data is fetched
-        if (json.revenue && json.countries) {
+        // Stop polling if data is fetched
+        if (json.revenue || json.countries) {
           setOCRReady(true);
           pollingActive = false;
           clearInterval(interval);
