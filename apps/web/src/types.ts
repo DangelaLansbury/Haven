@@ -48,18 +48,7 @@ export const DefaultFormFields = {
   sessionId: '',
   data: '',
   revenue: '250,000,000,000.00', // $250 billion
-  countries: [
-    CountryNames.switzerland,
-    CountryNames.australia,
-    CountryNames.japan,
-    CountryNames.ireland,
-    CountryNames.germany,
-    CountryNames.unitedkingdom,
-    CountryNames.luxembourg,
-    CountryNames.barbados,
-    CountryNames.caymanislands,
-    CountryNames.netherlands,
-  ],
+  countries: [CountryNames.switzerland, CountryNames.australia, CountryNames.japan, CountryNames.ireland, CountryNames.germany, CountryNames.unitedkingdom, CountryNames.caymanislands, CountryNames.netherlands],
 };
 
 export const DefaultMockData: FormFields = {
