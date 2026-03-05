@@ -47,11 +47,8 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
           </div>
           <div className={welcomeStyles.formTypeSelectionContainer}>
             <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToOCR}>
-              Get started
+              Check it out
             </div>
-            {/* <div className={welcomeStyles.formTypeSelector} onClick={handleExitToExplorer}>
-              Skip to results
-            </div> */}
           </div>
         </div>
       </motion.div>
