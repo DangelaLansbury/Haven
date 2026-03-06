@@ -13,6 +13,41 @@
   overflow-y: auto;
 }
 
+.headerContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.header {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  font-weight: 900;
+  margin: 0;
+}
+
+.description {
+  font-size: var(--font-sm);
+  line-height: 1.25rem;
+  color: var(--gray-600);
+  margin: 0;
+  text-align: left;
+  text-wrap: pretty;
+}
+.subtitle {
+  font-size: var(--font-xs);
+  line-height: 1.25rem;
+  color: var(--gray-600);
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+}
+
 .formTypeSelectionContainer {
   display: flex;
   flex-direction: column;

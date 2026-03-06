@@ -84,7 +84,9 @@
   justify-content: center;
   height: 2.5rem;
   opacity: 0.9;
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transition:
+    opacity 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
   width: 2.5rem;
   & img {
     height: 100%;

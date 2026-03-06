@@ -1,7 +1,5 @@
 import React from 'react';
-import formStyles from '../css/Form.module.css';
 import { motion } from 'framer-motion';
-import commonStyles from '../css/Common.module.css';
 import welcomeStyles from '../css/Welcome.module.css';
 
 interface WelcomeProps {
@@ -41,9 +39,9 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
         }}
       >
         <div className={welcomeStyles.initCard}>
-          <div className={commonStyles.headerContainer}>
-            <h1 className={commonStyles.header}>{`Welcome to Haven — Still in Development`}</h1>
-            <div className={commonStyles.subtitle}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
+          <div className={welcomeStyles.headerContainer}>
+            <h1 className={welcomeStyles.header}>{`Welcome to Haven — Still in Development`}</h1>
+            <div className={welcomeStyles.subtitle}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
           </div>
           <div className={welcomeStyles.formTypeSelectionContainer}>
             <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToOCR}>
