@@ -48,6 +48,10 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
               Check it out
             </div>
           </div>
+          <div className={welcomeStyles.footer}>
+            <div className={welcomeStyles.faq}>{`What is GILTI?`}</div>
+            <div className={welcomeStyles.faq}>{`Why did you make this?`}</div>
+          </div>
         </div>
       </motion.div>
     </div>
