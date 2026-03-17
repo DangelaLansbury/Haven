@@ -14,7 +14,7 @@
 }
 
 .headerContainer {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -33,19 +33,9 @@
 
 .description {
   font-size: var(--font-sm);
-  line-height: 1.25rem;
   color: var(--gray-600);
   margin: 0;
-  text-align: left;
   text-wrap: pretty;
-}
-.subtitle {
-  font-size: var(--font-xs);
-  line-height: 1.25rem;
-  color: var(--gray-600);
-  margin: 0;
-  text-align: center;
-  text-wrap: balance;
 }
 
 .formTypeSelectionContainer {

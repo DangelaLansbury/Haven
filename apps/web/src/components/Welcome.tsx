@@ -41,7 +41,7 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
         <div className={welcomeStyles.initCard}>
           <div className={welcomeStyles.headerContainer}>
             <h1 className={welcomeStyles.header}>{`Welcome to Haven — Still in Development`}</h1>
-            <div className={welcomeStyles.subtitle}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
+            <div className={welcomeStyles.description}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
           </div>
           <div className={welcomeStyles.formTypeSelectionContainer}>
             <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToOCR}>
