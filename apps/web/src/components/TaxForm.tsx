@@ -65,9 +65,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, setScreen, ses
           <div className={formStyles.formTable}>
             <div className={formStyles.formTableHeader}>
               <div className={formStyles.formTableTh}>
-                <span className={formStyles.section} style={{ width: '1rem', textAlign: 'center' }}>
-                  {'§1'}
-                </span>
+                <span className={formStyles.section}>{'§1'}</span>
                 {'REVENUE'}
               </div>
             </div>
@@ -78,9 +76,7 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, setScreen, ses
           <div className={formStyles.formTable}>
             <div className={formStyles.formTableHeader}>
               <div className={formStyles.formTableTh}>
-                <span className={formStyles.section} style={{ width: '1rem' }}>
-                  {'§2'}
-                </span>
+                <span className={formStyles.section}>{'§2'}</span>
                 {'COUNTRIES OF OPERATION'}
               </div>
             </div>

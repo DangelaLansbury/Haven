@@ -79,6 +79,7 @@
     & > .section {
       color: var(--haven-green);
       margin-right: 1rem;
+      width: 2rem;
     }
   }
 }
@@ -122,13 +123,12 @@
   text-align: left;
   width: 100%;
   &.formIndex {
-    align-items: center;
     color: var(--gray-800);
     font-size: var(--font-sm);
+    font-variant-numeric: tabular-nums;
     font-weight: 600;
     padding-left: 0.875rem;
-    text-align: center;
-    width: 2rem;
+    width: 3rem;
   }
   & .cellValue {
     align-items: center;

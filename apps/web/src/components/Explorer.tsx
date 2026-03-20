@@ -27,8 +27,8 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   console.log(blend);
 
   const memoizedBlend = React.useMemo(() => {
-    return optimizeBlend(formData.countries, revenue, { optimizationLevel: defaultOptLevel });
-  }, [formData.countries, revenue, defaultOptLevel]);
+    return optimizeBlend(formData.countries, revenue, { optimizationLevel: optLevel });
+  }, [formData.countries, revenue, optLevel]);
 
   React.useEffect(() => {
     setBlend(memoizedBlend);
