@@ -22,11 +22,13 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultMockData.revenue;
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
 
+  const defaultOptLevel = optLevel || 'optimal';
+
   console.log(blend);
 
   const memoizedBlend = React.useMemo(() => {
-    return optimizeBlend(formData.countries, revenue, { optimizationLevel: optLevel });
-  }, [formData.countries, revenue, optLevel, setBlend]);
+    return optimizeBlend(formData.countries, revenue, { optimizationLevel: defaultOptLevel });
+  }, [formData.countries, revenue, defaultOptLevel]);
 
   React.useEffect(() => {
     setBlend(memoizedBlend);
@@ -63,6 +65,10 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
     setOptLevel(level);
   }
 
+  function resetOptLevel() {
+    setOptLevel(defaultOptLevel);
+  }
+
   // const handleOptLevelChange = (level: 'optimal' | 'inefficient' | 'none') => {
   //   setOptLevel(level);
   // };
@@ -84,16 +90,16 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} className={formStyles.rangeInput} />
         </div>
 
-        <button onClick={handleOptLevelChange} value="optimal">
+        <button onMouseEnter={handleOptLevelChange} onMouseLeave={resetOptLevel} value="optimal">
           Optimal
         </button>
-        <button onClick={handleOptLevelChange} value="inefficient">
+        <button onMouseEnter={handleOptLevelChange} onMouseLeave={resetOptLevel} value="inefficient">
           Inefficient
         </button>
-        <button onClick={handleOptLevelChange} value="topup">
+        <button onMouseEnter={handleOptLevelChange} onMouseLeave={resetOptLevel} value="topup">
           GILTI Top-up
         </button>
-        <button onClick={handleOptLevelChange} value="none">
+        <button onMouseEnter={handleOptLevelChange} onMouseLeave={resetOptLevel} value="none">
           Tax at US Rate
         </button>
 
