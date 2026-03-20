@@ -22,7 +22,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultMockData.revenue;
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
 
-  const defaultOptLevel = optLevel || 'optimal';
+  const defaultOptLevel = 'optimal';
 
   console.log(blend);
 
