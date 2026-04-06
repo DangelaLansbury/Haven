@@ -23,6 +23,9 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
 
   const defaultOptLevel = 'optimal';
+  const [tempOptLevel, setTempOptLevel] = React.useState<string>(defaultOptLevel);
+
+  const [selectedOptLevel, setSelectedOptLevel] = React.useState<string | null>(null);
 
   console.log(blend);
 
@@ -41,32 +44,39 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
     }));
   }
 
-  const [tempRevenue, setTempRevenue] = React.useState<number>(initialRevenue);
+  // const [tempRevenue, setTempRevenue] = React.useState<number>(initialRevenue);
 
-  function handleHover() {
-    setTempRevenue(revenue);
-    setRevenue(DefaultMockData.revenue);
-    setFormData((prev: FormFields) => ({
-      ...prev,
-      revenue: 275000000000,
-    }));
-  }
+  // function handleHover() {
+  //   setTempRevenue(revenue);
+  //   setRevenue(DefaultMockData.revenue);
+  //   setFormData((prev: FormFields) => ({
+  //     ...prev,
+  //     revenue: 275000000000,
+  //   }));
+  // }
 
-  function handleHoverEnd() {
-    setRevenue(tempRevenue);
-    setFormData((prev: FormFields) => ({
-      ...prev,
-      revenue: tempRevenue,
-    }));
-  }
+  // function handleHoverEnd() {
+  //   setRevenue(tempRevenue);
+  //   setFormData((prev: FormFields) => ({
+  //     ...prev,
+  //     revenue: tempRevenue,
+  //   }));
+  // }
 
-  function handleOptLevelChange(event: React.ChangeEvent<HTMLSelectElement>) {
+  function handleOptLevelHover(event: React.ChangeEvent<HTMLSelectElement>) {
     const level = event.target.value as 'optimal' | 'inefficient' | 'topup' | 'none';
+    setTempOptLevel(level);
+  }
+
+  function handleOptLevelClick(event: React.MouseEvent<HTMLButtonElement>) {
+    const level = event.currentTarget.value as 'optimal' | 'inefficient' | 'topup' | 'none';
     setOptLevel(level);
   }
 
   function resetOptLevel() {
-    setOptLevel(defaultOptLevel);
+    if (!selectedOptLevel) {
+      setOptLevel(defaultOptLevel);
+    }
   }
 
   // const handleOptLevelChange = (level: 'optimal' | 'inefficient' | 'none') => {
@@ -90,16 +100,16 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} className={formStyles.rangeInput} />
         </div>
 
-        <button onMouseEnter={handleOptLevelChange} onMouseLeave={resetOptLevel} value="optimal">
+        <button onMouseEnter={handleOptLevelHover} onMouseLeave={resetOptLevel} onClick={handleOptLevelClick} value="optimal">
           Optimal
         </button>
-        <button onMouseEnter={handleOptLevelChange} onMouseLeave={resetOptLevel} value="inefficient">
+        <button onMouseEnter={handleOptLevelHover} onMouseLeave={resetOptLevel} onClick={handleOptLevelClick} value="inefficient">
           Inefficient
         </button>
-        <button onMouseEnter={handleOptLevelChange} onMouseLeave={resetOptLevel} value="topup">
+        <button onMouseEnter={handleOptLevelHover} onMouseLeave={resetOptLevel} onClick={handleOptLevelClick} value="topup">
           GILTI Top-up
         </button>
-        <button onMouseEnter={handleOptLevelChange} onMouseLeave={resetOptLevel} value="none">
+        <button onMouseEnter={handleOptLevelHover} onMouseLeave={resetOptLevel} onClick={handleOptLevelClick} value="none">
           Tax at US Rate
         </button>
 
