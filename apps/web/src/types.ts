@@ -10,6 +10,13 @@ export interface Country {
   rate: number;
 }
 
+export enum BlendLevels {
+  optimal = 'optimal',
+  inefficient = 'inefficient',
+  topup = 'topup',
+  none = 'none',
+}
+
 export enum CountryNames {
   australia = 'Australia',
   barbados = 'Barbados',

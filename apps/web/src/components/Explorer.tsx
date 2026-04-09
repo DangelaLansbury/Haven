@@ -1,7 +1,7 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormFields, DefaultMockData, MIN_REVENUE, MAX_REVENUE, BlendingResult, DollarValue, EFF_GILTI_RATE } from '../types';
+import { FormFields, DefaultMockData, MIN_REVENUE, MAX_REVENUE, BlendingResult, DollarValue, EFF_GILTI_RATE, BlendLevels } from '../types';
 import { optimizeBlend, formatDollars } from '../utils';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
@@ -14,24 +14,28 @@ interface ExplorerProps {
   setFormData: React.Dispatch<React.SetStateAction<FormFields>>;
   blend: BlendingResult;
   setBlend: React.Dispatch<React.SetStateAction<BlendingResult>>;
-  optLevel: 'optimal' | 'inefficient' | 'topup' | 'none';
-  setOptLevel: React.Dispatch<React.SetStateAction<'optimal' | 'inefficient' | 'topup' | 'none'>>;
+  optLevel: BlendLevels;
+  setOptLevel: React.Dispatch<React.SetStateAction<BlendLevels>>;
 }
 
 const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBlend, optLevel, setOptLevel }: ExplorerProps) => {
   const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultMockData.revenue;
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
 
-  const defaultOptLevel = 'optimal';
-  const [tempOptLevel, setTempOptLevel] = React.useState<string>(defaultOptLevel);
-
-  const [selectedOptLevel, setSelectedOptLevel] = React.useState<string | null>(null);
+  const defaultOptLevel = BlendLevels.optimal;
+  const [tempOptLevel, setTempOptLevel] = React.useState<BlendLevels | null>(null);
+  const [selectedOptLevel, setSelectedOptLevel] = React.useState<BlendLevels | null>(null);
 
   console.log(blend);
 
   const memoizedBlend = React.useMemo(() => {
+    if (tempOptLevel !== null) {
+      return optimizeBlend(formData.countries, revenue, { optimizationLevel: tempOptLevel });
+    } else if (selectedOptLevel !== null) {
+      return optimizeBlend(formData.countries, revenue, { optimizationLevel: selectedOptLevel });
+    }
     return optimizeBlend(formData.countries, revenue, { optimizationLevel: optLevel });
-  }, [formData.countries, revenue, optLevel]);
+  }, [formData.countries, revenue, optLevel, tempOptLevel]);
 
   React.useEffect(() => {
     setBlend(memoizedBlend);
@@ -44,44 +48,30 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
     }));
   }
 
-  // const [tempRevenue, setTempRevenue] = React.useState<number>(initialRevenue);
-
-  // function handleHover() {
-  //   setTempRevenue(revenue);
-  //   setRevenue(DefaultMockData.revenue);
-  //   setFormData((prev: FormFields) => ({
-  //     ...prev,
-  //     revenue: 275000000000,
-  //   }));
-  // }
-
-  // function handleHoverEnd() {
-  //   setRevenue(tempRevenue);
-  //   setFormData((prev: FormFields) => ({
-  //     ...prev,
-  //     revenue: tempRevenue,
-  //   }));
-  // }
-
-  function handleOptLevelHover(event: React.ChangeEvent<HTMLSelectElement>) {
-    const level = event.target.value as 'optimal' | 'inefficient' | 'topup' | 'none';
+  function handleOptLevelMouseEnter(event: React.MouseEvent<HTMLButtonElement>) {
+    const level = event.currentTarget.value as BlendLevels;
     setTempOptLevel(level);
   }
 
-  function handleOptLevelClick(event: React.MouseEvent<HTMLButtonElement>) {
-    const level = event.currentTarget.value as 'optimal' | 'inefficient' | 'topup' | 'none';
-    setOptLevel(level);
-  }
-
-  function resetOptLevel() {
-    if (!selectedOptLevel) {
+  function handleOptLevelMouseLeave() {
+    if (selectedOptLevel === null) {
       setOptLevel(defaultOptLevel);
+      setTempOptLevel(null);
+    } else {
+      setOptLevel(selectedOptLevel);
+      setTempOptLevel(null);
     }
   }
 
-  // const handleOptLevelChange = (level: 'optimal' | 'inefficient' | 'none') => {
-  //   setOptLevel(level);
-  // };
+  function handleOptLevelClick(event: React.MouseEvent<HTMLButtonElement>) {
+    const level = event.currentTarget.value as BlendLevels;
+
+    if (selectedOptLevel && selectedOptLevel === level) {
+      setSelectedOptLevel(null);
+    } else {
+      setSelectedOptLevel(level);
+    }
+  }
 
   return (
     <motion.div
@@ -100,24 +90,18 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} className={formStyles.rangeInput} />
         </div>
 
-        <button onMouseEnter={handleOptLevelHover} onMouseLeave={resetOptLevel} onClick={handleOptLevelClick} value="optimal">
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.optimal}>
           Optimal
         </button>
-        <button onMouseEnter={handleOptLevelHover} onMouseLeave={resetOptLevel} onClick={handleOptLevelClick} value="inefficient">
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.inefficient}>
           Inefficient
         </button>
-        <button onMouseEnter={handleOptLevelHover} onMouseLeave={resetOptLevel} onClick={handleOptLevelClick} value="topup">
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.topup}>
           GILTI Top-up
         </button>
-        <button onMouseEnter={handleOptLevelHover} onMouseLeave={resetOptLevel} onClick={handleOptLevelClick} value="none">
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.none}>
           Tax at US Rate
         </button>
-
-        {/* <div style={{ marginTop: '2rem' }}>
-          <button onMouseEnter={handleHover} onMouseLeave={handleHoverEnd}>
-            Hover over for defaults
-          </button>
-        </div> */}
 
         <div>{formData.countries.join(', ')}</div>
         <TaxBlendDonut blend={blend} />

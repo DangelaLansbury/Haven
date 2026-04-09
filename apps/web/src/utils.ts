@@ -1,5 +1,5 @@
 import * as fuzz from 'fuzzball';
-import { EFF_GILTI_RATE, GILTI_RATE, US_TAX_RATE, CountryNames, Countries, BlendingResult, DefaultMockData, DollarValue } from './types';
+import { EFF_GILTI_RATE, GILTI_RATE, US_TAX_RATE, CountryNames, Countries, BlendingResult, DefaultMockData, DollarValue, BlendLevels } from './types';
 
 export const formatPercentage = (value: number): number => {
   return Math.round(value * 100) / 100;
@@ -44,16 +44,19 @@ export function matchToCountryEnum(countryString: string): CountryNames | null {
   return null;
 }
 
-export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, options: { optimizationLevel: 'optimal' | 'inefficient' | 'topup' | 'none' }, giltiFloor: number = EFF_GILTI_RATE) => {
+export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, options: { optimizationLevel: BlendLevels }, giltiFloor: number = EFF_GILTI_RATE) => {
   if (jurisdictions.length === 0 || revenue <= 0) {
     console.warn('No valid jurisdictions or revenue provided');
     return makeDefaultBlend();
   }
 
-  const blendComposition: Record<string, number> = Object.keys(Countries).reduce((acc, key) => {
-    acc[key] = 0;
-    return acc;
-  }, {} as Record<string, number>);
+  const blendComposition: Record<string, number> = Object.keys(Countries).reduce(
+    (acc, key) => {
+      acc[key] = 0;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   // Step 2: Extract only selected country tax rates
   const taxRates = jurisdictions.map((key) => Countries[key].rate);
@@ -223,6 +226,6 @@ export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, op
 export const makeDefaultBlend = (): BlendingResult => {
   const countries = DefaultMockData.countries;
   const revenue = DefaultMockData.revenue;
-  const defaultBlend: BlendingResult = optimizeBlend(countries, revenue, { optimizationLevel: 'optimal' });
+  const defaultBlend: BlendingResult = optimizeBlend(countries, revenue, { optimizationLevel: BlendLevels.optimal });
   return defaultBlend;
 };
