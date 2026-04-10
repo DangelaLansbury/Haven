@@ -45,15 +45,14 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
           </div>
           <div className={welcomeStyles.formTypeSelectionContainer}>
             <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToOCR}>
-              Try OCR
+              Add your details
             </div>
             <div className={`${welcomeStyles.formTypeSelector}`} onClick={handleExitToExplorer}>
-              Skip to explorer
+              Use a demo dataset
             </div>
           </div>
           <div className={welcomeStyles.footer}>
             <div className={welcomeStyles.faq}>{`What is GILTI?`}</div>
-            <div className={welcomeStyles.faq}>{`Why did you make this?`}</div>
           </div>
         </div>
       </motion.div>
