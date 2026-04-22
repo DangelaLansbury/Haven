@@ -44,11 +44,11 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
             <div className={welcomeStyles.description}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
           </div>
           <div className={welcomeStyles.formTypeSelectionContainer}>
-            <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToOCR}>
+            {/* <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToOCR}>
               Add your details
-            </div>
-            <div className={`${welcomeStyles.formTypeSelector}`} onClick={handleExitToExplorer}>
-              Use a demo dataset
+            </div> */}
+            <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToExplorer}>
+              Get started
             </div>
           </div>
           <div className={welcomeStyles.footer}>
