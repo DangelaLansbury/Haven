@@ -9,13 +9,6 @@ interface WelcomeProps {
 const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
   const [isExiting, setIsExiting] = React.useState(false);
 
-  const handleExitToOCR = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      setScreen('ocr');
-    }, 300);
-  };
-
   const handleExitToExplorer = () => {
     setIsExiting(true);
     setTimeout(() => {
@@ -44,9 +37,6 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
             <div className={welcomeStyles.description}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
           </div>
           <div className={welcomeStyles.formTypeSelectionContainer}>
-            {/* <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToOCR}>
-              Add your details
-            </div> */}
             <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToExplorer}>
               Get started
             </div>
