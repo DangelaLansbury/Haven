@@ -8,6 +8,7 @@ interface WelcomeProps {
 
 const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
   const [isExiting, setIsExiting] = React.useState(false);
+  const [isGiltiInfoExpanded, setIsGiltiInfoExpanded] = React.useState(false);
 
   const handleExitToExplorer = () => {
     setIsExiting(true);
@@ -42,7 +43,10 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
             </div>
           </div>
           <div className={welcomeStyles.footer}>
-            <div className={welcomeStyles.faq}>{`What is GILTI?`}</div>
+            <div className={welcomeStyles.faq} onClick={() => setIsGiltiInfoExpanded(!isGiltiInfoExpanded)}>
+              {`What is GILTI?`}
+            </div>
+            {isGiltiInfoExpanded && <div className={welcomeStyles.faqContent}>{`GILTI (Global Intangible Low-Taxed Income) is a tax provision that aims to prevent U.S. corporations from deferring taxation of their foreign earnings.`}</div>}
           </div>
         </div>
       </motion.div>

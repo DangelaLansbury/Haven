@@ -91,3 +91,14 @@
   background-color: var(--paper);
   border: 1px solid var(--gray-150);
 }
+
+.faqContent {
+  font-size: var(--font-xs);
+  line-height: 1.25rem;
+  color: var(--gray-600);
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background-color: var(--gray-025);
+  border: 1px solid var(--gray-150);
+}
