@@ -142,6 +142,13 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
                   suffix={formatDollars((EFF_GILTI_RATE - blend.totalETR) * revenue).suffix}
                   className={explorerStyles.topupPenalty}
                 />
+                <span>{' = '}</span>
+                <NumberFlow
+                  value={formatDollars(blend.totalTaxPaid + (EFF_GILTI_RATE - blend.totalETR) * revenue).value}
+                  format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
+                  duration={300}
+                  suffix={formatDollars(blend.totalTaxPaid + (EFF_GILTI_RATE - blend.totalETR) * revenue).suffix}
+                />
               </div>
               <div style={{ fontSize: 'var(--font-xs)' }}>Tax remitted + top-up penalty*</div>
               <div style={{ fontSize: 'var(--font-xxs)', fontStyle: 'italic', marginTop: '1rem' }}>
