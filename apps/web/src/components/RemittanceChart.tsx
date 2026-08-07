@@ -2,21 +2,24 @@ import React from 'react';
 import * as d3 from 'd3';
 import { motion } from 'framer-motion';
 import chartStyles from '../css/Explorer.module.css';
-import { EFF_GILTI_RATE, GILTI_RATE, US_TAX_RATE } from '../types';
+import { DEFAULT_TAX_REGIME, EFF_GILTI_RATE, US_TAX_RATE } from '../types';
+import { calculateTaxBreakdown } from '../utils';
 
 interface RemittanceChartProps {
   /** Blended foreign tax rate (not the post-GILTI total tax rate). */
   etr: number;
+  isUsOnly?: boolean;
 }
 
-type SegmentKey = 'usedFtc' | 'haircut' | 'topUp' | 'excess';
+type SegmentKey = 'usedFtc' | 'haircut' | 'topUp' | 'excess' | 'domestic';
 type StackDatum = Record<SegmentKey, number>;
 
 const SEGMENTS: Array<{ key: SegmentKey; label: string; className: string }> = [
   { key: 'usedFtc', label: 'FTC used', className: chartStyles.chartFtc },
-  { key: 'topUp', label: 'GILTI top-up', className: chartStyles.chartTopup },
-  { key: 'haircut', label: '20% FTC haircut', className: chartStyles.chartHaircut },
+  { key: 'topUp', label: 'NCTI top-up', className: chartStyles.chartTopup },
+  { key: 'haircut', label: '10% FTC haircut', className: chartStyles.chartHaircut },
   { key: 'excess', label: 'Excess foreign tax', className: chartStyles.chartExcess },
+  { key: 'domestic', label: 'U.S. corporate tax', className: chartStyles.chartDomestic },
 ];
 
 const WIDTH = 240;
@@ -24,20 +27,18 @@ const HEIGHT = 300;
 const MARGIN = { top: 12, right: 108, bottom: 30, left: 24 };
 const BAR_WIDTH = 70;
 
-export const RemittanceChart: React.FC<RemittanceChartProps> = ({ etr = EFF_GILTI_RATE }) => {
-  const foreignTaxRate = Math.max(0, Number.isFinite(etr) ? etr : 0);
-  const potentialFtc = foreignTaxRate * 0.8;
-
-  // GILTI permits an 80% foreign-tax credit against the 10.5% GILTI liability.
-  // 10.5% / 80% = the 13.125% foreign-tax-rate optimization point.
+export const RemittanceChart: React.FC<RemittanceChartProps> = ({ etr = EFF_GILTI_RATE, isUsOnly = false }) => {
+  const foreignTaxRate = isUsOnly ? 0 : Math.max(0, Number.isFinite(etr) ? etr : 0);
+  const breakdown = calculateTaxBreakdown(foreignTaxRate, 1);
   const datum: StackDatum = {
-    usedFtc: Math.min(potentialFtc, GILTI_RATE),
-    haircut: foreignTaxRate * 0.2,
-    topUp: Math.max(GILTI_RATE - potentialFtc, 0),
-    excess: Math.max(potentialFtc - GILTI_RATE, 0),
+    usedFtc: isUsOnly ? 0 : breakdown.usedFtcRate,
+    haircut: isUsOnly ? 0 : breakdown.haircutRate,
+    topUp: isUsOnly ? 0 : breakdown.topUpRate,
+    excess: isUsOnly ? 0 : breakdown.excessFtcRate,
+    domestic: isUsOnly ? US_TAX_RATE : 0,
   };
 
-  const totalBurden = foreignTaxRate + datum.topUp;
+  const totalBurden = isUsOnly ? US_TAX_RATE : breakdown.totalTaxRate;
   const yMax = Math.max(US_TAX_RATE, totalBurden) * 1.08;
   const y = d3.scaleLinear().domain([0, yMax]).range([HEIGHT - MARGIN.bottom, MARGIN.top]);
   const stack = d3.stack<StackDatum>().keys(SEGMENTS.map(({ key }) => key));
@@ -51,7 +52,11 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ etr = EFF_GILT
         className={chartStyles.remittanceChart}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         role="img"
-        aria-label={`GILTI tax stack. Foreign tax rate ${(foreignTaxRate * 100).toFixed(2)} percent; total tax burden ${(totalBurden * 100).toFixed(2)} percent.`}
+        aria-label={
+          isUsOnly
+            ? `U.S.-only corporate tax burden ${(totalBurden * 100).toFixed(2)} percent.`
+            : `2026 NCTI tax stack. Foreign tax rate ${(foreignTaxRate * 100).toFixed(2)} percent; total tax burden ${(totalBurden * 100).toFixed(2)} percent.`
+        }
       >
         {ticks.map((tick) => (
           <g key={tick}>
@@ -62,14 +67,14 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ etr = EFF_GILT
           </g>
         ))}
 
-        <line className={chartStyles.giltiRateLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(GILTI_RATE)} y2={y(GILTI_RATE)} />
-        <text className={chartStyles.referenceLabel} x={plotRight + 6} y={y(GILTI_RATE) - 4}>
-          GILTI liability 10.5%
+        <line className={chartStyles.giltiRateLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(breakdown.usLiabilityRate)} y2={y(breakdown.usLiabilityRate)} />
+        <text className={chartStyles.referenceLabel} x={plotRight + 6} y={y(breakdown.usLiabilityRate) - 4}>
+          NCTI liability {d3.format('.1%')(breakdown.usLiabilityRate)}
         </text>
 
         <line className={chartStyles.optimizationLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(EFF_GILTI_RATE)} y2={y(EFF_GILTI_RATE)} />
         <text className={chartStyles.referenceLabel} x={plotRight + 6} y={y(EFF_GILTI_RATE) - 4}>
-          No-top-up FTR 13.125%
+          No-top-up FTR {d3.format('.1%')(breakdown.noTopUpForeignRate)}
         </text>
 
         <line className={chartStyles.usRateLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(US_TAX_RATE)} y2={y(US_TAX_RATE)} />
@@ -115,7 +120,7 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ etr = EFF_GILT
         })}
       </svg>
       <figcaption className={chartStyles.chartCaption}>
-        Total burden {d3.format('.2%')(totalBurden)}
+        Total burden {d3.format('.2%')(totalBurden)} · {DEFAULT_TAX_REGIME.label}
       </figcaption>
     </figure>
   );

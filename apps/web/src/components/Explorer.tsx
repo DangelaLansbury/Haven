@@ -1,8 +1,8 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormFields, DefaultMockData, MIN_REVENUE, MAX_REVENUE, BlendingResult, DollarValue, EFF_GILTI_RATE, BlendLevels } from '../types';
-import { optimizeBlend, formatDollars } from '../utils';
+import { FormFields, DefaultMockData, MIN_REVENUE, MAX_REVENUE, BlendingResult, DollarValue, BlendLevels, CountryNames } from '../types';
+import { calculateTaxBreakdown, optimizeBlend, formatDollars } from '../utils';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
@@ -73,6 +73,11 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
     }
   }
 
+  const foreignTaxRate = blend.totalETR;
+  const taxBreakdown = calculateTaxBreakdown(foreignTaxRate, revenue);
+  const topUpAmount = taxBreakdown.topUpAmount;
+  const isUsOnly = blend.blendComposition[CountryNames.unitedstates] === 1;
+
   return (
     <motion.div
       className={commonStyles.pageContainer}
@@ -90,14 +95,17 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} className={formStyles.rangeInput} />
         </div>
 
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.cash}>
+          Lowest current tax
+        </button>
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.optimal}>
-          Optimal
+          Eliminate U.S. top-up
         </button>
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.inefficient}>
-          Inefficient
+          Excess foreign tax
         </button>
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.topup}>
-          GILTI Top-up
+          NCTI top-up
         </button>
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.none}>
           Tax at US Rate
@@ -118,41 +126,37 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
         </div>
       </div>
       <div className={explorerStyles.rightSide}>
-        <RemittanceChart etr={blend.totalETR} />
+        <RemittanceChart etr={foreignTaxRate} isUsOnly={isUsOnly} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
           <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600 }}>
-            <NumberFlow value={blend.totalETR} duration={300} format={{ style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
+            <NumberFlow value={foreignTaxRate} duration={300} format={{ style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
           </div>
-          <div style={{ fontSize: 'var(--font-xs)' }}>Effective Tax Rate</div>
+          <div style={{ fontSize: 'var(--font-xs)' }}>{isUsOnly ? 'U.S. corporate tax rate' : 'Blended foreign tax rate'}</div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%' }}>
-          {/* <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
-            <NumberFlow value={formatDollars(blend.totalTaxPaid).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(blend.totalTaxPaid).suffix} />
-          </div>
-          <div style={{ fontSize: 'var(--font-xs)' }}>You pay</div> */}
-          {blend.totalETR < EFF_GILTI_RATE ? (
+          {taxBreakdown.topUpRate > 0 ? (
             <>
               <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
                 <NumberFlow value={formatDollars(blend.totalTaxPaid).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(blend.totalTaxPaid).suffix} />
                 <span className={explorerStyles.topupPenalty}>{' + '}</span>
                 <NumberFlow
-                  value={formatDollars((EFF_GILTI_RATE - blend.totalETR) * revenue).value}
+                  value={formatDollars(topUpAmount).value}
                   format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
                   duration={300}
-                  suffix={formatDollars((EFF_GILTI_RATE - blend.totalETR) * revenue).suffix}
+                  suffix={formatDollars(topUpAmount).suffix}
                   className={explorerStyles.topupPenalty}
                 />
                 <span>{' = '}</span>
                 <NumberFlow
-                  value={formatDollars(blend.totalTaxPaid + (EFF_GILTI_RATE - blend.totalETR) * revenue).value}
+                  value={formatDollars(blend.totalTaxPaid + topUpAmount).value}
                   format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
                   duration={300}
-                  suffix={formatDollars(blend.totalTaxPaid + (EFF_GILTI_RATE - blend.totalETR) * revenue).suffix}
+                  suffix={formatDollars(blend.totalTaxPaid + topUpAmount).suffix}
                 />
               </div>
-              <div style={{ fontSize: 'var(--font-xs)' }}>Tax remitted + top-up penalty*</div>
+              <div style={{ fontSize: 'var(--font-xs)' }}>Tax remitted + top-up*</div>
               <div style={{ fontSize: 'var(--font-xxs)', fontStyle: 'italic', marginTop: '1rem' }}>
-                {`*Top-up penalties cover any gap between FETR and the eff. GILTI rate (13.125%). Unlike foreign taxes, they are not creditable against U.S. tax liability, with no ability to recover, defer, or carry forward.`}
+                {`*The residual U.S. top-up is the 12.6% NCTI liability less the usable deemed-paid credit (90% of foreign tax), floored at zero. This is a simplified 2026+ model.`}
               </div>
             </>
           ) : (

@@ -103,6 +103,10 @@
   fill: violet;
 }
 
+.chartDomestic {
+  fill: var(--haven-green);
+}
+
 .barSection {
   align-items: center;
   display: flex;

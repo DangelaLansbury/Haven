@@ -11,6 +11,7 @@ export interface Country {
 }
 
 export enum BlendLevels {
+  cash = 'cash',
   optimal = 'optimal',
   inefficient = 'inefficient',
   topup = 'topup',
@@ -79,8 +80,36 @@ export const DefaultMockData: FormFields = {
 
 export interface BlendingResult {
   blendComposition: Record<CountryNames, number>;
+  /** Blended rate paid to foreign jurisdictions. */
   totalETR: number;
   totalTaxPaid: number;
+}
+
+export interface TaxRegime {
+  id: 'legacy-gilti' | '2026-ncti';
+  label: string;
+  effectiveYear: number;
+  corporateRate: number;
+  section250DeductionRate: number;
+  deemedPaidCreditRate: number;
+}
+
+export interface TaxBreakdown {
+  foreignTaxRate: number;
+  foreignTaxAmount: number;
+  potentialFtcRate: number;
+  usedFtcRate: number;
+  usedFtcAmount: number;
+  haircutRate: number;
+  haircutAmount: number;
+  excessFtcRate: number;
+  excessFtcAmount: number;
+  usLiabilityRate: number;
+  topUpRate: number;
+  topUpAmount: number;
+  totalTaxRate: number;
+  totalTaxAmount: number;
+  noTopUpForeignRate: number;
 }
 
 export const US_TAX_RATE = Countries[CountryNames.unitedstates].rate;
@@ -95,5 +124,28 @@ export const MAX_REVENUE = 350000000000; // $350 billion
 export const MIN_FTR = 0; // 0%
 export const MAX_FTR = 1; // 100%
 
-export const GILTI_RATE = 0.105; // 10.5%
-export const EFF_GILTI_RATE = 0.13125; // 13.125%
+export const LEGACY_GILTI_REGIME: TaxRegime = {
+  id: 'legacy-gilti',
+  label: 'Legacy GILTI (2018–2025)',
+  effectiveYear: 2018,
+  corporateRate: US_TAX_RATE,
+  section250DeductionRate: 0.5,
+  deemedPaidCreditRate: 0.8,
+};
+
+export const CURRENT_NCTI_REGIME: TaxRegime = {
+  id: '2026-ncti',
+  label: 'NCTI (2026+)',
+  effectiveYear: 2026,
+  corporateRate: US_TAX_RATE,
+  section250DeductionRate: 0.4,
+  deemedPaidCreditRate: 0.9,
+};
+
+export const DEFAULT_TAX_REGIME = CURRENT_NCTI_REGIME;
+
+/** U.S. effective rate on NCTI after the section 250 deduction: 21% × 60% = 12.6%. */
+export const GILTI_RATE = DEFAULT_TAX_REGIME.corporateRate * (1 - DEFAULT_TAX_REGIME.section250DeductionRate);
+
+/** Foreign rate at which 90% deemed-paid credits equal the 12.6% U.S. liability: 14%. */
+export const EFF_GILTI_RATE = GILTI_RATE / DEFAULT_TAX_REGIME.deemedPaidCreditRate;

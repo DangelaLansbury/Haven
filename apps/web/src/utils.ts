@@ -1,5 +1,17 @@
 import * as fuzz from 'fuzzball';
-import { EFF_GILTI_RATE, GILTI_RATE, US_TAX_RATE, CountryNames, Countries, BlendingResult, DefaultMockData, DollarValue, BlendLevels } from './types';
+import {
+  DEFAULT_TAX_REGIME,
+  EFF_GILTI_RATE,
+  US_TAX_RATE,
+  CountryNames,
+  Countries,
+  BlendingResult,
+  DefaultMockData,
+  DollarValue,
+  BlendLevels,
+  TaxBreakdown,
+  TaxRegime,
+} from './types';
 
 export const formatPercentage = (value: number): number => {
   return Math.round(value * 100) / 100;
@@ -24,11 +36,43 @@ export const formatDollars = (amount: number): DollarValue => {
   }
 };
 
+export const calculateTaxBreakdown = (
+  foreignTaxRate: number,
+  revenue: number,
+  regime: TaxRegime = DEFAULT_TAX_REGIME,
+): TaxBreakdown => {
+  const safeForeignTaxRate = Math.max(0, Number.isFinite(foreignTaxRate) ? foreignTaxRate : 0);
+  const safeRevenue = Math.max(0, Number.isFinite(revenue) ? revenue : 0);
+  const usLiabilityRate = regime.corporateRate * (1 - regime.section250DeductionRate);
+  const potentialFtcRate = safeForeignTaxRate * regime.deemedPaidCreditRate;
+  const usedFtcRate = Math.min(potentialFtcRate, usLiabilityRate);
+  const topUpRate = Math.max(usLiabilityRate - potentialFtcRate, 0);
+  const haircutRate = safeForeignTaxRate * (1 - regime.deemedPaidCreditRate);
+  const excessFtcRate = Math.max(potentialFtcRate - usLiabilityRate, 0);
+  const totalTaxRate = safeForeignTaxRate + topUpRate;
+
+  return {
+    foreignTaxRate: safeForeignTaxRate,
+    foreignTaxAmount: safeForeignTaxRate * safeRevenue,
+    potentialFtcRate,
+    usedFtcRate,
+    usedFtcAmount: usedFtcRate * safeRevenue,
+    haircutRate,
+    haircutAmount: haircutRate * safeRevenue,
+    excessFtcRate,
+    excessFtcAmount: excessFtcRate * safeRevenue,
+    usLiabilityRate,
+    topUpRate,
+    topUpAmount: topUpRate * safeRevenue,
+    totalTaxRate,
+    totalTaxAmount: totalTaxRate * safeRevenue,
+    noTopUpForeignRate: usLiabilityRate / regime.deemedPaidCreditRate,
+  };
+};
+
 export const calcTotalETR = (ftr: number): { ftc: number; topUp: number; etr: number } => {
-  const ftc = ftr * 0.8;
-  const topUp = Math.max(GILTI_RATE - ftc, 0);
-  const etr = ftr + topUp;
-  return { ftc, topUp, etr };
+  const result = calculateTaxBreakdown(ftr, 1);
+  return { ftc: result.potentialFtcRate, topUp: result.topUpRate, etr: result.totalTaxRate };
 };
 
 export function matchToCountryEnum(countryString: string): CountryNames | null {
@@ -44,123 +88,54 @@ export function matchToCountryEnum(countryString: string): CountryNames | null {
   return null;
 }
 
-export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, options: { optimizationLevel: BlendLevels }, giltiFloor: number = EFF_GILTI_RATE) => {
-  if (jurisdictions.length === 0 || revenue <= 0) {
-    console.warn('No valid jurisdictions or revenue provided');
-    return makeDefaultBlend();
-  }
-
-  const blendComposition: Record<string, number> = Object.keys(Countries).reduce(
-    (acc, key) => {
-      acc[key] = 0;
+const allocateToTargetRate = (jurisdictions: CountryNames[], targetRate: number): Record<string, number> => {
+  const composition = Object.keys(Countries).reduce(
+    (acc, country) => {
+      acc[country] = 0;
       return acc;
     },
     {} as Record<string, number>,
   );
 
-  // Step 2: Extract only selected country tax rates
-  const taxRates = jurisdictions.map((key) => Countries[key].rate);
+  const candidates = [...new Set(jurisdictions)]
+    .map((country) => ({ country, rate: Countries[country].rate }))
+    .sort((a, b) => a.rate - b.rate);
 
-  if (options.optimizationLevel === 'inefficient') {
-    // Inefficient: Allocate in a way that results in overpaying foreign tax (ETR > giltiFloor)
-    // Use randomized weights for added complexity and cap the effective tax rate
-
-    const maxETR = Math.min(1, giltiFloor * 1.25);
-    const ascendingRates = taxRates.map((rate, i) => ({ rate, index: i }));
-    ascendingRates.sort((a, b) => a.rate - b.rate);
-
-    let allocations = new Array(taxRates.length).fill(0);
-    let normalizedWeights: number[] = [];
-    let totalTaxPaid = 0;
-    let actualETR = 0;
-
-    const maxAttempts = 100;
-    let attempts = 0;
-
-    while (attempts < maxAttempts) {
-      const weights = new Array(taxRates.length).fill(0).map(() => Math.random());
-      const weightSum = weights.reduce((sum, w) => sum + w, 0);
-      normalizedWeights = weights.map((w) => w / weightSum);
-
-      allocations = new Array(taxRates.length).fill(0);
-      totalTaxPaid = 0;
-
-      normalizedWeights.forEach((w, i) => {
-        const amt = w * revenue;
-        allocations[i] = amt;
-        totalTaxPaid += amt * taxRates[i];
-      });
-
-      actualETR = totalTaxPaid / revenue;
-
-      if (actualETR > giltiFloor && actualETR <= maxETR) {
-        break;
-      }
-
-      attempts++;
-    }
-
-    allocations.forEach((amt, i) => {
-      const countryKey = jurisdictions[i];
-      blendComposition[countryKey] = amt / revenue;
-    });
-
-    return {
-      blendComposition,
-      totalETR: actualETR,
-      totalTaxPaid,
-    };
+  if (targetRate <= candidates[0].rate) {
+    composition[candidates[0].country] = 1;
+    return composition;
   }
 
-  if (options.optimizationLevel === 'topup') {
-    // Top-up: Allocate in a way that results in an ETR below GILTI floor, triggering additional US tax
-    const targetETR = giltiFloor * 0.75;
+  const highest = candidates[candidates.length - 1];
+  if (targetRate >= highest.rate) {
+    composition[highest.country] = 1;
+    return composition;
+  }
 
-    const indexedRates = taxRates.map((rate, i) => ({ rate, index: i }));
-    indexedRates.sort((a, b) => a.rate - b.rate);
+  const upperIndex = candidates.findIndex(({ rate }) => rate >= targetRate);
+  const lower = candidates[upperIndex - 1];
+  const upper = candidates[upperIndex];
 
-    const allocations = new Array(taxRates.length).fill(0);
-    let totalTaxPaid = 0;
-    let remainingRevenue = revenue;
+  if (upper.rate === targetRate) {
+    composition[upper.country] = 1;
+    return composition;
+  }
 
-    // Distribute small base allocation to all selected countries
-    const baseAllocation = revenue * 0.05;
-    for (let i = 0; i < taxRates.length; i++) {
-      const amt = Math.min(baseAllocation, remainingRevenue);
-      allocations[i] = amt;
-      totalTaxPaid += amt * taxRates[i];
-      remainingRevenue -= amt;
-    }
+  const upperShare = (targetRate - lower.rate) / (upper.rate - lower.rate);
+  composition[lower.country] = 1 - upperShare;
+  composition[upper.country] = upperShare;
+  return composition;
+};
 
-    for (const { rate, index } of indexedRates) {
-      if (remainingRevenue <= 0) break;
-
-      const maxAtThisRate = Math.max(0, (targetETR * revenue - totalTaxPaid) / rate);
-      const incomeHere = Math.min(remainingRevenue, maxAtThisRate);
-
-      allocations[index] += incomeHere;
-      totalTaxPaid += incomeHere * rate;
-      remainingRevenue -= incomeHere;
-    }
-
-    if (remainingRevenue > 0) {
-      const lowest = indexedRates[0].index;
-      allocations[lowest] += remainingRevenue;
-      totalTaxPaid += remainingRevenue * taxRates[lowest];
-    }
-
-    const actualETR = totalTaxPaid / revenue;
-
-    allocations.forEach((amt, i) => {
-      const countryKey = jurisdictions[i];
-      blendComposition[countryKey] = amt / revenue;
-    });
-
-    return {
-      blendComposition,
-      totalETR: actualETR,
-      totalTaxPaid,
-    };
+export const optimizeBlend = (
+  jurisdictions: CountryNames[],
+  revenue: number,
+  options: { optimizationLevel: BlendLevels },
+  noTopUpForeignRate: number = EFF_GILTI_RATE,
+) => {
+  if (jurisdictions.length === 0 || revenue <= 0) {
+    console.warn('No valid jurisdictions or revenue provided');
+    return makeDefaultBlend();
   }
 
   if (options.optimizationLevel === 'none') {
@@ -176,48 +151,25 @@ export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, op
     };
   }
 
-  // Step 3: Sort by descending rate
-  const indexedRates = taxRates.map((rate, i) => ({ rate, index: i }));
-  indexedRates.sort((a, b) => b.rate - a.rate);
+  const selectedRates = jurisdictions.map((country) => Countries[country].rate);
+  const targetRate =
+    options.optimizationLevel === BlendLevels.cash
+      ? Math.min(...selectedRates)
+      : options.optimizationLevel === BlendLevels.topup
+        ? noTopUpForeignRate * 0.75
+        : options.optimizationLevel === BlendLevels.inefficient
+          ? Math.min(US_TAX_RATE, noTopUpForeignRate * 1.25)
+          : noTopUpForeignRate;
 
-  let allocations = new Array(taxRates.length).fill(0);
-  let totalTaxPaid = 0;
-  let remainingRevenue = revenue;
-
-  indexedRates.sort((a, b) => b.rate - a.rate);
-
-  for (const { rate, index } of indexedRates) {
-    if (remainingRevenue <= 0) break;
-
-    const maxAtThisRate = Math.max(0, (giltiFloor * revenue - totalTaxPaid) / rate);
-    const incomeHere = Math.min(remainingRevenue, maxAtThisRate);
-
-    allocations[index] = incomeHere;
-    totalTaxPaid += incomeHere * rate;
-    remainingRevenue -= incomeHere;
-  }
-
-  if (remainingRevenue > 0) {
-    const lowest = indexedRates[indexedRates.length - 1].index;
-    allocations[lowest] += remainingRevenue;
-    totalTaxPaid += remainingRevenue * taxRates[lowest];
-  }
-
-  const actualETR = totalTaxPaid / revenue;
-  if (Math.abs(actualETR - giltiFloor) > 0.001) {
-    console.warn('Blend failed to converge to GILTI floor. Got:', actualETR);
-  }
-
-  // Add to blendComposition
-  allocations.forEach((amt, i) => {
-    const countryKey = jurisdictions[i];
-    blendComposition[countryKey] = amt / revenue;
-  });
-
-  const totalETR = totalTaxPaid / revenue;
+  const blendComposition = allocateToTargetRate(jurisdictions, targetRate);
+  const totalETR = Object.entries(blendComposition).reduce(
+    (rate, [country, share]) => rate + Countries[country].rate * share,
+    0,
+  );
+  const totalTaxPaid = totalETR * revenue;
 
   return {
-    blendComposition,
+    blendComposition: blendComposition as Record<CountryNames, number>,
     totalETR,
     totalTaxPaid,
   };
