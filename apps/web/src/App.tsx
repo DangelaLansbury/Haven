@@ -24,7 +24,7 @@ const App = () => {
   const [error, setError] = useState<string | null>(null);
   const defaultBlend = makeDefaultBlend();
   const [blend, setBlend] = useState<BlendingResult>(defaultBlend);
-  const [optLevel, setOptLevel] = useState<BlendLevels>(BlendLevels.optimal);
+  const [optLevel, setOptLevel] = useState<BlendLevels>(BlendLevels.lowestTax);
 
   useEffect(() => {
     // generate or read sessionId

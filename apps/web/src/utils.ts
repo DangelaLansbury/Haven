@@ -1,17 +1,5 @@
 import * as fuzz from 'fuzzball';
-import {
-  DEFAULT_TAX_REGIME,
-  EFF_GILTI_RATE,
-  US_TAX_RATE,
-  CountryNames,
-  Countries,
-  BlendingResult,
-  DefaultMockData,
-  DollarValue,
-  BlendLevels,
-  TaxBreakdown,
-  TaxRegime,
-} from './types';
+import { DEFAULT_TAX_REGIME, EFF_GILTI_RATE, US_TAX_RATE, CountryNames, Countries, BlendingResult, DefaultMockData, DollarValue, BlendLevels, TaxBreakdown, TaxRegime } from './types';
 
 export const formatPercentage = (value: number): number => {
   return Math.round(value * 100) / 100;
@@ -36,11 +24,7 @@ export const formatDollars = (amount: number): DollarValue => {
   }
 };
 
-export const calculateTaxBreakdown = (
-  foreignTaxRate: number,
-  revenue: number,
-  regime: TaxRegime = DEFAULT_TAX_REGIME,
-): TaxBreakdown => {
+export const calculateTaxBreakdown = (foreignTaxRate: number, revenue: number, regime: TaxRegime = DEFAULT_TAX_REGIME): TaxBreakdown => {
   const safeForeignTaxRate = Math.max(0, Number.isFinite(foreignTaxRate) ? foreignTaxRate : 0);
   const safeRevenue = Math.max(0, Number.isFinite(revenue) ? revenue : 0);
   const usLiabilityRate = regime.corporateRate * (1 - regime.section250DeductionRate);
@@ -97,9 +81,9 @@ const allocateToTargetRate = (jurisdictions: CountryNames[], targetRate: number)
     {} as Record<string, number>,
   );
 
-  const candidates = [...new Set(jurisdictions)]
-    .map((country) => ({ country, rate: Countries[country].rate }))
-    .sort((a, b) => a.rate - b.rate);
+  const minPercentage = 0.01; // 1% minimum allocation
+
+  const candidates = [...new Set(jurisdictions)].map((country) => ({ country, rate: Countries[country].rate })).sort((a, b) => a.rate - b.rate);
 
   if (targetRate <= candidates[0].rate) {
     composition[candidates[0].country] = 1;
@@ -127,12 +111,7 @@ const allocateToTargetRate = (jurisdictions: CountryNames[], targetRate: number)
   return composition;
 };
 
-export const optimizeBlend = (
-  jurisdictions: CountryNames[],
-  revenue: number,
-  options: { optimizationLevel: BlendLevels },
-  noTopUpForeignRate: number = EFF_GILTI_RATE,
-) => {
+export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, options: { optimizationLevel: BlendLevels }, noTopUpForeignRate: number = EFF_GILTI_RATE) => {
   if (jurisdictions.length === 0 || revenue <= 0) {
     console.warn('No valid jurisdictions or revenue provided');
     return makeDefaultBlend();
@@ -153,7 +132,7 @@ export const optimizeBlend = (
 
   const selectedRates = jurisdictions.map((country) => Countries[country].rate);
   const targetRate =
-    options.optimizationLevel === BlendLevels.cash
+    options.optimizationLevel === BlendLevels.lowestTax
       ? Math.min(...selectedRates)
       : options.optimizationLevel === BlendLevels.topup
         ? noTopUpForeignRate * 0.75
@@ -162,10 +141,7 @@ export const optimizeBlend = (
           : noTopUpForeignRate;
 
   const blendComposition = allocateToTargetRate(jurisdictions, targetRate);
-  const totalETR = Object.entries(blendComposition).reduce(
-    (rate, [country, share]) => rate + Countries[country].rate * share,
-    0,
-  );
+  const totalETR = Object.entries(blendComposition).reduce((rate, [country, share]) => rate + Countries[country].rate * share, 0);
   const totalTaxPaid = totalETR * revenue;
 
   return {
@@ -178,6 +154,6 @@ export const optimizeBlend = (
 export const makeDefaultBlend = (): BlendingResult => {
   const countries = DefaultMockData.countries;
   const revenue = DefaultMockData.revenue;
-  const defaultBlend: BlendingResult = optimizeBlend(countries, revenue, { optimizationLevel: BlendLevels.optimal });
+  const defaultBlend: BlendingResult = optimizeBlend(countries, revenue, { optimizationLevel: BlendLevels.lowestTax });
   return defaultBlend;
 };

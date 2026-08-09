@@ -11,8 +11,7 @@ export interface Country {
 }
 
 export enum BlendLevels {
-  cash = 'cash',
-  optimal = 'optimal',
+  lowestTax = 'lowestTax',
   inefficient = 'inefficient',
   topup = 'topup',
   none = 'none',
@@ -62,7 +61,7 @@ export const DefaultFormFields = {
 export const DefaultMockData: FormFields = {
   sessionId: '',
   data: '',
-  revenue: 150000000000, // $150 billion
+  revenue: 250000000000, // $250 billion
   countries: [
     CountryNames.ireland,
     CountryNames.germany,
@@ -123,15 +122,6 @@ export const MIN_REVENUE = 500000000; // $500 million
 export const MAX_REVENUE = 350000000000; // $350 billion
 export const MIN_FTR = 0; // 0%
 export const MAX_FTR = 1; // 100%
-
-export const LEGACY_GILTI_REGIME: TaxRegime = {
-  id: 'legacy-gilti',
-  label: 'Legacy GILTI (2018–2025)',
-  effectiveYear: 2018,
-  corporateRate: US_TAX_RATE,
-  section250DeductionRate: 0.5,
-  deemedPaidCreditRate: 0.8,
-};
 
 export const CURRENT_NCTI_REGIME: TaxRegime = {
   id: '2026-ncti',

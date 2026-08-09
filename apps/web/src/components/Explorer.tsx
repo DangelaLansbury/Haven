@@ -22,7 +22,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultMockData.revenue;
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
 
-  const defaultOptLevel = BlendLevels.optimal;
+  const defaultOptLevel = BlendLevels.lowestTax;
   const [tempOptLevel, setTempOptLevel] = React.useState<BlendLevels | null>(null);
   const [selectedOptLevel, setSelectedOptLevel] = React.useState<BlendLevels | null>(null);
 
@@ -90,16 +90,14 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
       }}
     >
       <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '30rem' }}>
-        <div className={formStyles.formGroup}>
-          <label htmlFor="revenue">Revenue: {formatDollars(revenue).value + formatDollars(revenue).suffix}</label>
-          <input id="revenue" type="range" min={MIN_REVENUE} max={MAX_REVENUE} value={revenue} onChange={(e): void => handleRevenueChange(e.target.value)} className={formStyles.rangeInput} />
+        {/* Revenue */}
+        <div>
+          {`Revenue: `}
+          <NumberFlow value={formatDollars(revenue).value} duration={300} format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }} suffix={formatDollars(revenue).suffix} />
         </div>
 
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.cash}>
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.lowestTax}>
           Lowest current tax
-        </button>
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.optimal}>
-          Eliminate U.S. top-up
         </button>
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.inefficient}>
           Excess foreign tax
