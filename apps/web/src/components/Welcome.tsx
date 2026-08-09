@@ -8,7 +8,7 @@ interface WelcomeProps {
 
 const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
   const [isExiting, setIsExiting] = React.useState(false);
-  const [isGiltiInfoExpanded, setIsGiltiInfoExpanded] = React.useState(false);
+  const [isNCTIInfoExpanded, setIsNCTIInfoExpanded] = React.useState(false);
 
   const handleExitToExplorer = () => {
     setIsExiting(true);
@@ -35,7 +35,7 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
         <div className={welcomeStyles.initCard}>
           <div className={welcomeStyles.headerContainer}>
             <h1 className={welcomeStyles.header}>{`Welcome to Haven`}</h1>
-            <div className={welcomeStyles.description}>{`Understanding GILTI optimization and exploring multi-device OCR workflows. (This is still a work in progress.)`}</div>
+            <div className={welcomeStyles.description}>{`Visualizing the effects of NCTI optimization`}</div>
           </div>
           <div className={welcomeStyles.formTypeSelectionContainer}>
             <div className={`${welcomeStyles.formTypeSelector} ${welcomeStyles.primary}`} onClick={handleExitToExplorer}>
@@ -43,10 +43,10 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
             </div>
           </div>
           <div className={welcomeStyles.footer}>
-            <div className={welcomeStyles.faq} onClick={() => setIsGiltiInfoExpanded(!isGiltiInfoExpanded)}>
-              {`What is GILTI?`}
+            <div className={welcomeStyles.faq} onClick={() => setIsNCTIInfoExpanded(!isNCTIInfoExpanded)}>
+              {`What is NCTI?`}
+              {isNCTIInfoExpanded && <div className={welcomeStyles.faqContent}>{`NCTI (Net Cash Tax Impact) is a metric used to evaluate the financial impact of tax optimizations.`}</div>}
             </div>
-            {isGiltiInfoExpanded && <div className={welcomeStyles.faqContent}>{`GILTI (Global Intangible Low-Taxed Income) is a tax provision that aims to prevent U.S. corporations from deferring taxation of their foreign earnings.`}</div>}
           </div>
         </div>
       </motion.div>
