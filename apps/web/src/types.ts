@@ -10,17 +10,17 @@ export interface Country {
   rate: number;
 }
 
-export enum BlendLevels {
-  lowestTax = 'lowestTax',
-  inefficient = 'inefficient',
-  topup = 'topup',
-  none = 'none',
+export enum OptimizationScenario {
+  unconstrained = 'unconstrained',
+  ftcEfficient = 'ftcEfficient',
+  constrained = 'constrained',
+  usOnly = 'usOnly',
 }
 
 export enum CountryNames {
   australia = 'Australia',
   barbados = 'Barbados',
-  cypress = 'Cypress',
+  cypress = 'Cyprus',
   germany = 'Germany',
   hungary = 'Hungary',
   ireland = 'Ireland',
@@ -37,7 +37,7 @@ export enum CountryNames {
 export const Countries: Record<string, Country> = {
   [CountryNames.australia]: { name: 'australia', rate: 0.3 },
   [CountryNames.barbados]: { name: 'barbados', rate: 0.055 },
-  [CountryNames.cypress]: { name: 'cypress', rate: 0.001 },
+  [CountryNames.cypress]: { name: 'cyprus', rate: 0.15 },
   [CountryNames.caymanislands]: { name: 'caymanislands', rate: 0.001 },
   [CountryNames.germany]: { name: 'germany', rate: 0.299 },
   [CountryNames.hungary]: { name: 'hungary', rate: 0.09 },
@@ -77,11 +77,28 @@ export const DefaultMockData: FormFields = {
   ],
 };
 
-export interface BlendingResult {
-  blendComposition: Record<CountryNames, number>;
-  /** Blended rate paid to foreign jurisdictions. */
-  totalETR: number;
-  totalTaxPaid: number;
+export interface CountryAllocation {
+  country: CountryNames;
+  share: number;
+  statutoryRate: number;
+  modeledRate: number;
+}
+
+export interface OptimizationConstraints {
+  maximumCountryShare: number;
+  minimumEffectiveRate: number;
+}
+
+export interface OptimizationResult {
+  scenario: OptimizationScenario;
+  allocations: CountryAllocation[];
+  statutoryForeignRate: number;
+  modeledForeignRate: number;
+  taxBreakdown: TaxBreakdown;
+  targetRate?: number;
+  targetWasReachable?: boolean;
+  constraints?: OptimizationConstraints;
+  constraintsSatisfied?: boolean;
 }
 
 export interface TaxRegime {

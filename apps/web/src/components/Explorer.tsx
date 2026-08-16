@@ -1,8 +1,8 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormFields, DefaultMockData, MIN_REVENUE, MAX_REVENUE, BlendingResult, DollarValue, BlendLevels, CountryNames } from '../types';
-import { calculateTaxBreakdown, optimizeBlend, formatDollars } from '../utils';
+import { FormFields, DefaultMockData, OptimizationResult, OptimizationScenario, CountryNames } from '../types';
+import { optimizeBlend, formatDollars } from '../utils';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
@@ -12,19 +12,19 @@ import { RadialTaxBlendChart, TaxBlendDonut } from './PieChart';
 interface ExplorerProps {
   formData: FormFields;
   setFormData: React.Dispatch<React.SetStateAction<FormFields>>;
-  blend: BlendingResult;
-  setBlend: React.Dispatch<React.SetStateAction<BlendingResult>>;
-  optLevel: BlendLevels;
-  setOptLevel: React.Dispatch<React.SetStateAction<BlendLevels>>;
+  blend: OptimizationResult;
+  setBlend: React.Dispatch<React.SetStateAction<OptimizationResult>>;
+  optLevel: OptimizationScenario;
+  setOptLevel: React.Dispatch<React.SetStateAction<OptimizationScenario>>;
 }
 
 const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBlend, optLevel, setOptLevel }: ExplorerProps) => {
   const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultMockData.revenue;
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
 
-  const defaultOptLevel = BlendLevels.lowestTax;
-  const [tempOptLevel, setTempOptLevel] = React.useState<BlendLevels | null>(null);
-  const [selectedOptLevel, setSelectedOptLevel] = React.useState<BlendLevels | null>(null);
+  const defaultOptLevel = OptimizationScenario.unconstrained;
+  const [tempOptLevel, setTempOptLevel] = React.useState<OptimizationScenario | null>(null);
+  const [selectedOptLevel, setSelectedOptLevel] = React.useState<OptimizationScenario | null>(null);
 
   const selectedCountries = React.useMemo(() => {
     return formData.countries && formData.countries.length > 0 ? formData.countries : [CountryNames.unitedstates];
@@ -51,12 +51,12 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
 
   const memoizedBlend = React.useMemo(() => {
     if (tempOptLevel !== null) {
-      return optimizeBlend(selectedCountries, revenue, { optimizationLevel: tempOptLevel });
+      return optimizeBlend(selectedCountries, revenue, tempOptLevel);
     } else if (selectedOptLevel !== null) {
-      return optimizeBlend(selectedCountries, revenue, { optimizationLevel: selectedOptLevel });
+      return optimizeBlend(selectedCountries, revenue, selectedOptLevel);
     }
-    return optimizeBlend(selectedCountries, revenue, { optimizationLevel: optLevel });
-  }, [selectedCountries, revenue, optLevel, tempOptLevel]);
+    return optimizeBlend(selectedCountries, revenue, optLevel);
+  }, [selectedCountries, revenue, optLevel, tempOptLevel, selectedOptLevel]);
 
   React.useEffect(() => {
     setBlend(memoizedBlend);
@@ -70,7 +70,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   }
 
   function handleOptLevelMouseEnter(event: React.MouseEvent<HTMLButtonElement>) {
-    const level = event.currentTarget.value as BlendLevels;
+    const level = event.currentTarget.value as OptimizationScenario;
     setTempOptLevel(level);
   }
 
@@ -85,7 +85,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   }
 
   function handleOptLevelClick(event: React.MouseEvent<HTMLButtonElement>) {
-    const level = event.currentTarget.value as BlendLevels;
+    const level = event.currentTarget.value as OptimizationScenario;
 
     if (selectedOptLevel && selectedOptLevel === level) {
       setSelectedOptLevel(null);
@@ -94,10 +94,11 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
     }
   }
 
-  const foreignTaxRate = blend.totalETR;
-  const taxBreakdown = calculateTaxBreakdown(foreignTaxRate, revenue);
+  const foreignTaxRate = blend.modeledForeignRate;
+  const taxBreakdown = blend.taxBreakdown;
   const topUpAmount = taxBreakdown.topUpAmount;
-  const isUsOnly = blend.blendComposition[CountryNames.unitedstates] === 1;
+  const isUsOnly = blend.scenario === OptimizationScenario.usOnly;
+  const displayedRate = isUsOnly ? taxBreakdown.totalTaxRate : foreignTaxRate;
 
   return (
     <motion.div
@@ -117,52 +118,62 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           <NumberFlow value={formatDollars(revenue).value} duration={300} format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }} suffix={formatDollars(revenue).suffix} />
         </div>
 
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.lowestTax}>
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.unconstrained}>
           Lowest current tax
         </button>
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.inefficient}>
-          Excess foreign tax
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.ftcEfficient}>
+          FTC-efficient 14% blend
         </button>
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.topup}>
-          NCTI top-up
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.constrained}>
+          Constrained 15% blend
         </button>
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={BlendLevels.none}>
+        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.usOnly}>
           Tax at US Rate
         </button>
 
         <div>{formData.countries.join(', ')}</div>
         <TaxBlendDonut blend={blend} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
-          {Object.entries(CountryNames).map(([key, value]) => (
+          {/* {Object.entries(CountryNames).map(([key, value]) => (
             <div key={key} className={explorerStyles.countryCheckbox} style={{ display: 'flex', alignItems: 'center' }}>
               <input id={key} type="checkbox" checked={selectedCountries.includes(value)} onChange={() => handleCountryChange(value)} />
               <label htmlFor={key}>{value}</label>
             </div>
-          ))}
-          {/* {blend.blendComposition && Object.keys(blend.blendComposition).length > 0 && (
+          ))} */}
+          {blend.allocations.length > 0 && (
             <ul>
-              {Object.entries(blend.blendComposition).map(([country, share]) => (
+              {blend.allocations.map(({ country, share, statutoryRate, modeledRate }) => (
                 <li key={country}>
-                  {country}: {share}
+                  {country}: {(share * 100).toFixed(1)}% at {(statutoryRate * 100).toFixed(1)}%
+                  {modeledRate !== statutoryRate ? ` (modeled at ${(modeledRate * 100).toFixed(1)}%)` : ''}
                 </li>
               ))}
             </ul>
-          )} */}
+          )}
+          {blend.constraints && (
+            <div style={{ fontSize: 'var(--font-xxs)' }}>
+              Modeled with a {(blend.constraints.minimumEffectiveRate * 100).toFixed(0)}% minimum effective rate and a {(blend.constraints.maximumCountryShare * 100).toFixed(0)}% maximum share per jurisdiction.
+              {blend.constraintsSatisfied === false && ' Select at least four foreign jurisdictions to satisfy the concentration cap.'}
+            </div>
+          )}
+          {blend.scenario === OptimizationScenario.ftcEfficient && blend.targetWasReachable === false && (
+            <div style={{ fontSize: 'var(--font-xxs)' }}>The selected jurisdictions cannot reach the 14% target; the closest available rate is shown.</div>
+          )}
         </div>
       </div>
       <div className={explorerStyles.rightSide}>
-        <RemittanceChart etr={foreignTaxRate} isUsOnly={isUsOnly} />
+        <RemittanceChart breakdown={taxBreakdown} isUsOnly={isUsOnly} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
           <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600 }}>
-            <NumberFlow value={foreignTaxRate} duration={300} format={{ style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
+            <NumberFlow value={displayedRate} duration={300} format={{ style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
           </div>
           <div style={{ fontSize: 'var(--font-xs)' }}>{isUsOnly ? 'U.S. corporate tax rate' : 'Blended foreign tax rate'}</div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%' }}>
-          {taxBreakdown.topUpRate > 0 ? (
+          {!isUsOnly && taxBreakdown.topUpRate > 0 ? (
             <>
               <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
-                <NumberFlow value={formatDollars(blend.totalTaxPaid).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(blend.totalTaxPaid).suffix} />
+                <NumberFlow value={formatDollars(taxBreakdown.foreignTaxAmount).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(taxBreakdown.foreignTaxAmount).suffix} />
                 <span className={explorerStyles.topupPenalty}>{' + '}</span>
                 <NumberFlow
                   value={formatDollars(topUpAmount).value}
@@ -173,10 +184,10 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
                 />
                 <span>{' = '}</span>
                 <NumberFlow
-                  value={formatDollars(blend.totalTaxPaid + topUpAmount).value}
+                  value={formatDollars(taxBreakdown.totalTaxAmount).value}
                   format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
                   duration={300}
-                  suffix={formatDollars(blend.totalTaxPaid + topUpAmount).suffix}
+                  suffix={formatDollars(taxBreakdown.totalTaxAmount).suffix}
                 />
               </div>
               <div style={{ fontSize: 'var(--font-xs)' }}>Tax remitted + top-up*</div>
@@ -187,7 +198,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           ) : (
             <>
               <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
-                <NumberFlow value={formatDollars(blend.totalTaxPaid).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(blend.totalTaxPaid).suffix} />
+                <NumberFlow value={formatDollars(taxBreakdown.totalTaxAmount).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(taxBreakdown.totalTaxAmount).suffix} />
               </div>
               <div style={{ fontSize: 'var(--font-xs)' }}>Tax remitted</div>
             </>

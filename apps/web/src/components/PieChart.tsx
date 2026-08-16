@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import React, { useEffect, useRef } from 'react';
-import { BlendingResult, CountryNames, Countries } from '../types';
+import { OptimizationResult, CountryNames, Countries } from '../types';
 import { matchToCountryEnum } from '../utils';
 import explorerStyles from '../css/Explorer.module.css';
 
@@ -13,13 +13,13 @@ type CountrySlice = {
 };
 
 interface Props {
-  blend: BlendingResult;
+  blend: OptimizationResult;
   size?: number; // Optional, default = 500
 }
 
 export const RadialTaxBlendChart: React.FC<Props> = ({ blend, size = 400 }) => {
   const ref = useRef<SVGSVGElement>(null);
-  const isActive = (key: string) => blend.blendComposition[matchToCountryEnum(key)];
+  const isActive = (key: string) => blend.allocations.some(({ country, share }) => country === key && share > 0);
   const isZeroRate = (key: string) => Countries[key as CountryNames].rate < 0.01;
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export const RadialTaxBlendChart: React.FC<Props> = ({ blend, size = 400 }) => {
       return {
         key,
         name: country.name,
-        percent: blend.blendComposition[key] || 0,
+        percent: blend.allocations.find(({ country }) => country === key)?.share || 0,
         taxRate: country.rate,
         color: isActive(key) ? 'var(--haven-green)' : 'var(--gray-200)',
       };
@@ -137,7 +137,7 @@ export const RadialTaxBlendChart: React.FC<Props> = ({ blend, size = 400 }) => {
 };
 
 interface Props {
-  blend: BlendingResult;
+  blend: OptimizationResult;
   size?: number; // Optional, default = 200
 }
 
@@ -155,15 +155,15 @@ export const TaxBlendDonut: React.FC<Props> = ({ blend, size = 200 }) => {
 
     svg.selectAll('*').remove(); // Clear previous render
 
-    const data = Object.entries(blend.blendComposition)
-      .filter(([_, pct]) => (pct as number) > 0.005)
-      .map(([key, pct]) => {
-        const country = Countries[key as CountryNames];
+    const data = blend.allocations
+      .filter(({ share }) => share > 0.005)
+      .map(({ country: key, share: pct, statutoryRate }) => {
+        const country = Countries[key];
         return {
           key,
           name: country.name,
           percent: pct,
-          taxRate: country.rate,
+          taxRate: statutoryRate,
           color: '#ccc',
         };
       });

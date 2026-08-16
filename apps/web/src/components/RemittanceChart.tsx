@@ -2,12 +2,10 @@ import React from 'react';
 import * as d3 from 'd3';
 import { motion } from 'framer-motion';
 import chartStyles from '../css/Explorer.module.css';
-import { DEFAULT_TAX_REGIME, EFF_GILTI_RATE, US_TAX_RATE } from '../types';
-import { calculateTaxBreakdown } from '../utils';
+import { DEFAULT_TAX_REGIME, EFF_GILTI_RATE, TaxBreakdown, US_TAX_RATE } from '../types';
 
 interface RemittanceChartProps {
-  /** Blended foreign tax rate (not the post-GILTI total tax rate). */
-  etr: number;
+  breakdown: TaxBreakdown;
   isUsOnly?: boolean;
 }
 
@@ -27,9 +25,8 @@ const HEIGHT = 300;
 const MARGIN = { top: 12, right: 108, bottom: 30, left: 24 };
 const BAR_WIDTH = 70;
 
-export const RemittanceChart: React.FC<RemittanceChartProps> = ({ etr = EFF_GILTI_RATE, isUsOnly = false }) => {
-  const foreignTaxRate = isUsOnly ? 0 : Math.max(0, Number.isFinite(etr) ? etr : 0);
-  const breakdown = calculateTaxBreakdown(foreignTaxRate, 1);
+export const RemittanceChart: React.FC<RemittanceChartProps> = ({ breakdown, isUsOnly = false }) => {
+  const foreignTaxRate = breakdown.foreignTaxRate;
   const datum: StackDatum = {
     usedFtc: isUsOnly ? 0 : breakdown.usedFtcRate,
     haircut: isUsOnly ? 0 : breakdown.haircutRate,

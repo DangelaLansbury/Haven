@@ -8,7 +8,7 @@ import TaxForm from './components/TaxForm';
 import WelcomeScreen from './components/Welcome';
 import Camera from './components/Camera';
 import Explorer from './components/Explorer';
-import { FormFields, DefaultMockData, CountryNames, BlendingResult, DefaultFormFields, BlendLevels } from './types';
+import { FormFields, DefaultMockData, CountryNames, OptimizationResult, DefaultFormFields, OptimizationScenario } from './types';
 import { formatDollars, makeDefaultBlend, matchToCountryEnum } from './utils';
 import { extractBelow, extractTextColumnBelow } from './ocrHelpers';
 import * as fuzz from 'fuzzball';
@@ -22,9 +22,8 @@ const App = () => {
   const [OCRReady, setOCRReady] = useState(false);
   const [fileAdded, setFileAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const defaultBlend = makeDefaultBlend();
-  const [blend, setBlend] = useState<BlendingResult>(defaultBlend);
-  const [optLevel, setOptLevel] = useState<BlendLevels>(BlendLevels.lowestTax);
+  const [blend, setBlend] = useState<OptimizationResult>(() => makeDefaultBlend());
+  const [optLevel, setOptLevel] = useState<OptimizationScenario>(OptimizationScenario.unconstrained);
 
   useEffect(() => {
     // generate or read sessionId
