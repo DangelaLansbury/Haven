@@ -26,16 +26,37 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   const [tempOptLevel, setTempOptLevel] = React.useState<BlendLevels | null>(null);
   const [selectedOptLevel, setSelectedOptLevel] = React.useState<BlendLevels | null>(null);
 
+  const selectedCountries = React.useMemo(() => {
+    return formData.countries && formData.countries.length > 0 ? formData.countries : [CountryNames.unitedstates];
+  }, [formData.countries]);
+
+  function handleCountryChange(country: CountryNames) {
+    setFormData((prev: FormFields) => {
+      const updatedCountries = prev.countries.includes(country) ? prev.countries.filter((c) => c !== country) : [...prev.countries, country];
+
+      return {
+        ...prev,
+        countries: updatedCountries,
+      };
+    });
+  }
+
+  React.useEffect(() => {
+    if (formData.revenue !== revenue) {
+      setRevenue(formData.revenue);
+    }
+  }, [formData.revenue]);
+
   console.log(blend);
 
   const memoizedBlend = React.useMemo(() => {
     if (tempOptLevel !== null) {
-      return optimizeBlend(formData.countries, revenue, { optimizationLevel: tempOptLevel });
+      return optimizeBlend(selectedCountries, revenue, { optimizationLevel: tempOptLevel });
     } else if (selectedOptLevel !== null) {
-      return optimizeBlend(formData.countries, revenue, { optimizationLevel: selectedOptLevel });
+      return optimizeBlend(selectedCountries, revenue, { optimizationLevel: selectedOptLevel });
     }
-    return optimizeBlend(formData.countries, revenue, { optimizationLevel: optLevel });
-  }, [formData.countries, revenue, optLevel, tempOptLevel]);
+    return optimizeBlend(selectedCountries, revenue, { optimizationLevel: optLevel });
+  }, [selectedCountries, revenue, optLevel, tempOptLevel]);
 
   React.useEffect(() => {
     setBlend(memoizedBlend);
@@ -111,8 +132,14 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
 
         <div>{formData.countries.join(', ')}</div>
         <TaxBlendDonut blend={blend} />
-        <div>
-          {blend.blendComposition && Object.keys(blend.blendComposition).length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
+          {Object.entries(CountryNames).map(([key, value]) => (
+            <div key={key} className={explorerStyles.countryCheckbox} style={{ display: 'flex', alignItems: 'center' }}>
+              <input id={key} type="checkbox" checked={selectedCountries.includes(value)} onChange={() => handleCountryChange(value)} />
+              <label htmlFor={key}>{value}</label>
+            </div>
+          ))}
+          {/* {blend.blendComposition && Object.keys(blend.blendComposition).length > 0 && (
             <ul>
               {Object.entries(blend.blendComposition).map(([country, share]) => (
                 <li key={country}>
@@ -120,7 +147,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
                 </li>
               ))}
             </ul>
-          )}
+          )} */}
         </div>
       </div>
       <div className={explorerStyles.rightSide}>
