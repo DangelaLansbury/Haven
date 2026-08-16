@@ -30,24 +30,11 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
     return formData.countries && formData.countries.length > 0 ? formData.countries : [CountryNames.unitedstates];
   }, [formData.countries]);
 
-  function handleCountryChange(country: CountryNames) {
-    setFormData((prev: FormFields) => {
-      const updatedCountries = prev.countries.includes(country) ? prev.countries.filter((c) => c !== country) : [...prev.countries, country];
-
-      return {
-        ...prev,
-        countries: updatedCountries,
-      };
-    });
-  }
-
   React.useEffect(() => {
     if (formData.revenue !== revenue) {
       setRevenue(formData.revenue);
     }
   }, [formData.revenue]);
-
-  console.log(blend);
 
   const memoizedBlend = React.useMemo(() => {
     if (tempOptLevel !== null) {
@@ -134,18 +121,11 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
         <div>{formData.countries.join(', ')}</div>
         <TaxBlendDonut blend={blend} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
-          {/* {Object.entries(CountryNames).map(([key, value]) => (
-            <div key={key} className={explorerStyles.countryCheckbox} style={{ display: 'flex', alignItems: 'center' }}>
-              <input id={key} type="checkbox" checked={selectedCountries.includes(value)} onChange={() => handleCountryChange(value)} />
-              <label htmlFor={key}>{value}</label>
-            </div>
-          ))} */}
           {blend.allocations.length > 0 && (
             <ul>
               {blend.allocations.map(({ country, share, statutoryRate, modeledRate }) => (
                 <li key={country}>
-                  {country}: {(share * 100).toFixed(1)}% at {(statutoryRate * 100).toFixed(1)}%
-                  {modeledRate !== statutoryRate ? ` (modeled at ${(modeledRate * 100).toFixed(1)}%)` : ''}
+                  {country}: {(share * 100).toFixed(1)}% at {(statutoryRate * 100).toFixed(1)}%{modeledRate !== statutoryRate ? ` (modeled at ${(modeledRate * 100).toFixed(1)}%)` : ''}
                 </li>
               ))}
             </ul>
@@ -173,7 +153,12 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           {!isUsOnly && taxBreakdown.topUpRate > 0 ? (
             <>
               <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
-                <NumberFlow value={formatDollars(taxBreakdown.foreignTaxAmount).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(taxBreakdown.foreignTaxAmount).suffix} />
+                <NumberFlow
+                  value={formatDollars(taxBreakdown.foreignTaxAmount).value}
+                  format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
+                  duration={300}
+                  suffix={formatDollars(taxBreakdown.foreignTaxAmount).suffix}
+                />
                 <span className={explorerStyles.topupPenalty}>{' + '}</span>
                 <NumberFlow
                   value={formatDollars(topUpAmount).value}
@@ -198,7 +183,12 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           ) : (
             <>
               <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
-                <NumberFlow value={formatDollars(taxBreakdown.totalTaxAmount).value} format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }} duration={300} suffix={formatDollars(taxBreakdown.totalTaxAmount).suffix} />
+                <NumberFlow
+                  value={formatDollars(taxBreakdown.totalTaxAmount).value}
+                  format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
+                  duration={300}
+                  suffix={formatDollars(taxBreakdown.totalTaxAmount).suffix}
+                />
               </div>
               <div style={{ fontSize: 'var(--font-xs)' }}>Tax remitted</div>
             </>
