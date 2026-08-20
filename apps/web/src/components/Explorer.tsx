@@ -112,7 +112,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           FTC-efficient 14% blend
         </button>
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.constrained}>
-          Constrained 15% blend
+          Constrained blend
         </button>
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.usOnly}>
           Tax at US Rate

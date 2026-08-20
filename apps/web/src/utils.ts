@@ -75,8 +75,8 @@ export function matchToCountryEnum(countryString: string): CountryNames | null {
 type Candidate = { country: CountryNames; statutoryRate: number };
 
 const CONSTRAINED_MODEL: OptimizationConstraints = {
-  maximumCountryShare: 1,
-  minimumEffectiveRate: 0.15,
+  maximumCountryShare: 0.25,
+  minimumEffectiveRate: 0.01,
 };
 
 const prepareCandidates = (jurisdictions: CountryNames[]): Candidate[] =>
