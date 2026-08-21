@@ -130,10 +130,10 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
               ))}
             </ul>
           )}
-          {blend.constraints && (
+          {!isUsOnly && (
             <div style={{ fontSize: 'var(--font-xxs)' }}>
-              Modeled with a {(blend.constraints.minimumEffectiveRate * 100).toFixed(0)}% minimum effective rate and a {(blend.constraints.maximumCountryShare * 100).toFixed(0)}% maximum share per jurisdiction.
-              {blend.constraintsSatisfied === false && ' Select at least four foreign jurisdictions to satisfy the concentration cap.'}
+              A company in {blend.allocations[0].country} would own the IP and sell it to companies operating in other jurisdictions, which would pay royalties to the IP owner. The royalties are taxed at the statutory rate of the IP owner's
+              jurisdiction, and the U.S. parent company pays a top-up tax on the difference between the U.S. corporate rate and the foreign tax credit.
             </div>
           )}
           {blend.scenario === OptimizationScenario.ftcEfficient && blend.targetWasReachable === false && (
