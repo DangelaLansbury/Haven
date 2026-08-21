@@ -1,5 +1,5 @@
 import * as fuzz from 'fuzzball';
-import { CountryAllocation, CountryNames, Countries, DEFAULT_TAX_REGIME, DefaultMockData, DollarValue, OptimizationConstraints, OptimizationResult, OptimizationScenario, TaxBreakdown, TaxRegime } from './types';
+import { CountryAllocation, CountryNames, Countries, DEFAULT_TAX_REGIME, DefaultMockData, DollarValue, OptimizationResult, OptimizationScenario, TaxBreakdown, TaxRegime } from './types';
 
 export const formatPercentage = (value: number): number => {
   return Math.round(value * 100) / 100;
@@ -72,69 +72,41 @@ export function matchToCountryEnum(countryString: string): CountryNames | null {
   return null;
 }
 
-type Candidate = { country: CountryNames; statutoryRate: number };
-
-const CONSTRAINED_MODEL: OptimizationConstraints = {
-  maximumCountryShare: 0.25,
-  minimumEffectiveRate: 0.01,
-};
+type Candidate = { country: CountryNames; taxRate: number };
 
 const prepareCandidates = (jurisdictions: CountryNames[]): Candidate[] =>
   [...new Set(jurisdictions)]
     .filter((country) => country !== CountryNames.unitedstates)
-    .map((country) => ({ country, statutoryRate: Countries[country].rate }))
-    .sort((a, b) => a.statutoryRate - b.statutoryRate || a.country.localeCompare(b.country));
+    .map((country) => ({ country, taxRate: Countries[country].rate }))
+    .sort((a, b) => a.taxRate - b.taxRate || a.country.localeCompare(b.country));
 
-const toAllocation = (candidate: Candidate, share: number, modeledRate: number = candidate.statutoryRate): CountryAllocation => ({
+const toAllocation = (candidate: Candidate, share: number): CountryAllocation => ({
   country: candidate.country,
   share,
-  statutoryRate: candidate.statutoryRate,
-  modeledRate,
+  taxRate: candidate.taxRate,
 });
 
-const calculateWeightedRate = (allocations: CountryAllocation[], rateKey: 'statutoryRate' | 'modeledRate'): number => allocations.reduce((total, allocation) => total + allocation.share * allocation[rateKey], 0);
+const calculateWeightedRate = (allocations: CountryAllocation[]): number => allocations.reduce((total, allocation) => total + allocation.share * allocation.taxRate, 0);
 
 const allocateUnconstrained = (candidates: Candidate[]): CountryAllocation[] => [toAllocation(candidates[0], 1)];
 
 const allocateFtcEfficient = (candidates: Candidate[], targetRate: number): { allocations: CountryAllocation[]; targetWasReachable: boolean } => {
-  const exact = candidates.find(({ statutoryRate }) => Math.abs(statutoryRate - targetRate) < 1e-10);
+  const exact = candidates.find(({ taxRate }) => Math.abs(taxRate - targetRate) < 1e-10);
   if (exact) return { allocations: [toAllocation(exact, 1)], targetWasReachable: true };
 
-  const lower = [...candidates].reverse().find(({ statutoryRate }) => statutoryRate < targetRate);
-  const upper = candidates.find(({ statutoryRate }) => statutoryRate > targetRate);
+  const lower = [...candidates].reverse().find(({ taxRate }) => taxRate < targetRate);
+  const upper = candidates.find(({ taxRate }) => taxRate > targetRate);
 
   if (!lower || !upper) {
-    const closest = candidates.reduce((best, candidate) => (Math.abs(candidate.statutoryRate - targetRate) < Math.abs(best.statutoryRate - targetRate) ? candidate : best));
+    const closest = candidates.reduce((best, candidate) => (Math.abs(candidate.taxRate - targetRate) < Math.abs(best.taxRate - targetRate) ? candidate : best));
     return { allocations: [toAllocation(closest, 1)], targetWasReachable: false };
   }
 
-  const upperShare = (targetRate - lower.statutoryRate) / (upper.statutoryRate - lower.statutoryRate);
+  const upperShare = (targetRate - lower.taxRate) / (upper.taxRate - lower.taxRate);
   return {
     allocations: [toAllocation(lower, 1 - upperShare), toAllocation(upper, upperShare)],
     targetWasReachable: true,
   };
-};
-
-const allocateConstrained = (candidates: Candidate[], constraints: OptimizationConstraints): { allocations: CountryAllocation[]; constraintsSatisfied: boolean } => {
-  const requiredCountries = Math.ceil(1 / constraints.maximumCountryShare);
-  const constraintsSatisfied = candidates.length >= requiredCountries;
-  const maximumShare = constraintsSatisfied ? constraints.maximumCountryShare : 1 / candidates.length;
-  const ranked = candidates
-    .map((candidate) => ({ ...candidate, modeledRate: Math.max(candidate.statutoryRate, constraints.minimumEffectiveRate) }))
-    // When several countries are lifted to the same 15% modeled floor, prefer
-    // the statutory rates closest to that floor rather than the lowest havens.
-    .sort((a, b) => a.modeledRate - b.modeledRate || b.statutoryRate - a.statutoryRate || a.country.localeCompare(b.country));
-
-  const allocations: CountryAllocation[] = [];
-  let remainingShare = 1;
-  for (const candidate of ranked) {
-    if (remainingShare <= 1e-10) break;
-    const share = Math.min(maximumShare, remainingShare);
-    allocations.push(toAllocation(candidate, share, candidate.modeledRate));
-    remainingShare -= share;
-  }
-
-  return { allocations, constraintsSatisfied };
 };
 
 const createUsOnlyResult = (revenue: number, regime: TaxRegime): OptimizationResult => {
@@ -142,9 +114,8 @@ const createUsOnlyResult = (revenue: number, regime: TaxRegime): OptimizationRes
   const taxAmount = taxRate * revenue;
   return {
     scenario: OptimizationScenario.usOnly,
-    allocations: [toAllocation({ country: CountryNames.unitedstates, statutoryRate: taxRate }, 1)],
-    statutoryForeignRate: 0,
-    modeledForeignRate: 0,
+    allocations: [toAllocation({ country: CountryNames.unitedstates, taxRate }, 1)],
+    foreignTaxRate: 0,
     taxBreakdown: {
       foreignTaxRate: 0,
       foreignTaxAmount: 0,
@@ -177,35 +148,24 @@ export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, sc
   let allocations: CountryAllocation[];
   let targetRate: number | undefined;
   let targetWasReachable: boolean | undefined;
-  let constraints: OptimizationConstraints | undefined;
-  let constraintsSatisfied: boolean | undefined;
 
   if (scenario === OptimizationScenario.unconstrained) {
     allocations = allocateUnconstrained(candidates);
-  } else if (scenario === OptimizationScenario.ftcEfficient) {
+  } else {
     targetRate = noTopUpRate;
     const result = allocateFtcEfficient(candidates, targetRate);
     allocations = result.allocations;
     targetWasReachable = result.targetWasReachable;
-  } else {
-    constraints = CONSTRAINED_MODEL;
-    const result = allocateConstrained(candidates, constraints);
-    allocations = result.allocations;
-    constraintsSatisfied = result.constraintsSatisfied;
   }
 
-  const statutoryForeignRate = calculateWeightedRate(allocations, 'statutoryRate');
-  const modeledForeignRate = calculateWeightedRate(allocations, 'modeledRate');
+  const foreignTaxRate = calculateWeightedRate(allocations);
   return {
     scenario,
     allocations,
-    statutoryForeignRate,
-    modeledForeignRate,
-    taxBreakdown: calculateTaxBreakdown(modeledForeignRate, revenue, regime),
+    foreignTaxRate,
+    taxBreakdown: calculateTaxBreakdown(foreignTaxRate, revenue, regime),
     targetRate,
     targetWasReachable,
-    constraints,
-    constraintsSatisfied,
   };
 };
 

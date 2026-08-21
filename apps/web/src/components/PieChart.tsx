@@ -157,13 +157,13 @@ export const TaxBlendDonut: React.FC<Props> = ({ blend, size = 200 }) => {
 
     const data = blend.allocations
       .filter(({ share }) => share > 0.005)
-      .map(({ country: key, share: pct, statutoryRate }) => {
+      .map(({ country: key, share: pct, taxRate }) => {
         const country = Countries[key];
         return {
           key,
           name: country.name,
           percent: pct,
-          taxRate: statutoryRate,
+          taxRate,
           color: '#ccc',
         };
       });

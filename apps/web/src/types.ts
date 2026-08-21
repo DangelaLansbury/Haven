@@ -13,7 +13,6 @@ export interface Country {
 export enum OptimizationScenario {
   unconstrained = 'unconstrained',
   ftcEfficient = 'ftcEfficient',
-  constrained = 'constrained',
   usOnly = 'usOnly',
 }
 
@@ -79,25 +78,16 @@ export const DefaultMockData: FormFields = {
 export interface CountryAllocation {
   country: CountryNames;
   share: number;
-  statutoryRate: number;
-  modeledRate: number;
-}
-
-export interface OptimizationConstraints {
-  maximumCountryShare: number;
-  minimumEffectiveRate: number;
+  taxRate: number;
 }
 
 export interface OptimizationResult {
   scenario: OptimizationScenario;
   allocations: CountryAllocation[];
-  statutoryForeignRate: number;
-  modeledForeignRate: number;
+  foreignTaxRate: number;
   taxBreakdown: TaxBreakdown;
   targetRate?: number;
   targetWasReachable?: boolean;
-  constraints?: OptimizationConstraints;
-  constraintsSatisfied?: boolean;
 }
 
 export interface TaxRegime {

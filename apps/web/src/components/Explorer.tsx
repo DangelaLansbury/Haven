@@ -81,7 +81,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
     }
   }
 
-  const foreignTaxRate = blend.modeledForeignRate;
+  const foreignTaxRate = blend.foreignTaxRate;
   const taxBreakdown = blend.taxBreakdown;
   const topUpAmount = taxBreakdown.topUpAmount;
   const isUsOnly = blend.scenario === OptimizationScenario.usOnly;
@@ -111,9 +111,6 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.ftcEfficient}>
           FTC-efficient 14% blend
         </button>
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.constrained}>
-          Constrained blend
-        </button>
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.usOnly}>
           Tax at US Rate
         </button>
@@ -123,9 +120,9 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
           {blend.allocations.length > 0 && (
             <ul>
-              {blend.allocations.map(({ country, share, statutoryRate, modeledRate }) => (
+              {blend.allocations.map(({ country, share, taxRate }) => (
                 <li key={country}>
-                  {country}: {(share * 100).toFixed(1)}% at {(statutoryRate * 100).toFixed(1)}%{modeledRate !== statutoryRate ? ` (modeled at ${(modeledRate * 100).toFixed(1)}%)` : ''}
+                  {country}: {(share * 100).toFixed(1)}% at {(taxRate * 100).toFixed(1)}%
                 </li>
               ))}
             </ul>
