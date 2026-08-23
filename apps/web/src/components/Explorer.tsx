@@ -128,13 +128,18 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
             </ul>
           )}
           {!isUsOnly && (
-            <div style={{ fontSize: 'var(--font-xxs)' }}>
-              A company in {blend.allocations[0].country} would own the IP and sell it to companies operating in other jurisdictions, which would pay royalties to the IP owner. The royalties are taxed at the statutory rate of the IP owner's
-              jurisdiction, and the U.S. parent company pays a top-up tax on the difference between the U.S. corporate rate and the foreign tax credit.
-            </div>
+            <>
+              <div style={{ fontSize: 'var(--font-xxs)' }}>
+                A company in {blend.allocations[0].country} would own the IP and sell it to companies operating in other jurisdictions, which would pay royalties to the IP owner. The royalties are taxed at the statutory rate of the IP
+                owner's jurisdiction, and the U.S. parent company pays a top-up tax on the difference between the U.S. corporate rate and the foreign tax credit.
+              </div>
+              <div
+                style={{ fontSize: 'var(--font-xxs)' }}
+              >{`Customers in country of operation -> Company A books sales revenue -> Company A pays royalties to IP owner in low-tax jurisdiction -> IP owner remits tax -> U.S. parent pays top-up tax if applicable.`}</div>
+            </>
           )}
           {blend.scenario === OptimizationScenario.ftcEfficient && blend.targetWasReachable === false && (
-            <div style={{ fontSize: 'var(--font-xxs)' }}>The selected jurisdictions cannot reach the 14% target; the closest available rate is shown.</div>
+            <div style={{ fontSize: 'var(--font-xxs)', marginTop: '0.5rem' }}>The selected jurisdictions cannot reach the 14% target; the closest available rate is shown.</div>
           )}
         </div>
       </div>
