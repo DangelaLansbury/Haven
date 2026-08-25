@@ -17,6 +17,22 @@
   max-width: calc(200px + 2rem);
 }
 
+.mapPanel {
+  align-self: center;
+  flex: 1 1 32rem;
+  margin: 0;
+  max-width: 42rem;
+  min-width: 18rem;
+  width: 100%;
+}
+
+.mapPanel figcaption {
+  color: var(--gray-650);
+  font-size: var(--font-xxs);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
 /* ----- FONT STYLES ----- */
 
 .topupPenalty {

@@ -8,6 +8,7 @@ import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
 import NumberFlow from '@number-flow/react';
 import { RadialTaxBlendChart, TaxBlendDonut } from './PieChart';
+import { WorldMap } from './Map';
 
 interface ExplorerProps {
   formData: FormFields;
@@ -86,6 +87,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   const topUpAmount = taxBreakdown.topUpAmount;
   const isUsOnly = blend.scenario === OptimizationScenario.usOnly;
   const displayedRate = isUsOnly ? taxBreakdown.totalTaxRate : foreignTaxRate;
+  const highlightedCountries = React.useMemo(() => blend.allocations.map(({ country }) => country), [blend.allocations]);
 
   return (
     <motion.div
@@ -143,6 +145,10 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
           )}
         </div>
       </div>
+      <figure className={explorerStyles.mapPanel}>
+        <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} highlightFill="var(--haven-green)" />
+        <figcaption>Jurisdictions used in the current optimization blend</figcaption>
+      </figure>
       <div className={explorerStyles.rightSide}>
         <RemittanceChart breakdown={taxBreakdown} isUsOnly={isUsOnly} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
