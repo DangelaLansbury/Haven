@@ -1,8 +1,8 @@
 import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormFields, DefaultMockData, OptimizationResult, OptimizationScenario, CountryNames } from '../types';
-import { optimizeBlend, formatDollars } from '../utils';
+import { FormFields, DefaultMockData, OptimizationResult, OptimizationScenario } from '../types';
+import { formatDollars } from '../utils';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
@@ -13,13 +13,12 @@ import { WorldMap } from './Map';
 interface ExplorerProps {
   formData: FormFields;
   setFormData: React.Dispatch<React.SetStateAction<FormFields>>;
-  blend: OptimizationResult;
-  setBlend: React.Dispatch<React.SetStateAction<OptimizationResult>>;
+  presetBlends: Record<OptimizationScenario, OptimizationResult>;
   optLevel: OptimizationScenario;
   setOptLevel: React.Dispatch<React.SetStateAction<OptimizationScenario>>;
 }
 
-const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBlend, optLevel, setOptLevel }: ExplorerProps) => {
+const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends, optLevel, setOptLevel }: ExplorerProps) => {
   const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultMockData.revenue;
   const [revenue, setRevenue] = React.useState<number>(initialRevenue);
 
@@ -27,28 +26,14 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
   const [tempOptLevel, setTempOptLevel] = React.useState<OptimizationScenario | null>(null);
   const [selectedOptLevel, setSelectedOptLevel] = React.useState<OptimizationScenario | null>(null);
 
-  const selectedCountries = React.useMemo(() => {
-    return formData.countries && formData.countries.length > 0 ? formData.countries : [CountryNames.unitedstates];
-  }, [formData.countries]);
-
   React.useEffect(() => {
     if (formData.revenue !== revenue) {
       setRevenue(formData.revenue);
     }
   }, [formData.revenue]);
 
-  const memoizedBlend = React.useMemo(() => {
-    if (tempOptLevel !== null) {
-      return optimizeBlend(selectedCountries, revenue, tempOptLevel);
-    } else if (selectedOptLevel !== null) {
-      return optimizeBlend(selectedCountries, revenue, selectedOptLevel);
-    }
-    return optimizeBlend(selectedCountries, revenue, optLevel);
-  }, [selectedCountries, revenue, optLevel, tempOptLevel, selectedOptLevel]);
-
-  React.useEffect(() => {
-    setBlend(memoizedBlend);
-  }, [memoizedBlend, setBlend]);
+  const activeOptLevel = tempOptLevel ?? selectedOptLevel ?? optLevel;
+  const blend = presetBlends[activeOptLevel];
 
   function handleRevenueChange(value: number) {
     setFormData((prev: FormFields) => ({
@@ -147,7 +132,6 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, blend, setBl
       </div>
       <figure className={explorerStyles.mapPanel}>
         <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} highlightFill="var(--haven-green)" />
-        <figcaption>Jurisdictions used in the current optimization blend</figcaption>
       </figure>
       <div className={explorerStyles.rightSide}>
         <RemittanceChart breakdown={taxBreakdown} isUsOnly={isUsOnly} />
