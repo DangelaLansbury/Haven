@@ -103,7 +103,6 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
         </button>
 
         <div>{formData.countries.join(', ')}</div>
-        <TaxBlendDonut blend={blend} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
           {blend.allocations.length > 0 && (
             <ul>
