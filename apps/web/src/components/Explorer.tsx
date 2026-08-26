@@ -70,7 +70,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
   const foreignTaxRate = blend.foreignTaxRate;
   const taxBreakdown = blend.taxBreakdown;
   const topUpAmount = taxBreakdown.topUpAmount;
-  const isUsOnly = blend.scenario === OptimizationScenario.usOnly;
+  const isUsOnly = React.useMemo(() => blend.scenario === OptimizationScenario.usOnly, [blend.scenario]);
   const displayedRate = isUsOnly ? taxBreakdown.totalTaxRate : foreignTaxRate;
   const highlightedCountries = React.useMemo(() => blend.allocations.map(({ country }) => country), [blend.allocations]);
 
