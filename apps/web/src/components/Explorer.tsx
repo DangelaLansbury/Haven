@@ -7,7 +7,6 @@ import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
 import NumberFlow from '@number-flow/react';
-import { RadialTaxBlendChart, TaxBlendDonut } from './PieChart';
 import { WorldMap } from './Map';
 
 interface ExplorerProps {
