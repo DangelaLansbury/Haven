@@ -20,6 +20,7 @@ type WorldMapProps = {
 type MapFeature = any;
 type Dot = { x: number; y: number; country: string; countryId?: string; key: string };
 const EMPTY_HIGHLIGHTS: Array<string | number> = [];
+const MAP_GEOMETRY_CACHE = new Map<string, { dots: Dot[]; projection: ReturnType<typeof geoNaturalEarth1> }>();
 
 // Tiny jurisdictions omitted from the 110m atlas still need a visible map marker.
 const COUNTRY_COORDINATES: Record<string, [number, number]> = {
@@ -45,6 +46,52 @@ const normalizeCountry = (value: string | number) =>
     .replace(/unitedstatesofamerica/g, 'unitedstates')
     .replace(/[^a-z0-9]/g, '');
 
+const countries = (() => {
+  const collection = feature(world as any, (world as any).objects.countries) as any;
+  return collection.features as MapFeature[];
+})();
+
+function getMapGeometry(width: number, height: number, gap: number, highlightedDotRadius: number) {
+  const cacheKey = `${width}:${height}:${gap}:${highlightedDotRadius}`;
+  const cached = MAP_GEOMETRY_CACHE.get(cacheKey);
+  if (cached) return cached;
+
+  const padding = Math.max(highlightedDotRadius + 2, gap / 2);
+  const projection = geoNaturalEarth1().fitExtent(
+    [[padding, padding], [width - padding, height - padding]],
+    { type: 'FeatureCollection', features: countries },
+  );
+  const dots: Dot[] = [];
+
+  for (let y = padding; y <= height - padding; y += gap) {
+    for (let x = padding; x <= width - padding; x += gap) {
+      const coordinates = projection.invert?.([x, y]);
+      if (!coordinates) continue;
+      const owner = countries.find((country) => geoContains(country, coordinates));
+      if (!owner) continue;
+      dots.push({
+        x,
+        y,
+        country: normalizeCountry(owner.properties?.name ?? ''),
+        countryId: normalizeCountry(owner.id ?? ''),
+        key: `${x}-${y}`,
+      });
+    }
+  }
+
+  const geometry = { dots, projection };
+  MAP_GEOMETRY_CACHE.set(cacheKey, geometry);
+  return geometry;
+}
+
+/** Prepare the expensive geographic lookup before the map is mounted. */
+export function preloadWorldMap(width = 640, height = 330, gap = 8, highlightedDotRadius = 3.2) {
+  getMapGeometry(width, height, gap, highlightedDotRadius);
+}
+
+const dotsToPath = (dots: Dot[], radius: number) =>
+  dots.map(({ x, y }) => `M${x - radius},${y}a${radius},${radius} 0 1,0 ${radius * 2},0a${radius},${radius} 0 1,0 -${radius * 2},0`).join('');
+
 export const WorldMap = React.memo(function WorldMap({
   width,
   height,
@@ -56,33 +103,9 @@ export const WorldMap = React.memo(function WorldMap({
   highlightedDotRadius = 3.2,
   gap = 8,
 }: WorldMapProps) {
-  const countries = useMemo(() => {
-    const collection = feature(world as any, (world as any).objects.countries) as any;
-    return collection.features as MapFeature[];
-  }, []);
   const highlighted = useMemo(() => new Set([...highlightedCountries, ...highlightedIds].map(normalizeCountry)), [highlightedCountries, highlightedIds]);
 
-  const { dots, projection } = useMemo(() => {
-    const padding = Math.max(highlightedDotRadius + 2, gap / 2);
-    const nextProjection = geoNaturalEarth1().fitExtent(
-      [[padding, padding], [width - padding, height - padding]],
-      { type: 'FeatureCollection', features: countries },
-    );
-    const nextDots: Dot[] = [];
-
-    for (let y = padding; y <= height - padding; y += gap) {
-      for (let x = padding; x <= width - padding; x += gap) {
-        const coordinates = nextProjection.invert?.([x, y]);
-        if (!coordinates) continue;
-        const owner = countries.find((country) => geoContains(country, coordinates));
-        if (!owner) continue;
-        const name = normalizeCountry(owner.properties?.name ?? '');
-        const id = normalizeCountry(owner.id ?? '');
-        nextDots.push({ x, y, country: name, countryId: id, key: `${x}-${y}` });
-      }
-    }
-    return { dots: nextDots, projection: nextProjection };
-  }, [countries, gap, height, highlightedDotRadius, width]);
+  const { dots, projection } = useMemo(() => getMapGeometry(width, height, gap, highlightedDotRadius), [gap, height, highlightedDotRadius, width]);
 
   const fallbackDots = useMemo(
     () => Object.entries(COUNTRY_COORDINATES).flatMap(([country, coordinates]) => {
@@ -93,13 +116,21 @@ export const WorldMap = React.memo(function WorldMap({
     [dots, highlighted, projection],
   );
 
+  const { defaultPath, highlightedPath } = useMemo(() => {
+    const normal: Dot[] = [];
+    const active: Dot[] = [];
+    [...dots, ...fallbackDots].forEach((dot) => {
+      const isHighlighted = highlighted.has(dot.country) || (dot.countryId !== undefined && highlighted.has(dot.countryId));
+      (isHighlighted ? active : normal).push(dot);
+    });
+    return { defaultPath: dotsToPath(normal, dotRadius), highlightedPath: dotsToPath(active, highlightedDotRadius) };
+  }, [dotRadius, dots, fallbackDots, highlighted, highlightedDotRadius]);
+
   return (
     <svg role="img" aria-label={`Dot matrix world map${highlighted.size ? ` highlighting ${highlightedCountries.join(', ')}` : ''}`} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
       <title>World map with highlighted optimization jurisdictions</title>
-      {[...dots, ...fallbackDots].map((dot) => {
-        const isHighlighted = highlighted.has(dot.country) || (dot.countryId !== undefined && highlighted.has(dot.countryId));
-        return <circle key={dot.key} cx={dot.x} cy={dot.y} r={isHighlighted ? highlightedDotRadius : dotRadius} fill={isHighlighted ? highlightFill : defaultFill} style={{ transition: 'fill 180ms ease, r 180ms ease' }} />;
-      })}
+      <path d={defaultPath} fill={defaultFill} />
+      <path d={highlightedPath} fill={highlightFill} />
     </svg>
   );
 });
