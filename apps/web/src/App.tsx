@@ -12,7 +12,6 @@ import { FormFields, DefaultMockData, CountryNames, OptimizationResult, DefaultF
 import { formatDollars, matchToCountryEnum, optimizeBlend } from './utils';
 import { extractBelow, extractTextColumnBelow } from './ocrHelpers';
 import * as fuzz from 'fuzzball';
-import { preloadWorldMap } from './components/Map';
 
 const App = () => {
   const [sessionId, setSessionId] = useState('');
@@ -24,19 +23,6 @@ const App = () => {
   const [fileAdded, setFileAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [optLevel, setOptLevel] = useState<OptimizationScenario>(OptimizationScenario.unconstrained);
-
-  useEffect(() => {
-    const browser = window as Window & {
-      requestIdleCallback?: (callback: () => void) => number;
-      cancelIdleCallback?: (id: number) => void;
-    };
-    const idleId = browser.requestIdleCallback?.(() => preloadWorldMap());
-    if (idleId === undefined) {
-      const timeoutId = window.setTimeout(() => preloadWorldMap(), 0);
-      return () => window.clearTimeout(timeoutId);
-    }
-    return () => browser.cancelIdleCallback?.(idleId);
-  }, []);
 
   const presetBlends = React.useMemo<Record<OptimizationScenario, OptimizationResult>>(() => {
     const countries = formData.countries?.length ? formData.countries : [CountryNames.unitedstates];

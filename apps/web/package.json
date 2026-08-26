@@ -2,6 +2,7 @@
   "name": "web",
   "private": true,
   "scripts": {
+    "generate:map": "bun scripts/generate-map-dots.ts",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
