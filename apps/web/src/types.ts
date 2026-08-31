@@ -61,18 +61,7 @@ export const DefaultMockData: FormFields = {
   sessionId: '',
   data: '',
   revenue: 250000000000, // $250 billion
-  countries: [
-    CountryNames.ireland,
-    CountryNames.germany,
-    CountryNames.japan,
-    CountryNames.luxembourg,
-    CountryNames.unitedkingdom,
-    CountryNames.singapore,
-    CountryNames.australia,
-    CountryNames.hungary,
-    CountryNames.cyprus,
-    CountryNames.barbados,
-  ],
+  countries: [CountryNames.caymanislands, CountryNames.germany, CountryNames.japan, CountryNames.luxembourg, CountryNames.unitedkingdom, CountryNames.singapore, CountryNames.australia, CountryNames.hungary, CountryNames.barbados],
 };
 
 export interface CountryAllocation {
