@@ -11,7 +11,7 @@ const HIGHLIGHT_RADIUS = 3.2;
 const padding = Math.max(HIGHLIGHT_RADIUS + 2, GAP / 2);
 
 const normalizeCountry = (value: string | number) =>
-  String(value).toLowerCase().replace(/unitedstatesofamerica/g, 'unitedstates').replace(/[^a-z0-9]/g, '');
+  String(value).toLowerCase().replace(/[^a-z0-9]/g, '').replace(/unitedstatesofamerica/g, 'unitedstates');
 
 const collection = feature(world as any, (world as any).objects.countries) as any;
 const countries = collection.features as any[];
