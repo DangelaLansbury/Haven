@@ -8,7 +8,9 @@ type WorldMapProps = {
   highlightedCountries?: Array<string | number>;
   /** Kept as an alias for existing callers. */
   highlightedIds?: Array<string | number>;
+  candidateCountries?: Array<string | number>;
   defaultFill?: string;
+  candidateFill?: string;
   highlightFill?: string;
   dotRadius?: number;
   highlightedDotRadius?: number;
@@ -19,8 +21,8 @@ const EMPTY_HIGHLIGHTS: Array<string | number> = [];
 const normalizeCountry = (value: string | number) =>
   String(value)
     .toLowerCase()
-    .replace(/unitedstatesofamerica/g, 'unitedstates')
-    .replace(/[^a-z0-9]/g, '');
+    .replace(/[^a-z0-9]/g, '')
+    .replace(/unitedstatesofamerica/g, 'unitedstates');
 
 const coordinatePath = (coordinates: readonly number[], radius: number) => {
   let path = '';
@@ -37,21 +39,27 @@ export const WorldMap = React.memo(function WorldMap({
   height,
   highlightedCountries = EMPTY_HIGHLIGHTS,
   highlightedIds = EMPTY_HIGHLIGHTS,
+  candidateCountries = EMPTY_HIGHLIGHTS,
   defaultFill = '#d1d5db',
+  candidateFill = '#6b7280',
   highlightFill = '#f59e0b',
   dotRadius = 1.8,
   highlightedDotRadius = 3.2,
 }: WorldMapProps) {
   const highlighted = useMemo(() => new Set([...highlightedCountries, ...highlightedIds].map(normalizeCountry)), [highlightedCountries, highlightedIds]);
+  const candidates = useMemo(() => new Set(candidateCountries.map(normalizeCountry)), [candidateCountries]);
 
-  const { defaultPath, highlightedPath } = useMemo(() => {
+  const { defaultPath, candidatePath, highlightedPath } = useMemo(() => {
     let normal = '';
+    let candidate = '';
     let active = '';
     const countriesWithDots = new Set<string>();
 
     WORLD_MAP_DOT_GROUPS.forEach(([country, countryId, coordinates]) => {
-      countriesWithDots.add(country);
-      if (highlighted.has(country) || highlighted.has(countryId)) active += coordinatePath(coordinates, highlightedDotRadius);
+      const canonicalCountry = normalizeCountry(country);
+      countriesWithDots.add(canonicalCountry);
+      if (highlighted.has(canonicalCountry) || highlighted.has(countryId)) active += coordinatePath(coordinates, highlightedDotRadius);
+      else if (candidates.has(canonicalCountry) || candidates.has(countryId)) candidate += coordinatePath(coordinates, dotRadius);
       else normal += coordinatePath(coordinates, dotRadius);
     });
 
@@ -61,13 +69,21 @@ export const WorldMap = React.memo(function WorldMap({
       active += coordinatePath(marker, highlightedDotRadius);
     });
 
-    return { defaultPath: normal, highlightedPath: active };
-  }, [dotRadius, highlighted, highlightedDotRadius]);
+    candidates.forEach((country) => {
+      if (highlighted.has(country)) return;
+      const marker = WORLD_MAP_MARKERS[country];
+      if (!marker || countriesWithDots.has(country)) return;
+      candidate += coordinatePath(marker, dotRadius);
+    });
+
+    return { defaultPath: normal, candidatePath: candidate, highlightedPath: active };
+  }, [candidates, dotRadius, highlighted, highlightedDotRadius]);
 
   return (
     <svg role="img" aria-label={`Dot matrix world map${highlighted.size ? ` highlighting ${highlightedCountries.join(', ')}` : ''}`} viewBox={`0 0 ${WORLD_MAP_WIDTH} ${WORLD_MAP_HEIGHT}`} width={width} height={height} style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
-      <title>World map with highlighted optimization jurisdictions</title>
+      <title>World map with excluded candidate jurisdictions in dark grey and optimized jurisdictions highlighted</title>
       <path d={defaultPath} fill={defaultFill} />
+      <path d={candidatePath} fill={candidateFill} />
       <path d={highlightedPath} fill={highlightFill} />
     </svg>
   );

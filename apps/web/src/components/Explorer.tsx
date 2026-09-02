@@ -72,6 +72,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
   const isUsOnly = React.useMemo(() => blend.scenario === OptimizationScenario.usOnly, [blend.scenario]);
   const displayedRate = isUsOnly ? taxBreakdown.totalTaxRate : foreignTaxRate;
   const highlightedCountries = React.useMemo(() => blend.allocations.map(({ country }) => country), [blend.allocations]);
+  const candidateCountries = React.useMemo(() => formData.countries ?? [], [formData.countries]);
 
   return (
     <motion.div
@@ -129,7 +130,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
         </div>
       </div>
       <figure className={explorerStyles.mapPanel}>
-        <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} highlightFill="var(--haven-green)" />
+        <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} highlightFill="var(--haven-green)" />
       </figure>
       <div className={explorerStyles.rightSide}>
         <RemittanceChart breakdown={taxBreakdown} isUsOnly={isUsOnly} />
