@@ -85,7 +85,10 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
         },
       }}
     >
-      <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '30rem' }}>
+      <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '34rem' }}>
+        <figure className={explorerStyles.mapPanel}>
+          <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} highlightFill="var(--haven-green)" />
+        </figure>
         {/* Revenue */}
         <div>
           {`Revenue: `}
@@ -129,9 +132,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
           )}
         </div>
       </div>
-      <figure className={explorerStyles.mapPanel}>
-        <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} highlightFill="var(--haven-green)" />
-      </figure>
+
       <div className={explorerStyles.rightSide}>
         <RemittanceChart breakdown={taxBreakdown} isUsOnly={isUsOnly} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
