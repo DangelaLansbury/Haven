@@ -95,9 +95,7 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ breakdown, isU
                 animate={{ y: y(end), height: Math.max(0, segmentHeight) }}
                 transition={{ duration: 0.5, ease: 'easeInOut' }}
               >
-                <title>
-                  {segment.label}: {d3.format('.2%')(value)}
-                </title>
+                <title>{`${segment.label}: ${d3.format('.2%')(value)}`}</title>
               </motion.rect>
               {segmentHeight >= 18 && (
                 <motion.text

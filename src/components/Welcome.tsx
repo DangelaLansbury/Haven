@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import welcomeStyles from '../css/Welcome.module.css';
 
 interface WelcomeProps {
-  setScreen: (screen: 'explorer' | 'ocr') => void;
+  setScreen: (screen: 'explorer') => void;
 }
 
-const WelcomeScreen: React.FC<WelcomeProps> = ({ title, setScreen }) => {
+const WelcomeScreen: React.FC<WelcomeProps> = ({ setScreen }) => {
   const [isExiting, setIsExiting] = React.useState(false);
   const [isNCTIInfoExpanded, setIsNCTIInfoExpanded] = React.useState(false);
 

@@ -2,14 +2,14 @@ import React from 'react';
 import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
 import { FormTableRow } from './FormInput';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import { FormFields, DefaultFormFields } from '../types';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { matchToCountryEnum } from '../utils';
 
 // duration: 0.3, ease: [0.48, 0, 0.62, 1]
 
-const mainCardVariants = {
+const mainCardVariants: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: {
     opacity: 1,
@@ -21,7 +21,7 @@ const mainCardVariants = {
   },
 };
 
-const sideCardVariants = {
+const sideCardVariants: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: {
     opacity: 1,
@@ -48,10 +48,10 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, setScreen, ses
         <div className={commonStyles.header}>{'Scan the QR code'}</div>
         <div className={commonStyles.description}>We'll populate your tax details automatically.</div>
         <div style={{ padding: '2rem 0.25rem' }}>
-          <QRCode value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#151515'} bgColor={'#fffefb'} size={144} />
+          <QRCodeSVG value={`${window.location.origin}/upload?sessionId=${sessionId}`} fgColor={'#151515'} bgColor={'#fffefb'} size={144} />
         </div>
         <div>
-          <button className={commonStyles.secondaryButton} style={{ width: '100%' }} onClick={() => setScreen && setScreen('explorer')}>
+          <button style={{ width: '100%' }} onClick={() => setScreen && setScreen('explorer')}>
             Skip to results
           </button>
         </div>

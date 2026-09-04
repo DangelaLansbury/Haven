@@ -4,7 +4,7 @@ import cameraStyles from '../css/Camera.module.css';
 import commonStyles from '../css/Common.module.css';
 
 interface CameraProps {
-  onCapture: (imageSrc: string) => void;
+  onCapture: React.ChangeEventHandler<HTMLInputElement>;
   OCRReady: boolean;
   fileAdded?: boolean;
   error?: string;
@@ -14,7 +14,7 @@ function Camera({ onCapture, OCRReady, fileAdded, error }: CameraProps) {
   return (
     <div className={cameraStyles.cameraContainer}>
       <div className={cameraStyles.overlay}>
-        <>{error && <div className={commonStyles.error}>{error}</div>}</>
+        <>{error && <div>{error}</div>}</>
         {!OCRReady ? (
           <>
             {!fileAdded ? (

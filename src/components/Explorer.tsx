@@ -1,7 +1,6 @@
 import React from 'react';
-import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
-import { FormFields, DefaultMockData, OptimizationResult, OptimizationScenario } from '../types';
+import { CountryNames, OptimizationResult, OptimizationScenario } from '../types';
 import { formatDollars } from '../utils';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
@@ -9,37 +8,23 @@ import { motion } from 'framer-motion';
 import NumberFlow from '@number-flow/react';
 import { WorldMap } from './Map';
 
+const NUMBER_FLOW_TIMING: EffectTiming = { duration: 300 };
+
 interface ExplorerProps {
-  formData: FormFields;
-  setFormData: React.Dispatch<React.SetStateAction<FormFields>>;
+  countries: CountryNames[];
+  revenue: number;
   presetBlends: Record<OptimizationScenario, OptimizationResult>;
   optLevel: OptimizationScenario;
   setOptLevel: React.Dispatch<React.SetStateAction<OptimizationScenario>>;
 }
 
-const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends, optLevel, setOptLevel }: ExplorerProps) => {
-  const initialRevenue = formData.revenue && !isNaN(formData.revenue) ? formData.revenue : DefaultMockData.revenue;
-  const [revenue, setRevenue] = React.useState<number>(initialRevenue);
-
+const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, optLevel, setOptLevel }: ExplorerProps) => {
   const defaultOptLevel = OptimizationScenario.unconstrained;
   const [tempOptLevel, setTempOptLevel] = React.useState<OptimizationScenario | null>(null);
   const [selectedOptLevel, setSelectedOptLevel] = React.useState<OptimizationScenario | null>(null);
 
-  React.useEffect(() => {
-    if (formData.revenue !== revenue) {
-      setRevenue(formData.revenue);
-    }
-  }, [formData.revenue]);
-
   const activeOptLevel = tempOptLevel ?? selectedOptLevel ?? optLevel;
   const blend = presetBlends[activeOptLevel];
-
-  function handleRevenueChange(value: number) {
-    setFormData((prev: FormFields) => ({
-      ...prev,
-      revenue: value,
-    }));
-  }
 
   function handleOptLevelMouseEnter(event: React.MouseEvent<HTMLButtonElement>) {
     const level = event.currentTarget.value as OptimizationScenario;
@@ -72,7 +57,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
   const isUsOnly = React.useMemo(() => blend.scenario === OptimizationScenario.usOnly, [blend.scenario]);
   const displayedRate = isUsOnly ? taxBreakdown.totalTaxRate : foreignTaxRate;
   const highlightedCountries = React.useMemo(() => blend.allocations.map(({ country }) => country), [blend.allocations]);
-  const candidateCountries = React.useMemo(() => formData.countries ?? [], [formData.countries]);
+  const candidateCountries = React.useMemo(() => countries, [countries]);
 
   return (
     <motion.div
@@ -92,7 +77,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
         {/* Revenue */}
         <div>
           {`Revenue: `}
-          <NumberFlow value={formatDollars(revenue).value} duration={300} format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }} suffix={formatDollars(revenue).suffix} />
+          <NumberFlow value={formatDollars(revenue).value} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }} suffix={formatDollars(revenue).suffix} />
         </div>
 
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.unconstrained}>
@@ -105,7 +90,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
           Tax at US Rate
         </button>
 
-        <div>{formData.countries.join(', ')}</div>
+        <div>{countries.join(', ')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
           {blend.allocations.length > 0 && (
             <ul>
@@ -137,7 +122,7 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
         <RemittanceChart breakdown={taxBreakdown} isUsOnly={isUsOnly} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
           <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600 }}>
-            <NumberFlow value={displayedRate} duration={300} format={{ style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
+            <NumberFlow value={displayedRate} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
           </div>
           <div style={{ fontSize: 'var(--font-xs)' }}>{isUsOnly ? 'U.S. corporate tax rate' : 'Blended foreign tax rate'}</div>
         </div>
@@ -147,23 +132,23 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
               <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
                 <NumberFlow
                   value={formatDollars(taxBreakdown.foreignTaxAmount).value}
-                  format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
-                  duration={300}
+                  format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }}
+                  transformTiming={NUMBER_FLOW_TIMING}
                   suffix={formatDollars(taxBreakdown.foreignTaxAmount).suffix}
                 />
                 <span className={explorerStyles.topupPenalty}>{' + '}</span>
                 <NumberFlow
                   value={formatDollars(topUpAmount).value}
-                  format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
-                  duration={300}
+                  format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }}
+                  transformTiming={NUMBER_FLOW_TIMING}
                   suffix={formatDollars(topUpAmount).suffix}
                   className={explorerStyles.topupPenalty}
                 />
                 <span>{' = '}</span>
                 <NumberFlow
                   value={formatDollars(taxBreakdown.totalTaxAmount).value}
-                  format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
-                  duration={300}
+                  format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }}
+                  transformTiming={NUMBER_FLOW_TIMING}
                   suffix={formatDollars(taxBreakdown.totalTaxAmount).suffix}
                 />
               </div>
@@ -177,8 +162,8 @@ const Explorer: React.FC<ExplorerProps> = ({ formData, setFormData, presetBlends
               <div style={{ fontSize: 'var(--font-md)', fontWeight: 600, marginTop: '0.5rem' }}>
                 <NumberFlow
                   value={formatDollars(taxBreakdown.totalTaxAmount).value}
-                  format={{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }}
-                  duration={300}
+                  format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }}
+                  transformTiming={NUMBER_FLOW_TIMING}
                   suffix={formatDollars(taxBreakdown.totalTaxAmount).suffix}
                 />
               </div>

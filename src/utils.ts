@@ -1,9 +1,4 @@
-import * as fuzz from 'fuzzball';
-import { CountryAllocation, CountryNames, Countries, DEFAULT_TAX_REGIME, DefaultMockData, DollarValue, OptimizationResult, OptimizationScenario, TaxBreakdown, TaxRegime } from './types';
-
-export const formatPercentage = (value: number): number => {
-  return Math.round(value * 100) / 100;
-};
+import { CountryAllocation, CountryNames, Countries, DEFAULT_TAX_REGIME, DollarValue, OptimizationResult, OptimizationScenario, TaxBreakdown, TaxRegime } from './types';
 
 export const formatDollars = (amount: number): DollarValue => {
   if (amount > 1000000000) {
@@ -23,6 +18,11 @@ export const formatDollars = (amount: number): DollarValue => {
     };
   }
 };
+
+export function matchToCountryEnum(countryString: string): CountryNames | null {
+  const normalizedInput = countryString.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return Object.values(CountryNames).find((country) => country.toLowerCase().replace(/[^a-z0-9]/g, '') === normalizedInput) ?? null;
+}
 
 export const calculateTaxBreakdown = (foreignTaxRate: number, revenue: number, regime: TaxRegime = DEFAULT_TAX_REGIME): TaxBreakdown => {
   const safeForeignTaxRate = Math.max(0, Number.isFinite(foreignTaxRate) ? foreignTaxRate : 0);
@@ -53,24 +53,6 @@ export const calculateTaxBreakdown = (foreignTaxRate: number, revenue: number, r
     noTopUpForeignRate: usLiabilityRate / regime.deemedPaidCreditRate,
   };
 };
-
-export const calcTotalETR = (ftr: number): { ftc: number; topUp: number; etr: number } => {
-  const result = calculateTaxBreakdown(ftr, 1);
-  return { ftc: result.potentialFtcRate, topUp: result.topUpRate, etr: result.totalTaxRate };
-};
-
-export function matchToCountryEnum(countryString: string): CountryNames | null {
-  const normString = countryString.trim().toLowerCase();
-  const threshold = 80;
-  for (const key of Object.keys(CountryNames)) {
-    const enumValue = CountryNames[key as keyof typeof CountryNames];
-    const match = fuzz.ratio(enumValue, normString);
-    if (match >= threshold) {
-      return enumValue as CountryNames;
-    }
-  }
-  return null;
-}
 
 type Candidate = { country: CountryNames; taxRate: number };
 
@@ -168,5 +150,3 @@ export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, sc
     targetWasReachable,
   };
 };
-
-export const makeDefaultBlend = (): OptimizationResult => optimizeBlend(DefaultMockData.countries ?? [], DefaultMockData.revenue, OptimizationScenario.unconstrained);

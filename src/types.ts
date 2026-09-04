@@ -1,3 +1,8 @@
+export interface ExplorerData {
+  revenue: number;
+  countries: CountryNames[];
+}
+
 export interface FormFields {
   sessionId: string;
   data: string;
@@ -33,7 +38,7 @@ export enum CountryNames {
   caymanislands = 'Cayman Islands',
 }
 
-export const Countries: Record<string, Country> = {
+export const Countries: Record<CountryNames, Country> = {
   [CountryNames.australia]: { name: 'australia', rate: 0.3 },
   [CountryNames.barbados]: { name: 'barbados', rate: 0.055 },
   [CountryNames.cyprus]: { name: 'cyprus', rate: 0.15 },
@@ -50,18 +55,16 @@ export const Countries: Record<string, Country> = {
   [CountryNames.unitedstates]: { name: 'unitedstates', rate: 0.21 },
 };
 
+export const DefaultMockData: ExplorerData = {
+  revenue: 250000000000, // $250 billion
+  countries: [CountryNames.caymanislands, CountryNames.germany, CountryNames.japan, CountryNames.unitedkingdom, CountryNames.singapore, CountryNames.australia, CountryNames.hungary, CountryNames.barbados, CountryNames.unitedstates],
+};
+
 export const DefaultFormFields = {
   sessionId: '',
   data: '',
-  revenue: '250,000,000,000.00', // $250 billion
+  revenue: '250,000,000,000.00',
   countries: [CountryNames.switzerland, CountryNames.japan, CountryNames.ireland, CountryNames.unitedkingdom, CountryNames.caymanislands, CountryNames.netherlands],
-};
-
-export const DefaultMockData: FormFields = {
-  sessionId: '',
-  data: '',
-  revenue: 250000000000, // $250 billion
-  countries: [CountryNames.caymanislands, CountryNames.germany, CountryNames.japan, CountryNames.unitedkingdom, CountryNames.singapore, CountryNames.australia, CountryNames.hungary, CountryNames.barbados, CountryNames.unitedstates],
 };
 
 export interface CountryAllocation {
@@ -112,11 +115,6 @@ export interface DollarValue {
   value: number;
   suffix: string;
 }
-
-export const MIN_REVENUE = 500000000; // $500 million
-export const MAX_REVENUE = 350000000000; // $350 billion
-export const MIN_FTR = 0; // 0%
-export const MAX_FTR = 1; // 100%
 
 export const CURRENT_NCTI_REGIME: TaxRegime = {
   id: '2026-ncti',

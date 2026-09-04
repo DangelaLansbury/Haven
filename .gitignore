@@ -1,9 +1,6 @@
 node_modules/
-.bun/
 dist/
-apps/*/dist/
 .env
 .env.*
 .DS_Store
 Thumbs.db
-bun.lockb
