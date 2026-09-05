@@ -7,6 +7,7 @@ import explorerStyles from '../css/Explorer.module.css';
 import { motion } from 'framer-motion';
 import NumberFlow from '@number-flow/react';
 import { WorldMap } from './Map';
+import formStyles from '../css/Form.module.css';
 
 const NUMBER_FLOW_TIMING: EffectTiming = { duration: 300 };
 
@@ -93,13 +94,13 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, o
         <div>{countries.join(', ')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
           {blend.allocations.length > 0 && (
-            <ul>
+            <div className={formStyles.formSection}>
               {blend.allocations.map(({ country, share, taxRate }) => (
-                <li key={country}>
+                <div className={formStyles.formGroup} key={country}>
                   {country}: {(share * 100).toFixed(1)}% at {(taxRate * 100).toFixed(1)}%
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
           {!isUsOnly && (
             <>
