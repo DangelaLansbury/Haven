@@ -14,7 +14,7 @@
   justify-content: center;
   padding: 1rem;
   width: 100%;
-  max-width: calc(200px + 2rem);
+  max-width: calc(340px + 2rem);
 }
 
 .mapPanel {
@@ -76,18 +76,21 @@
   stroke: var(--haven-green);
   stroke-dasharray: 4 3;
   stroke-width: 1.5;
+  z-index: 10;
 }
 
 .giltiRateLine {
   stroke: red;
   stroke-dasharray: 4 3;
   stroke-width: 1.25;
+  z-index: 10;
 }
 
 .usRateLine {
   stroke: var(--gray-650);
   stroke-dasharray: 2 3;
   stroke-width: 1;
+  z-index: 10;
 }
 
 .segmentLabel {
@@ -95,6 +98,12 @@
   font-size: 7px;
   font-weight: 600;
   pointer-events: none;
+}
+
+.scenarioLabel {
+  fill: var(--gray-650);
+  font-size: 8px;
+  font-weight: 500;
 }
 
 .chartCaption {

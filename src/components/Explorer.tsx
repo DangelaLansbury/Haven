@@ -120,7 +120,7 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, o
       </div>
 
       <div className={explorerStyles.rightSide}>
-        <RemittanceChart breakdown={taxBreakdown} isUsOnly={isUsOnly} />
+        <RemittanceChart blends={presetBlends} activeScenario={activeOptLevel} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
           <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600 }}>
             <NumberFlow value={displayedRate} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
