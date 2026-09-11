@@ -91,7 +91,6 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, o
           Tax at US Rate
         </button>
 
-        <div>{countries.join(', ')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
           {blend.allocations.length > 0 && (
             <div className={formStyles.formSection}>
@@ -100,6 +99,16 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, o
                   {country}: {(share * 100).toFixed(1)}% at {(taxRate * 100).toFixed(1)}%
                 </div>
               ))}
+              {countries.map((country) => {
+                if (!blend.allocations.some((allocation) => allocation.country === country)) {
+                  return (
+                    <div className={formStyles.formGroup} key={country}>
+                      {country}: 0%
+                    </div>
+                  );
+                }
+                return null;
+              })}
             </div>
           )}
           {!isUsOnly && (
