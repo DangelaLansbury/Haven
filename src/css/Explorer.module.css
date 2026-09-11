@@ -62,7 +62,7 @@
 }
 
 .gridLine {
-  stroke: var(--gray-200);
+  stroke: var(--gray-100);
   stroke-width: 1;
 }
 
