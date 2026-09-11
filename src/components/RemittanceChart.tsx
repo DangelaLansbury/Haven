@@ -104,11 +104,6 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ blends, active
                     <rect className={segment.className} x={0} y={y(end)} width={x.bandwidth()} height={Math.max(0, segmentHeight)}>
                       <title>{`${segment.label}: ${d3.format('.2%')(value)}`}</title>
                     </rect>
-                    {isActive && segmentHeight >= 18 && (
-                      <text className={chartStyles.segmentLabel} x={x.bandwidth() / 2} y={y(end) + segmentHeight / 2} textAnchor="middle" dominantBaseline="middle">
-                        {segment.label} {d3.format('.2%')(value)}
-                      </text>
-                    )}
                   </g>
                 );
               })}
