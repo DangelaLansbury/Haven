@@ -1,5 +1,6 @@
 export interface ExplorerData {
   revenue: number;
+  profitMargin: number;
   countries: CountryNames[];
 }
 
@@ -7,6 +8,7 @@ export interface FormFields {
   sessionId: string;
   data: string;
   revenue: number;
+  profitMargin?: number;
   countries?: CountryNames[];
 }
 
@@ -57,6 +59,7 @@ export const Countries: Record<CountryNames, Country> = {
 
 export const DefaultMockData: ExplorerData = {
   revenue: 250000000000, // $250 billion
+  profitMargin: 0.2, // Illustrative 20% margin: $50 billion of profit
   countries: [CountryNames.caymanislands, CountryNames.germany, CountryNames.japan, CountryNames.unitedkingdom, CountryNames.singapore, CountryNames.australia, CountryNames.hungary, CountryNames.barbados, CountryNames.unitedstates],
 };
 
@@ -92,6 +95,7 @@ export interface TaxRegime {
 }
 
 export interface TaxBreakdown {
+  taxableProfit: number;
   foreignTaxRate: number;
   foreignTaxAmount: number;
   potentialFtcRate: number;

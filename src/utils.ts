@@ -24,9 +24,15 @@ export function matchToCountryEnum(countryString: string): CountryNames | null {
   return Object.values(CountryNames).find((country) => country.toLowerCase().replace(/[^a-z0-9]/g, '') === normalizedInput) ?? null;
 }
 
-export const calculateTaxBreakdown = (foreignTaxRate: number, revenue: number, regime: TaxRegime = DEFAULT_TAX_REGIME): TaxBreakdown => {
-  const safeForeignTaxRate = Math.max(0, Number.isFinite(foreignTaxRate) ? foreignTaxRate : 0);
+export const calculateProfit = (revenue: number, profitMargin: number): number => {
   const safeRevenue = Math.max(0, Number.isFinite(revenue) ? revenue : 0);
+  const safeProfitMargin = Math.min(1, Math.max(0, Number.isFinite(profitMargin) ? profitMargin : 0));
+  return safeRevenue * safeProfitMargin;
+};
+
+export const calculateTaxBreakdown = (foreignTaxRate: number, profit: number, regime: TaxRegime = DEFAULT_TAX_REGIME): TaxBreakdown => {
+  const safeForeignTaxRate = Math.max(0, Number.isFinite(foreignTaxRate) ? foreignTaxRate : 0);
+  const safeProfit = Math.max(0, Number.isFinite(profit) ? profit : 0);
   const usLiabilityRate = regime.corporateRate * (1 - regime.section250DeductionRate);
   const potentialFtcRate = safeForeignTaxRate * regime.deemedPaidCreditRate;
   const usedFtcRate = Math.min(potentialFtcRate, usLiabilityRate);
@@ -36,20 +42,21 @@ export const calculateTaxBreakdown = (foreignTaxRate: number, revenue: number, r
   const totalTaxRate = safeForeignTaxRate + topUpRate;
 
   return {
+    taxableProfit: safeProfit,
     foreignTaxRate: safeForeignTaxRate,
-    foreignTaxAmount: safeForeignTaxRate * safeRevenue,
+    foreignTaxAmount: safeForeignTaxRate * safeProfit,
     potentialFtcRate,
     usedFtcRate,
-    usedFtcAmount: usedFtcRate * safeRevenue,
+    usedFtcAmount: usedFtcRate * safeProfit,
     haircutRate,
-    haircutAmount: haircutRate * safeRevenue,
+    haircutAmount: haircutRate * safeProfit,
     excessFtcRate,
-    excessFtcAmount: excessFtcRate * safeRevenue,
+    excessFtcAmount: excessFtcRate * safeProfit,
     usLiabilityRate,
     topUpRate,
-    topUpAmount: topUpRate * safeRevenue,
+    topUpAmount: topUpRate * safeProfit,
     totalTaxRate,
-    totalTaxAmount: totalTaxRate * safeRevenue,
+    totalTaxAmount: totalTaxRate * safeProfit,
     noTopUpForeignRate: usLiabilityRate / regime.deemedPaidCreditRate,
   };
 };
@@ -91,14 +98,15 @@ const allocateFtcEfficient = (candidates: Candidate[], targetRate: number): { al
   };
 };
 
-const createUsOnlyResult = (revenue: number, regime: TaxRegime): OptimizationResult => {
+const createUsOnlyResult = (profit: number, regime: TaxRegime): OptimizationResult => {
   const taxRate = regime.corporateRate;
-  const taxAmount = taxRate * revenue;
+  const taxAmount = taxRate * profit;
   return {
     scenario: OptimizationScenario.usOnly,
     allocations: [toAllocation({ country: CountryNames.unitedstates, taxRate }, 1)],
     foreignTaxRate: 0,
     taxBreakdown: {
+      taxableProfit: profit,
       foreignTaxRate: 0,
       foreignTaxAmount: 0,
       potentialFtcRate: 0,
@@ -118,12 +126,12 @@ const createUsOnlyResult = (revenue: number, regime: TaxRegime): OptimizationRes
   };
 };
 
-export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, scenario: OptimizationScenario, regime: TaxRegime = DEFAULT_TAX_REGIME): OptimizationResult => {
-  if (!Number.isFinite(revenue) || revenue <= 0) throw new Error('Revenue must be greater than zero.');
-  if (scenario === OptimizationScenario.usOnly) return createUsOnlyResult(revenue, regime);
+export const optimizeBlend = (jurisdictions: CountryNames[], profit: number, scenario: OptimizationScenario, regime: TaxRegime = DEFAULT_TAX_REGIME): OptimizationResult => {
+  if (!Number.isFinite(profit) || profit <= 0) throw new Error('Profit must be greater than zero.');
+  if (scenario === OptimizationScenario.usOnly) return createUsOnlyResult(profit, regime);
 
   const candidates = prepareCandidates(jurisdictions);
-  if (candidates.length === 0) return createUsOnlyResult(revenue, regime);
+  if (candidates.length === 0) return createUsOnlyResult(profit, regime);
 
   const usLiabilityRate = regime.corporateRate * (1 - regime.section250DeductionRate);
   const noTopUpRate = usLiabilityRate / regime.deemedPaidCreditRate;
@@ -145,7 +153,7 @@ export const optimizeBlend = (jurisdictions: CountryNames[], revenue: number, sc
     scenario,
     allocations,
     foreignTaxRate,
-    taxBreakdown: calculateTaxBreakdown(foreignTaxRate, revenue, regime),
+    taxBreakdown: calculateTaxBreakdown(foreignTaxRate, profit, regime),
     targetRate,
     targetWasReachable,
   };

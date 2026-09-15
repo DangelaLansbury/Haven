@@ -3,20 +3,21 @@ import Explorer from './components/Explorer';
 import WelcomeScreen from './components/Welcome';
 import commonStyles from './css/Common.module.css';
 import { CountryNames, DefaultMockData, OptimizationResult, OptimizationScenario } from './types';
-import { optimizeBlend } from './utils';
+import { calculateProfit, optimizeBlend } from './utils';
 
 const App = () => {
   const [screen, setScreen] = useState<'initial' | 'explorer'>('initial');
   const [optLevel, setOptLevel] = useState<OptimizationScenario>(OptimizationScenario.unconstrained);
-  const { countries, revenue } = DefaultMockData;
+  const { countries, revenue, profitMargin } = DefaultMockData;
+  const profit = calculateProfit(revenue, profitMargin);
 
   const presetBlends = useMemo<Record<OptimizationScenario, OptimizationResult>>(
     () => ({
-      [OptimizationScenario.unconstrained]: optimizeBlend(countries, revenue, OptimizationScenario.unconstrained),
-      [OptimizationScenario.ftcEfficient]: optimizeBlend(countries, revenue, OptimizationScenario.ftcEfficient),
-      [OptimizationScenario.usOnly]: optimizeBlend([CountryNames.unitedstates], revenue, OptimizationScenario.usOnly),
+      [OptimizationScenario.unconstrained]: optimizeBlend(countries, profit, OptimizationScenario.unconstrained),
+      [OptimizationScenario.ftcEfficient]: optimizeBlend(countries, profit, OptimizationScenario.ftcEfficient),
+      [OptimizationScenario.usOnly]: optimizeBlend([CountryNames.unitedstates], profit, OptimizationScenario.usOnly),
     }),
-    [countries, revenue],
+    [countries, profit],
   );
 
   return (
@@ -29,7 +30,7 @@ const App = () => {
       {screen === 'initial' ? (
         <WelcomeScreen setScreen={setScreen} />
       ) : (
-        <Explorer countries={countries} revenue={revenue} presetBlends={presetBlends} optLevel={optLevel} setOptLevel={setOptLevel} />
+        <Explorer countries={countries} revenue={revenue} profit={profit} profitMargin={profitMargin} presetBlends={presetBlends} optLevel={optLevel} setOptLevel={setOptLevel} />
       )}
     </>
   );

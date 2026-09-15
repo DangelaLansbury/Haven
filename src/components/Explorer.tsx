@@ -14,12 +14,14 @@ const NUMBER_FLOW_TIMING: EffectTiming = { duration: 300 };
 interface ExplorerProps {
   countries: CountryNames[];
   revenue: number;
+  profit: number;
+  profitMargin: number;
   presetBlends: Record<OptimizationScenario, OptimizationResult>;
   optLevel: OptimizationScenario;
   setOptLevel: React.Dispatch<React.SetStateAction<OptimizationScenario>>;
 }
 
-const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, optLevel, setOptLevel }: ExplorerProps) => {
+const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitMargin, presetBlends, optLevel, setOptLevel }: ExplorerProps) => {
   const defaultOptLevel = OptimizationScenario.unconstrained;
   const [tempOptLevel, setTempOptLevel] = React.useState<OptimizationScenario | null>(null);
   const [selectedOptLevel, setSelectedOptLevel] = React.useState<OptimizationScenario | null>(null);
@@ -75,10 +77,17 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, o
         <figure className={explorerStyles.mapPanel}>
           <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} highlightFill="var(--haven-green)" />
         </figure>
-        {/* Revenue */}
         <div>
           {`Revenue: `}
           <NumberFlow value={formatDollars(revenue).value} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }} suffix={formatDollars(revenue).suffix} />
+        </div>
+        <div>
+          {`Profit margin: `}
+          <NumberFlow value={profitMargin} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 1 }} />
+        </div>
+        <div>
+          {`Taxable profit: `}
+          <NumberFlow value={formatDollars(profit).value} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }} suffix={formatDollars(profit).suffix} />
         </div>
 
         <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.unconstrained}>
@@ -96,7 +105,7 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, o
             <div className={formStyles.formSection}>
               {blend.allocations.map(({ country, share, taxRate }) => (
                 <div className={formStyles.formGroup} key={country}>
-                  {country}: {(share * 100).toFixed(1)}% at {(taxRate * 100).toFixed(1)}%
+                  {country}: {(share * 100).toFixed(1)}% of profit at {(taxRate * 100).toFixed(1)}%
                 </div>
               ))}
               {countries.map((country) => {
@@ -110,17 +119,6 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, presetBlends, o
                 return null;
               })}
             </div>
-          )}
-          {!isUsOnly && (
-            <>
-              <div style={{ fontSize: 'var(--font-xxs)' }}>
-                A company in {blend.allocations[0].country} would own the IP and sell it to companies operating in other jurisdictions, which would pay royalties to the IP owner. The royalties are taxed at the statutory rate of the IP
-                owner's jurisdiction, and the U.S. parent company pays a top-up tax on the difference between the U.S. corporate rate and the foreign tax credit.
-              </div>
-              <div
-                style={{ fontSize: 'var(--font-xxs)' }}
-              >{`Customers in country of operation -> Company A books sales revenue -> Company A pays royalties to IP owner in low-tax jurisdiction -> IP owner remits tax -> U.S. parent pays top-up tax if applicable.`}</div>
-            </>
           )}
           {blend.scenario === OptimizationScenario.ftcEfficient && blend.targetWasReachable === false && (
             <div style={{ fontSize: 'var(--font-xxs)', marginTop: '0.5rem' }}>The selected jurisdictions cannot reach the 14% target; the closest available rate is shown.</div>
