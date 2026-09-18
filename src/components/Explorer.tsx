@@ -1,6 +1,6 @@
 import React from 'react';
 import commonStyles from '../css/Common.module.css';
-import { CountryNames, OptimizationResult, OptimizationScenario } from '../types';
+import { Countries, CountryNames, OptimizationResult, OptimizationScenario } from '../types';
 import { formatDollars } from '../utils';
 import { RemittanceChart } from './RemittanceChart';
 import explorerStyles from '../css/Explorer.module.css';
@@ -103,7 +103,7 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
           {blend.allocations.length > 0 && (
             <div className={formStyles.formSection}>
-              {blend.allocations.map(({ country, share, taxRate }) => (
+              {/* {blend.allocations.map(({ country, share, taxRate }) => (
                 <div className={formStyles.formGroup} key={country}>
                   {country}: {(share * 100).toFixed(1)}% of profit at {(taxRate * 100).toFixed(1)}%
                 </div>
@@ -117,6 +117,17 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
                   );
                 }
                 return null;
+              })} */}
+              {countries.map((country) => {
+                const allocation = blend.allocations.find((allocation) => allocation.country === country);
+                const share = allocation ? allocation.share : 0;
+                const taxRate = allocation ? allocation.taxRate : Countries[country].rate;
+
+                return (
+                  <div className={formStyles.formGroup} key={country}>
+                    {country}: {(share * 100).toFixed(1)}% of profit at {(taxRate * 100).toFixed(1)}%
+                  </div>
+                );
               })}
             </div>
           )}
