@@ -1,0 +1,9 @@
+.dots {
+  transition: stroke-width 220ms ease-in-out, stroke 220ms ease-in-out, opacity 220ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dots {
+    transition: none;
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import styles from '../css/Map.module.css';
 import { WORLD_MAP_DOT_GROUPS, WORLD_MAP_HEIGHT, WORLD_MAP_MARKERS, WORLD_MAP_WIDTH } from '../data/worldMapDots';
 
 type WorldMapProps = {
@@ -24,15 +25,26 @@ const normalizeCountry = (value: string | number) =>
     .replace(/[^a-z0-9]/g, '')
     .replace(/unitedstatesofamerica/g, 'unitedstates');
 
-const coordinatePath = (coordinates: readonly number[], radius: number) => {
+// Round caps turn zero-length segments into dots; stroke width controls their diameter.
+const coordinatePath = (coordinates: readonly number[]) => {
   let path = '';
   for (let index = 0; index < coordinates.length; index += 2) {
-    const x = coordinates[index];
-    const y = coordinates[index + 1];
-    path += `M${x - radius},${y}a${radius},${radius} 0 1,0 ${radius * 2},0a${radius},${radius} 0 1,0 -${radius * 2},0`;
+    path += `M${coordinates[index]},${coordinates[index + 1]}h0`;
   }
   return path;
 };
+
+const countriesWithDots = new Set(WORLD_MAP_DOT_GROUPS.map(([country]) => normalizeCountry(country)));
+const dotPaths = [
+  ...WORLD_MAP_DOT_GROUPS.map(([country, countryId, coordinates]) => ({
+    country: normalizeCountry(country), countryId, path: coordinatePath(coordinates), marker: false,
+  })),
+  ...Object.entries(WORLD_MAP_MARKERS)
+    .filter(([country]) => !countriesWithDots.has(country))
+    .map(([country, coordinates]) => ({
+      country, countryId: country, path: coordinatePath(coordinates), marker: true,
+    })),
+];
 
 export const WorldMap = React.memo(function WorldMap({
   width,
@@ -49,36 +61,6 @@ export const WorldMap = React.memo(function WorldMap({
   const highlighted = useMemo(() => new Set([...highlightedCountries, ...highlightedIds].map(normalizeCountry)), [highlightedCountries, highlightedIds]);
   const candidates = useMemo(() => new Set(candidateCountries.map(normalizeCountry)), [candidateCountries]);
 
-  const { defaultPath, candidatePath, highlightedPath } = useMemo(() => {
-    let normal = '';
-    let candidate = '';
-    let active = '';
-    const countriesWithDots = new Set<string>();
-
-    WORLD_MAP_DOT_GROUPS.forEach(([country, countryId, coordinates]) => {
-      const canonicalCountry = normalizeCountry(country);
-      countriesWithDots.add(canonicalCountry);
-      if (highlighted.has(canonicalCountry) || highlighted.has(countryId)) active += coordinatePath(coordinates, highlightedDotRadius);
-      else if (candidates.has(canonicalCountry) || candidates.has(countryId)) candidate += coordinatePath(coordinates, dotRadius);
-      else normal += coordinatePath(coordinates, dotRadius);
-    });
-
-    highlighted.forEach((country) => {
-      const marker = WORLD_MAP_MARKERS[country];
-      if (!marker || countriesWithDots.has(country)) return;
-      active += coordinatePath(marker, highlightedDotRadius);
-    });
-
-    candidates.forEach((country) => {
-      if (highlighted.has(country)) return;
-      const marker = WORLD_MAP_MARKERS[country];
-      if (!marker || countriesWithDots.has(country)) return;
-      candidate += coordinatePath(marker, dotRadius);
-    });
-
-    return { defaultPath: normal, candidatePath: candidate, highlightedPath: active };
-  }, [candidates, dotRadius, highlighted, highlightedDotRadius]);
-
   return (
     <svg
       role="img"
@@ -88,9 +70,23 @@ export const WorldMap = React.memo(function WorldMap({
       height={height}
       style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}
     >
-      <path d={defaultPath} fill={defaultFill} />
-      <path d={candidatePath} fill={candidateFill} />
-      <path d={highlightedPath} fill={highlightFill} />
+      {dotPaths.map(({ country, countryId, path, marker }) => {
+        const active = highlighted.has(country) || highlighted.has(countryId);
+        const candidate = candidates.has(country) || candidates.has(countryId);
+        const visible = !marker || active || candidate;
+        return (
+          <path
+            key={country}
+            className={styles.dots}
+            d={path}
+            fill="none"
+            strokeLinecap="round"
+            stroke={active ? highlightFill : candidate ? candidateFill : defaultFill}
+            strokeWidth={visible ? 2 * (active ? highlightedDotRadius : dotRadius) : 0}
+            opacity={visible ? 1 : 0}
+          />
+        );
+      })}
     </svg>
   );
 });
