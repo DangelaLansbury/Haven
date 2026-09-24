@@ -40,9 +40,9 @@ export const WorldMap = React.memo(function WorldMap({
   highlightedCountries = EMPTY_HIGHLIGHTS,
   highlightedIds = EMPTY_HIGHLIGHTS,
   candidateCountries = EMPTY_HIGHLIGHTS,
-  defaultFill = '#d1d5db',
-  candidateFill = '#6b7280',
-  highlightFill = '#f59e0b',
+  defaultFill = 'var(--gray-125)',
+  candidateFill = 'var(--gray-300)',
+  highlightFill = 'var(--haven-green)',
   dotRadius = 1.8,
   highlightedDotRadius = 3.2,
 }: WorldMapProps) {
@@ -80,8 +80,14 @@ export const WorldMap = React.memo(function WorldMap({
   }, [candidates, dotRadius, highlighted, highlightedDotRadius]);
 
   return (
-    <svg role="img" aria-label={`Dot matrix world map${highlighted.size ? ` highlighting ${highlightedCountries.join(', ')}` : ''}`} viewBox={`0 0 ${WORLD_MAP_WIDTH} ${WORLD_MAP_HEIGHT}`} width={width} height={height} style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
-      <title>World map with excluded candidate jurisdictions in dark grey and optimized jurisdictions highlighted</title>
+    <svg
+      role="img"
+      aria-label={`Dot matrix world map${highlighted.size ? ` highlighting ${highlightedCountries.join(', ')}` : ''}`}
+      viewBox={`0 0 ${WORLD_MAP_WIDTH} ${WORLD_MAP_HEIGHT}`}
+      width={width}
+      height={height}
+      style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}
+    >
       <path d={defaultPath} fill={defaultFill} />
       <path d={candidatePath} fill={candidateFill} />
       <path d={highlightedPath} fill={highlightFill} />
