@@ -75,7 +75,7 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
     >
       <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '32rem' }}>
         <figure className={explorerStyles.mapPanel}>
-          <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} highlightFill="var(--haven-green)" />
+          <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} />
         </figure>
         <div>
           {`Revenue: `}
