@@ -115,16 +115,6 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
           <NumberFlow value={formatDollars(profit).value} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }} suffix={formatDollars(profit).suffix} />
         </div>
 
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.unconstrained}>
-          Lowest current tax
-        </button>
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.ftcEfficient}>
-          FTC-efficient 14% blend
-        </button>
-        <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.usOnly}>
-          Tax at US Rate
-        </button>
-
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
           {blend.allocations.length > 0 && (
             <div className={formStyles.formSection}>
@@ -148,6 +138,17 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
       </motion.div>
 
       <motion.div variants={sideGraphVariants} initial="initial" animate="animate" className={explorerStyles.rightSide}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'flex-start', gap: '0.5rem', width: '100%', marginBottom: '0.75rem' }}>
+          <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.unconstrained}>
+            Lowest current tax
+          </button>
+          <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.ftcEfficient}>
+            FTC-efficient 14% blend
+          </button>
+          <button onMouseEnter={handleOptLevelMouseEnter} onMouseLeave={handleOptLevelMouseLeave} onClick={handleOptLevelClick} value={OptimizationScenario.usOnly}>
+            Tax at US Rate
+          </button>
+        </div>
         <RemittanceChart blends={presetBlends} activeScenario={activeOptLevel} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
           <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600 }}>
