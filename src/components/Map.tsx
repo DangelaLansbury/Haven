@@ -37,12 +37,18 @@ const coordinatePath = (coordinates: readonly number[]) => {
 const countriesWithDots = new Set(WORLD_MAP_DOT_GROUPS.map(([country]) => normalizeCountry(country)));
 const dotPaths = [
   ...WORLD_MAP_DOT_GROUPS.map(([country, countryId, coordinates]) => ({
-    country: normalizeCountry(country), countryId, path: coordinatePath(coordinates), marker: false,
+    country: normalizeCountry(country),
+    countryId,
+    path: coordinatePath(coordinates),
+    marker: false,
   })),
   ...Object.entries(WORLD_MAP_MARKERS)
     .filter(([country]) => !countriesWithDots.has(country))
     .map(([country, coordinates]) => ({
-      country, countryId: country, path: coordinatePath(coordinates), marker: true,
+      country,
+      countryId: country,
+      path: coordinatePath(coordinates),
+      marker: true,
     })),
 ];
 
@@ -55,8 +61,8 @@ export const WorldMap = React.memo(function WorldMap({
   defaultFill = 'var(--gray-125)',
   candidateFill = 'var(--gray-300)',
   highlightFill = 'var(--haven-green)',
-  dotRadius = 1.8,
-  highlightedDotRadius = 3.2,
+  dotRadius = 2,
+  highlightedDotRadius = 3.6,
 }: WorldMapProps) {
   const highlighted = useMemo(() => new Set([...highlightedCountries, ...highlightedIds].map(normalizeCountry)), [highlightedCountries, highlightedIds]);
   const candidates = useMemo(() => new Set(candidateCountries.map(normalizeCountry)), [candidateCountries]);
