@@ -44,7 +44,7 @@ export const Countries: Record<CountryNames, Country> = {
   [CountryNames.australia]: { name: 'australia', rate: 0.3 },
   [CountryNames.barbados]: { name: 'barbados', rate: 0.055 },
   [CountryNames.cyprus]: { name: 'cyprus', rate: 0.15 },
-  [CountryNames.caymanislands]: { name: 'caymanislands', rate: 0.001 },
+  [CountryNames.caymanislands]: { name: 'caymanislands', rate: 0.0 },
   [CountryNames.germany]: { name: 'germany', rate: 0.299 },
   [CountryNames.hungary]: { name: 'hungary', rate: 0.09 },
   [CountryNames.ireland]: { name: 'ireland', rate: 0.125 },

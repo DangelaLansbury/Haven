@@ -20,9 +20,9 @@ const SEGMENTS: Array<{ key: SegmentKey; label: string; className: string }> = [
   { key: 'domestic', label: 'U.S. corporate tax', className: chartStyles.chartDomestic },
 ];
 
-const WIDTH = 400;
-const HEIGHT = 300;
-const MARGIN = { top: 12, right: 108, bottom: 30, left: 24 };
+const WIDTH = 300;
+const HEIGHT = 200;
+const MARGIN = { top: 12, right: 8, bottom: 30, left: 24 };
 const INACTIVE_OPACITY = 0.15;
 const SCENARIOS = [OptimizationScenario.unconstrained, OptimizationScenario.ftcEfficient, OptimizationScenario.usOnly];
 const SCENARIO_LABELS: Record<OptimizationScenario, string> = {
@@ -111,7 +111,7 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ blends, active
           );
         })}
 
-        <line className={chartStyles.giltiRateLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(GILTI_RATE)} y2={y(GILTI_RATE)} />
+        {/* <line className={chartStyles.giltiRateLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(GILTI_RATE)} y2={y(GILTI_RATE)} />
         <text className={chartStyles.referenceLabel} x={plotRight + 6} y={y(GILTI_RATE) - 4}>
           NCTI liability {d3.format('.1%')(GILTI_RATE)}
         </text>
@@ -124,7 +124,7 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ blends, active
         <line className={chartStyles.usRateLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(US_TAX_RATE)} y2={y(US_TAX_RATE)} />
         <text className={chartStyles.referenceLabel} x={plotRight + 6} y={y(US_TAX_RATE) - 4}>
           U.S. rate 21%
-        </text>
+        </text> */}
 
         {SCENARIOS.map((scenario) => (
           <motion.text
