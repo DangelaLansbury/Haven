@@ -8,8 +8,33 @@ import { motion } from 'framer-motion';
 import NumberFlow from '@number-flow/react';
 import { WorldMap } from './Map';
 import formStyles from '../css/Form.module.css';
+import type { Variants } from 'framer-motion';
 
 const NUMBER_FLOW_TIMING: EffectTiming = { duration: 300 };
+
+const sideGraphVariants: Variants = {
+  initial: { opacity: 0, y: 20 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      opacity: { duration: 0.3, ease: [0.48, 0, 0.62, 1] },
+      y: { duration: 1, ease: [0.5, 1, 0.5, 1] },
+    },
+  },
+};
+
+const mainFormVariants: Variants = {
+  initial: { opacity: 0, y: 20 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      opacity: { duration: 0.3, ease: [0.48, 0, 0.62, 1] },
+      y: { duration: 0.4, ease: [0.48, 0, 0.62, 1] },
+    },
+  },
+};
 
 interface ExplorerProps {
   countries: CountryNames[];
@@ -73,7 +98,8 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
         },
       }}
     >
-      <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '32rem' }}>
+      <motion.div variants={mainFormVariants} initial="initial" animate="animate" className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '32rem' }}>
+        {/* <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '32rem' }}> */}
         <figure className={explorerStyles.mapPanel}>
           <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} />
         </figure>
@@ -135,9 +161,11 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
             <div style={{ fontSize: 'var(--font-xxs)', marginTop: '0.5rem' }}>The selected jurisdictions cannot reach the 14% target; the closest available rate is shown.</div>
           )}
         </div>
-      </div>
+        {/* </div> */}
+      </motion.div>
 
-      <div className={explorerStyles.rightSide}>
+      <motion.div variants={sideGraphVariants} initial="initial" animate="animate" className={explorerStyles.rightSide}>
+        {/* <div className={explorerStyles.rightSide}> */}
         <RemittanceChart blends={presetBlends} activeScenario={activeOptLevel} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
           <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600 }}>
@@ -190,7 +218,8 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
             </>
           )}
         </div>
-      </div>
+        {/* </div> */}
+      </motion.div>
     </motion.div>
   );
 };
