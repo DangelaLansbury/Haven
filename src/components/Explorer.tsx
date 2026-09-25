@@ -99,7 +99,6 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
       }}
     >
       <motion.div variants={mainFormVariants} initial="initial" animate="animate" className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '32rem' }}>
-        {/* <div className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '32rem' }}> */}
         <figure className={explorerStyles.mapPanel}>
           <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} />
         </figure>
@@ -129,21 +128,6 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
           {blend.allocations.length > 0 && (
             <div className={formStyles.formSection}>
-              {/* {blend.allocations.map(({ country, share, taxRate }) => (
-                <div className={formStyles.formGroup} key={country}>
-                  {country}: {(share * 100).toFixed(1)}% of profit at {(taxRate * 100).toFixed(1)}%
-                </div>
-              ))}
-              {countries.map((country) => {
-                if (!blend.allocations.some((allocation) => allocation.country === country)) {
-                  return (
-                    <div className={formStyles.formGroup} key={country}>
-                      {country}: 0%
-                    </div>
-                  );
-                }
-                return null;
-              })} */}
               {countries.map((country) => {
                 const allocation = blend.allocations.find((allocation) => allocation.country === country);
                 const share = allocation ? allocation.share : 0;
@@ -161,11 +145,9 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
             <div style={{ fontSize: 'var(--font-xxs)', marginTop: '0.5rem' }}>The selected jurisdictions cannot reach the 14% target; the closest available rate is shown.</div>
           )}
         </div>
-        {/* </div> */}
       </motion.div>
 
       <motion.div variants={sideGraphVariants} initial="initial" animate="animate" className={explorerStyles.rightSide}>
-        {/* <div className={explorerStyles.rightSide}> */}
         <RemittanceChart blends={presetBlends} activeScenario={activeOptLevel} />
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%', marginTop: '1.5rem' }}>
           <div style={{ fontSize: 'var(--font-xl)', fontWeight: 600 }}>
@@ -218,7 +200,6 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
             </>
           )}
         </div>
-        {/* </div> */}
       </motion.div>
     </motion.div>
   );
