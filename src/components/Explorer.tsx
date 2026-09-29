@@ -98,8 +98,8 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
         },
       }}
     >
-      <motion.div variants={mainFormVariants} initial="initial" animate="animate" className={explorerStyles.leftSide} style={{ flex: 2, maxWidth: '32rem' }}>
-        <figure className={explorerStyles.mapPanel}>
+      <motion.div variants={mainFormVariants} initial="initial" animate="animate" className={`${explorerStyles.leftSide} ${explorerStyles.mapPanel}`} style={{ flex: 2, maxWidth: '32rem' }}>
+        <figure>
           <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={candidateCountries} />
         </figure>
         <div>
