@@ -115,7 +115,7 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
           <NumberFlow value={formatDollars(profit).value} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }} suffix={formatDollars(profit).suffix} />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%' }}>
           {blend.allocations.length > 0 && (
             <div className={formStyles.formSection}>
               {countries.map((country) => {
@@ -125,7 +125,9 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
 
                 return (
                   <div className={formStyles.formGroup} key={country}>
-                    {country}: {(share * 100).toFixed(1)}% of profit at {(taxRate * 100).toFixed(1)}%
+                    <div style={{ display: 'flex', flex: 1 }}>{country}</div>
+                    <div style={{ display: 'flex', flex: 1, maxWidth: '120px', textAlign: 'right', justifyContent: 'flex-end' }}>{(share * 100).toFixed(1)}% of profit</div>
+                    <div style={{ display: 'flex', flex: 1, maxWidth: '120px', textAlign: 'right', justifyContent: 'flex-end' }}>{(taxRate * 100).toFixed(1)}%</div>
                   </div>
                 );
               })}
