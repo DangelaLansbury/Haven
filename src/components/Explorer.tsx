@@ -126,8 +126,12 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
                 return (
                   <div className={formStyles.formGroup} key={country}>
                     <div style={{ display: 'flex', flex: 1 }}>{country}</div>
-                    <div style={{ display: 'flex', flex: 1, maxWidth: '120px', textAlign: 'right', justifyContent: 'flex-end' }}>{(share * 100).toFixed(1)}% of profit</div>
-                    <div style={{ display: 'flex', flex: 1, maxWidth: '120px', textAlign: 'right', justifyContent: 'flex-end' }}>{(taxRate * 100).toFixed(1)}%</div>
+                    <div style={{ display: 'flex', flex: 1, maxWidth: '120px', textAlign: 'right', justifyContent: 'flex-end' }}>
+                      <NumberFlow value={taxRate} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }} />
+                    </div>
+                    <div style={{ display: 'flex', flex: 1, maxWidth: '120px', textAlign: 'right', justifyContent: 'flex-end' }}>
+                      <NumberFlow value={share * 100} transformTiming={NUMBER_FLOW_TIMING} format={{ style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }} />
+                    </div>
                   </div>
                 );
               })}
