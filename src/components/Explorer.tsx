@@ -118,6 +118,11 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
         <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'flex-start', width: '100%' }}>
           {blend.allocations.length > 0 && (
             <div className={formStyles.formSection}>
+              <div className={formStyles.formGroup}>
+                <div style={{ display: 'flex', flex: 1, fontWeight: 600 }}>Country</div>
+                <div style={{ display: 'flex', flex: 1, maxWidth: '120px', textAlign: 'right', justifyContent: 'flex-end', fontWeight: 600 }}>Tax rate</div>
+                <div style={{ display: 'flex', flex: 1, maxWidth: '120px', textAlign: 'right', justifyContent: 'flex-end', fontWeight: 600 }}>Share of profit</div>
+              </div>
               {countries.map((country) => {
                 const allocation = blend.allocations.find((allocation) => allocation.country === country);
                 const share = allocation ? allocation.share : 0;
