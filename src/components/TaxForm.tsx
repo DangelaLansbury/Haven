@@ -3,7 +3,7 @@ import formStyles from '../css/Form.module.css';
 import commonStyles from '../css/Common.module.css';
 import { FormTableRow } from './FormInput';
 import { QRCodeSVG } from 'qrcode.react';
-import { FormFields, DefaultFormFields } from '../types';
+import { FormFields, DefaultMockData } from '../types';
 import { motion, type Variants } from 'framer-motion';
 import { matchToCountryEnum } from '../utils';
 
@@ -42,6 +42,11 @@ interface TaxFormProps {
 }
 
 const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, setScreen, sessionId }) => {
+  const formattedDefaultRevenue = DefaultMockData.revenue.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
   return (
     <div className={commonStyles.pageContainer}>
       <motion.div variants={sideCardVariants} initial="initial" animate="animate" className={formStyles.sideCard}>
@@ -70,18 +75,18 @@ const TaxForm: React.FC<TaxFormProps> = ({ formData, setFormData, setScreen, ses
               </div>
             </div>
             <div className={formStyles.formTableRows}>
-              <FormTableRow key="revenue" formIndex="$" label="Revenue" value={DefaultFormFields.revenue} />
+              <FormTableRow key="revenue" formIndex="$" label="Revenue" value={formattedDefaultRevenue} />
             </div>
           </div>
           <div className={formStyles.formTable}>
             <div className={formStyles.formTableHeader}>
               <div className={formStyles.formTableTh}>
                 <span className={formStyles.section}>{'§2'}</span>
-                {'COUNTRIES OF OPERATION'}
+                {'GROUP JURISDICTIONS'}
               </div>
             </div>
             <div className={formStyles.formTableRows}>
-              {DefaultFormFields.countries.map((country, index) => (
+              {DefaultMockData.countries.map((country, index) => (
                 <FormTableRow key={`${matchToCountryEnum(country)}`} formIndex={`${index + 1}`} value={`${matchToCountryEnum(country)}`} />
               ))}
             </div>

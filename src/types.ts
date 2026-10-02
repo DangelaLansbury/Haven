@@ -26,12 +26,16 @@ export enum OptimizationScenario {
 export enum CountryNames {
   australia = 'Australia',
   barbados = 'Barbados',
+  canada = 'Canada',
+  china = 'China',
   cyprus = 'Cyprus',
   germany = 'Germany',
   hungary = 'Hungary',
+  india = 'India',
   ireland = 'Ireland',
   japan = 'Japan',
   luxembourg = 'Luxembourg',
+  mexico = 'Mexico',
   netherlands = 'Netherlands',
   singapore = 'Singapore',
   switzerland = 'Switzerland',
@@ -42,14 +46,18 @@ export enum CountryNames {
 
 export const Countries: Record<CountryNames, Country> = {
   [CountryNames.australia]: { name: 'australia', rate: 0.3 },
-  [CountryNames.barbados]: { name: 'barbados', rate: 0.055 },
+  [CountryNames.barbados]: { name: 'barbados', rate: 0.09 },
+  [CountryNames.canada]: { name: 'canada', rate: 0.265 },
+  [CountryNames.china]: { name: 'china', rate: 0.25 },
   [CountryNames.cyprus]: { name: 'cyprus', rate: 0.15 },
   [CountryNames.caymanislands]: { name: 'caymanislands', rate: 0.0 },
   [CountryNames.germany]: { name: 'germany', rate: 0.299 },
   [CountryNames.hungary]: { name: 'hungary', rate: 0.09 },
+  [CountryNames.india]: { name: 'india', rate: 0.2517 },
   [CountryNames.ireland]: { name: 'ireland', rate: 0.125 },
   [CountryNames.japan]: { name: 'japan', rate: 0.297 },
   [CountryNames.luxembourg]: { name: 'luxembourg', rate: 0.249 },
+  [CountryNames.mexico]: { name: 'mexico', rate: 0.3 },
   [CountryNames.netherlands]: { name: 'netherlands', rate: 0.258 },
   [CountryNames.singapore]: { name: 'singapore', rate: 0.17 },
   [CountryNames.switzerland]: { name: 'switzerland', rate: 0.14 },
@@ -60,14 +68,22 @@ export const Countries: Record<CountryNames, Country> = {
 export const DefaultMockData: ExplorerData = {
   revenue: 250000000000, // $250 billion
   profitMargin: 0.2, // Illustrative 20% margin: $50 billion of profit
-  countries: [CountryNames.caymanislands, CountryNames.germany, CountryNames.japan, CountryNames.unitedkingdom, CountryNames.singapore, CountryNames.australia, CountryNames.hungary, CountryNames.barbados, CountryNames.unitedstates],
-};
-
-export const DefaultFormFields = {
-  sessionId: '',
-  data: '',
-  revenue: '250,000,000,000.00',
-  countries: [CountryNames.switzerland, CountryNames.japan, CountryNames.ireland, CountryNames.unitedkingdom, CountryNames.caymanislands, CountryNames.netherlands],
+  countries: [
+    CountryNames.unitedstates,
+    CountryNames.canada,
+    CountryNames.mexico,
+    CountryNames.unitedkingdom,
+    CountryNames.germany,
+    CountryNames.india,
+    CountryNames.china,
+    CountryNames.japan,
+    CountryNames.ireland,
+    CountryNames.netherlands,
+    CountryNames.luxembourg,
+    CountryNames.singapore,
+    CountryNames.switzerland,
+    CountryNames.caymanislands,
+  ],
 };
 
 export interface CountryAllocation {
