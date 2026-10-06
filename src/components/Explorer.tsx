@@ -145,9 +145,6 @@ const Explorer: React.FC<ExplorerProps> = ({ countries, revenue, profit, profitM
           {blend.scenario === OptimizationScenario.ftcEfficient && blend.targetWasReachable === false && (
             <div style={{ fontSize: 'var(--font-xxs)', marginTop: '0.5rem' }}>The selected jurisdictions cannot reach the 14% target; the closest available rate is shown.</div>
           )}
-          <div style={{ fontSize: 'var(--font-xxs)', fontStyle: 'italic', marginTop: '0.5rem' }}>
-            Illustrative headline rates; incentives, local variation, and Pillar Two global-minimum top-up taxes are not modeled.
-          </div>
         </div>
       </motion.div>
 
