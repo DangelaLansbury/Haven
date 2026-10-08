@@ -2,22 +2,23 @@ import { useMemo, useState } from 'react';
 import Explorer from './components/Explorer';
 import WelcomeScreen from './components/Welcome';
 import commonStyles from './css/Common.module.css';
-import { CountryNames, DefaultMockData, OptimizationResult, OptimizationScenario } from './types';
-import { calculateProfit, optimizeBlend } from './utils';
+import { DefaultMockData, OptimizationResult, OptimizationScenario } from './types';
+import { calculateProfit, createAllocationResult, createUsOnlyResult, optimizeFtcBlend } from './utils';
 
 const App = () => {
   const [screen, setScreen] = useState<'initial' | 'explorer'>('initial');
-  const [optLevel, setOptLevel] = useState<OptimizationScenario>(OptimizationScenario.unconstrained);
-  const { countries, revenue, profitMargin } = DefaultMockData;
+  const [selectedScenario, setSelectedScenario] = useState<OptimizationScenario>(OptimizationScenario.economicFootprint);
+  const { funnelAllocations, generatedAllocations, jurisdictionSections, revenue, profitMargin } = DefaultMockData;
   const profit = calculateProfit(revenue, profitMargin);
 
   const presetBlends = useMemo<Record<OptimizationScenario, OptimizationResult>>(
     () => ({
-      [OptimizationScenario.unconstrained]: optimizeBlend(countries, profit, OptimizationScenario.unconstrained),
-      [OptimizationScenario.ftcEfficient]: optimizeBlend(countries, profit, OptimizationScenario.ftcEfficient),
-      [OptimizationScenario.usOnly]: optimizeBlend([CountryNames.unitedstates], profit, OptimizationScenario.usOnly),
+      [OptimizationScenario.economicFootprint]: createAllocationResult(generatedAllocations, profit, OptimizationScenario.economicFootprint),
+      [OptimizationScenario.illustrativeFunnel]: createAllocationResult(funnelAllocations, profit, OptimizationScenario.illustrativeFunnel),
+      [OptimizationScenario.ftcCrossCredit]: optimizeFtcBlend(generatedAllocations, jurisdictionSections, profit),
+      [OptimizationScenario.usOnly]: createUsOnlyResult(profit),
     }),
-    [countries, profit],
+    [funnelAllocations, generatedAllocations, jurisdictionSections, profit],
   );
 
   return (
@@ -30,7 +31,13 @@ const App = () => {
       {screen === 'initial' ? (
         <WelcomeScreen setScreen={setScreen} />
       ) : (
-        <Explorer countries={countries} revenue={revenue} profit={profit} profitMargin={profitMargin} presetBlends={presetBlends} optLevel={optLevel} setOptLevel={setOptLevel} />
+        <Explorer
+          data={DefaultMockData}
+          profit={profit}
+          presetBlends={presetBlends}
+          selectedScenario={selectedScenario}
+          onSelectScenario={setSelectedScenario}
+        />
       )}
     </>
   );

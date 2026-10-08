@@ -7,14 +7,63 @@
   height: 100%;
 }
 
+.explorerPage {
+  overflow-y: auto;
+}
+
 .rightSide {
+  box-sizing: border-box;
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 1rem;
   width: 100%;
-  max-width: calc(240px + 2rem);
+  max-width: 22rem;
+  min-width: 0;
+}
+
+.scenarioControls {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+.scenarioButton {
+  background: var(--paper);
+  border: 1px solid var(--gray-150);
+  border-radius: 0.375rem;
+  color: var(--gray-700);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-xxs);
+  line-height: 1.2;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.5rem;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.scenarioButton[data-active='true'] {
+  background: var(--green);
+  border-color: var(--green-pure);
+  color: var(--gray-900);
+}
+
+.scenarioButton:focus-visible {
+  outline: 2px solid var(--haven-green);
+  outline-offset: 2px;
+}
+
+.scenarioDescription {
+  color: var(--gray-600);
+  font-size: var(--font-xxs);
+  line-height: 1.35;
+  margin: 0 0 0.75rem;
+  min-height: 3.75rem;
+  width: 100%;
 }
 
 .mapPanel {
@@ -24,7 +73,6 @@
   max-width: 36rem;
   min-width: 18rem;
   width: 100%;
-  /*  */
   background-color: var(--paper);
   border-radius: 0.5rem;
   border: 1px solid var(--border-color);
@@ -35,16 +83,68 @@
   justify-content: flex-start;
   height: calc(100vh - var(--app-header-height) - 4rem);
   padding: 1.5rem;
-  /* width: 100%; */
-  /* max-width: 34rem; */
   overflow-y: auto;
 }
 
+.mapFigure {
+  margin: 0 0 0.75rem;
+  width: 100%;
+}
+
 .mapPanel figcaption {
-  color: var(--gray-650);
+  color: var(--gray-600);
   font-size: var(--font-xxs);
   margin-top: 0.5rem;
   text-align: center;
+}
+
+.rateSummary {
+  font-size: var(--font-xl);
+  font-weight: 600;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.summaryLabel {
+  font-size: var(--font-xs);
+  font-weight: 400;
+}
+
+.taxSummary {
+  width: 100%;
+}
+
+.taxAmount {
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.modelNote {
+  font-size: var(--font-xxs);
+  margin: 0.5rem 0 0;
+}
+
+@media (max-width: 800px) {
+  .explorerPage {
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 1rem;
+  }
+
+  .mapPanel {
+    flex: none;
+    height: auto;
+    max-width: none;
+    min-width: 0;
+    overflow: visible;
+    padding: 1rem;
+  }
+
+  .rightSide {
+    flex: none;
+    max-width: none;
+  }
 }
 
 /* ----- FONT STYLES ----- */
@@ -82,7 +182,7 @@
 
 .axisLabel,
 .referenceLabel {
-  fill: var(--gray-650);
+  fill: var(--gray-600);
   font-size: 8px;
 }
 
@@ -115,13 +215,13 @@
 }
 
 .scenarioLabel {
-  fill: var(--gray-650);
+  fill: var(--gray-600);
   font-size: 8px;
   font-weight: 500;
 }
 
 .chartCaption {
-  color: var(--gray-650);
+  color: var(--gray-600);
   font-size: var(--font-xs);
   margin-top: 0.25rem;
 }

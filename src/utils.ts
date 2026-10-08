@@ -1,12 +1,27 @@
-import { CountryAllocation, CountryNames, Countries, DEFAULT_TAX_REGIME, DollarValue, OptimizationResult, OptimizationScenario, TaxBreakdown, TaxRegime } from './types';
+import {
+  CountryAllocation,
+  CountryNames,
+  Countries,
+  DEFAULT_FTC_BLEND_CONSTRAINTS,
+  DEFAULT_TAX_REGIME,
+  DollarValue,
+  FtcBlendConstraints,
+  JurisdictionSection,
+  OptimizationResult,
+  OptimizationScenario,
+  ProfitShare,
+  TaxBreakdown,
+  TaxRegime,
+  withDomesticShare,
+} from './types';
 
 export const formatDollars = (amount: number): DollarValue => {
-  if (amount > 1000000000) {
+  if (Math.abs(amount) >= 1000000000) {
     return {
       value: amount / 1000000000,
       suffix: 'B',
     };
-  } else if (amount > 1000000) {
+  } else if (Math.abs(amount) >= 1000000) {
     return {
       value: amount / 1000000,
       suffix: 'M',
@@ -31,6 +46,7 @@ export const calculateProfit = (revenue: number, profitMargin: number): number =
 };
 
 export const calculateTaxBreakdown = (foreignTaxRate: number, profit: number, regime: TaxRegime = DEFAULT_TAX_REGIME): TaxBreakdown => {
+  validateRegime(regime);
   const safeForeignTaxRate = Math.max(0, Number.isFinite(foreignTaxRate) ? foreignTaxRate : 0);
   const safeProfit = Math.max(0, Number.isFinite(profit) ? profit : 0);
   const usLiabilityRate = regime.corporateRate * (1 - regime.section250DeductionRate);
@@ -61,99 +77,182 @@ export const calculateTaxBreakdown = (foreignTaxRate: number, profit: number, re
   };
 };
 
-type Candidate = { country: CountryNames; taxRate: number };
+const EPSILON = 1e-9;
 
-const prepareCandidates = (jurisdictions: CountryNames[]): Candidate[] =>
-  [...new Set(jurisdictions)]
-    .filter((country) => country !== CountryNames.unitedstates)
-    .map((country) => ({ country, taxRate: Countries[country].rate }))
-    .sort((a, b) => a.taxRate - b.taxRate || a.country.localeCompare(b.country));
+const validateProfit = (profit: number) => {
+  if (!Number.isFinite(profit) || profit <= 0) throw new Error('Profit must be finite and greater than zero.');
+};
 
-const toAllocation = (candidate: Candidate, share: number): CountryAllocation => ({
-  country: candidate.country,
+const validateRegime = (regime: TaxRegime) => {
+  const rates = [regime.corporateRate, regime.section250DeductionRate, regime.deemedPaidCreditRate];
+  if (rates.some((rate) => !Number.isFinite(rate) || rate < 0 || rate > 1) || regime.deemedPaidCreditRate === 0) {
+    throw new Error('Tax regime rates must be between 0 and 100%, with a positive deemed-paid credit rate.');
+  }
+};
+
+const validateCountry = (country: CountryNames) => {
+  if (!Object.hasOwn(Countries, country)) throw new Error(`Unknown jurisdiction: ${country}.`);
+};
+
+const toAllocation = ({ country, share }: ProfitShare, regime: TaxRegime): CountryAllocation => ({
+  country,
   share,
-  taxRate: candidate.taxRate,
+  taxRate: country === CountryNames.unitedstates ? regime.corporateRate : Countries[country].rate,
 });
 
-const calculateWeightedRate = (allocations: CountryAllocation[]): number => allocations.reduce((total, allocation) => total + allocation.share * allocation.taxRate, 0);
-
-const allocateUnconstrained = (candidates: Candidate[]): CountryAllocation[] => [toAllocation(candidates[0], 1)];
-
-const allocateFtcEfficient = (candidates: Candidate[], targetRate: number): { allocations: CountryAllocation[]; targetWasReachable: boolean } => {
-  const exact = candidates.find(({ taxRate }) => Math.abs(taxRate - targetRate) < 1e-10);
-  if (exact) return { allocations: [toAllocation(exact, 1)], targetWasReachable: true };
-
-  const lower = [...candidates].reverse().find(({ taxRate }) => taxRate < targetRate);
-  const upper = candidates.find(({ taxRate }) => taxRate > targetRate);
-
-  if (!lower || !upper) {
-    const closest = candidates.reduce((best, candidate) => (Math.abs(candidate.taxRate - targetRate) < Math.abs(best.taxRate - targetRate) ? candidate : best));
-    return { allocations: [toAllocation(closest, 1)], targetWasReachable: false };
+const normalizeShares = (shares: ProfitShare[]): ProfitShare[] => {
+  const countries = new Set<CountryNames>();
+  let total = 0;
+  for (const { country, share } of shares) {
+    validateCountry(country);
+    if (countries.has(country)) throw new Error(`Duplicate profit allocation: ${country}.`);
+    if (!Number.isFinite(share) || share < 0) throw new Error('Profit shares must be finite and non-negative.');
+    countries.add(country);
+    total += share;
   }
-
-  const upperShare = (targetRate - lower.taxRate) / (upper.taxRate - lower.taxRate);
-  return {
-    allocations: [toAllocation(lower, 1 - upperShare), toAllocation(upper, upperShare)],
-    targetWasReachable: true,
-  };
+  if (Math.abs(total - 1) > EPSILON) throw new Error(`Profit shares must total 100%; received ${(total * 100).toFixed(4)}%.`);
+  // Normalize rounding error without discarding small, positive allocations.
+  return shares.filter(({ share }) => share > 0).map(({ country, share }) => ({ country, share: share / total }));
 };
 
-const createUsOnlyResult = (profit: number, regime: TaxRegime): OptimizationResult => {
-  const taxRate = regime.corporateRate;
-  const taxAmount = taxRate * profit;
-  return {
-    scenario: OptimizationScenario.usOnly,
-    allocations: [toAllocation({ country: CountryNames.unitedstates, taxRate }, 1)],
-    foreignTaxRate: 0,
-    taxBreakdown: {
-      taxableProfit: profit,
-      foreignTaxRate: 0,
-      foreignTaxAmount: 0,
-      potentialFtcRate: 0,
-      usedFtcRate: 0,
-      usedFtcAmount: 0,
-      haircutRate: 0,
-      haircutAmount: 0,
-      excessFtcRate: 0,
-      excessFtcAmount: 0,
-      usLiabilityRate: taxRate,
-      topUpRate: taxRate,
-      topUpAmount: taxAmount,
-      totalTaxRate: taxRate,
-      totalTaxAmount: taxAmount,
-      noTopUpForeignRate: 0,
-    },
-  };
-};
+const calculateWeightedRate = (shares: ProfitShare[]): number => shares.reduce((total, { country, share }) => total + share * Countries[country].rate, 0);
 
-export const optimizeBlend = (jurisdictions: CountryNames[], profit: number, scenario: OptimizationScenario, regime: TaxRegime = DEFAULT_TAX_REGIME): OptimizationResult => {
-  if (!Number.isFinite(profit) || profit <= 0) throw new Error('Profit must be greater than zero.');
-  if (scenario === OptimizationScenario.usOnly) return createUsOnlyResult(profit, regime);
+export const createAllocationResult = (
+  shares: ProfitShare[],
+  profit: number,
+  scenario: OptimizationScenario,
+  regime: TaxRegime = DEFAULT_TAX_REGIME,
+): OptimizationResult => {
+  validateProfit(profit);
+  validateRegime(regime);
+  const allocations = normalizeShares(shares).map((share) => toAllocation(share, regime));
+  const domesticShare = allocations.find(({ country }) => country === CountryNames.unitedstates)?.share ?? 0;
+  const foreignShare = 1 - domesticShare;
+  // U.S. profit is taxed directly at the corporate rate; only foreign-booked profit enters NCTI.
+  const foreignAllocations = allocations.filter(({ country }) => country !== CountryNames.unitedstates);
+  const foreignTaxRate = foreignShare > 0 ? calculateWeightedRate(foreignAllocations) / foreignShare : 0;
+  const taxBreakdown = calculateTaxBreakdown(foreignTaxRate, profit * foreignShare, regime);
+  const domesticTaxAmount = profit * domesticShare * regime.corporateRate;
+  const totalTaxAmount = domesticTaxAmount + taxBreakdown.totalTaxAmount;
 
-  const candidates = prepareCandidates(jurisdictions);
-  if (candidates.length === 0) return createUsOnlyResult(profit, regime);
-
-  const usLiabilityRate = regime.corporateRate * (1 - regime.section250DeductionRate);
-  const noTopUpRate = usLiabilityRate / regime.deemedPaidCreditRate;
-  let allocations: CountryAllocation[];
-  let targetRate: number | undefined;
-  let targetWasReachable: boolean | undefined;
-
-  if (scenario === OptimizationScenario.unconstrained) {
-    allocations = allocateUnconstrained(candidates);
-  } else {
-    targetRate = noTopUpRate;
-    const result = allocateFtcEfficient(candidates, targetRate);
-    allocations = result.allocations;
-    targetWasReachable = result.targetWasReachable;
-  }
-
-  const foreignTaxRate = calculateWeightedRate(allocations);
   return {
     scenario,
+    profit,
     allocations,
+    domesticShare,
+    domesticTaxAmount,
     foreignTaxRate,
-    taxBreakdown: calculateTaxBreakdown(foreignTaxRate, profit, regime),
+    taxBreakdown,
+    totalTaxAmount,
+    effectiveTaxRate: totalTaxAmount / profit,
+  };
+};
+
+export const createUsOnlyResult = (profit: number, regime: TaxRegime = DEFAULT_TAX_REGIME): OptimizationResult =>
+  createAllocationResult([{ country: CountryNames.unitedstates, share: 1 }], profit, OptimizationScenario.usOnly, regime);
+
+const indexSections = (sections: JurisdictionSection[]) => {
+  const index = new Map<JurisdictionSection['id'], CountryNames[]>();
+  const countries = new Set<CountryNames>();
+  for (const { id, countries: sectionCountries } of sections) {
+    if (index.has(id)) throw new Error(`Duplicate jurisdiction section: ${id}.`);
+    for (const country of sectionCountries) {
+      validateCountry(country);
+      if (countries.has(country)) throw new Error(`Jurisdiction belongs to multiple sections: ${country}.`);
+      if (id !== 'parent' && country === CountryNames.unitedstates) throw new Error('The U.S. parent cannot be a foreign jurisdiction.');
+      countries.add(country);
+    }
+    index.set(id, sectionCountries);
+  }
+  return index;
+};
+
+type AllocationBucket = {
+  shares: ProfitShare[];
+  taxRate: number;
+  minimum: number;
+  maximum: number;
+};
+
+const singleCountryBucket = (country: CountryNames, maximum: number): AllocationBucket => ({
+  shares: [{ country, share: 1 }],
+  taxRate: Countries[country].rate,
+  minimum: 0,
+  maximum,
+});
+
+// With proportional operations represented as one bucket, filling available
+// capacity in rate order finds the exact minimum or maximum feasible rate.
+const extremeAllocation = (buckets: AllocationBucket[], direction: 1 | -1): ProfitShare[] => {
+  let remaining = 1 - buckets.reduce((total, { minimum }) => total + minimum, 0);
+  return [...buckets]
+    .sort((a, b) => direction * (a.taxRate - b.taxRate) || a.shares[0].country.localeCompare(b.shares[0].country))
+    .flatMap(({ shares, minimum, maximum }) => {
+      const additional = Math.min(remaining, maximum - minimum);
+      remaining = Math.max(0, remaining - additional);
+      const weight = minimum + additional;
+      return shares.map(({ country, share }) => ({ country, share: share * weight }));
+    });
+};
+
+export const optimizeFtcBlend = (
+  generatedAllocations: ProfitShare[],
+  sections: JurisdictionSection[],
+  profit: number,
+  constraints: FtcBlendConstraints = DEFAULT_FTC_BLEND_CONSTRAINTS,
+  regime: TaxRegime = DEFAULT_TAX_REGIME,
+): OptimizationResult => {
+  validateProfit(profit);
+  validateRegime(regime);
+  const generated = normalizeShares(generatedAllocations);
+  // U.S. profit stays with the parent; the constraints below apply to the foreign profit pool.
+  const domesticShare = generated.find(({ country }) => country === CountryNames.unitedstates)?.share ?? 0;
+  const { minimumOperationsShare, maximumLowTaxShare, maximumSingleHubShare } = constraints;
+  if ([minimumOperationsShare, maximumLowTaxShare, maximumSingleHubShare].some((share) => !Number.isFinite(share) || share < 0 || share > 1)) {
+    throw new Error('FTC blend constraints must be finite shares between 0 and 100%.');
+  }
+
+  const sectionCountries = indexSections(sections);
+  const operations = new Set(sectionCountries.get('operations') ?? []);
+  const hubs = sectionCountries.get('hubs') ?? [];
+  const lowTax = [...(sectionCountries.get('low-tax') ?? [])].sort((a, b) => Countries[a].rate - Countries[b].rate || a.localeCompare(b));
+  const generatedOperations = generated.filter(({ country }) => operations.has(country));
+  const generatedOperationsTotal = generatedOperations.reduce((sum, { share }) => sum + share, 0);
+  if (generatedOperationsTotal === 0) throw new Error('FTC blending requires generated profit in substantive operations.');
+
+  const operationShares = generatedOperations.map(({ country, share }) => ({ country, share: share / generatedOperationsTotal }));
+  const buckets: AllocationBucket[] = [
+    {
+      shares: operationShares,
+      taxRate: calculateWeightedRate(operationShares),
+      minimum: minimumOperationsShare,
+      maximum: 1,
+    },
+    ...hubs.map((country) => singleCountryBucket(country, maximumSingleHubShare)),
+  ];
+  // A shared low-tax cap needs only its cheapest/costliest jurisdiction at each
+  // extreme. Mixing these extremes also respects the combined cap.
+  const lowest = extremeAllocation(lowTax.length ? [...buckets, singleCountryBucket(lowTax[0], maximumLowTaxShare)] : buckets, 1);
+  const highest = extremeAllocation(lowTax.length ? [...buckets, singleCountryBucket(lowTax[lowTax.length - 1], maximumLowTaxShare)] : buckets, -1);
+  const minimumRate = calculateWeightedRate(lowest);
+  const maximumRate = calculateWeightedRate(highest);
+
+  const targetRate = (regime.corporateRate * (1 - regime.section250DeductionRate)) / regime.deemedPaidCreditRate;
+  const targetWasReachable = targetRate >= minimumRate - EPSILON && targetRate <= maximumRate + EPSILON;
+  const rateRange = maximumRate - minimumRate;
+  const highWeight = rateRange > 0 ? Math.min(1, Math.max(0, (targetRate - minimumRate) / rateRange)) : 0;
+  const shares = new Map<CountryNames, number>();
+  for (const [allocations, weight] of [[lowest, 1 - highWeight], [highest, highWeight]] as const) {
+    for (const { country, share } of allocations) shares.set(country, (shares.get(country) ?? 0) + share * weight);
+  }
+
+  return {
+    ...createAllocationResult(
+      withDomesticShare([...shares].map(([country, share]) => ({ country, share })), domesticShare),
+      profit,
+      OptimizationScenario.ftcCrossCredit,
+      regime,
+    ),
     targetRate,
     targetWasReachable,
   };

@@ -2,7 +2,8 @@ import React from 'react';
 import * as d3 from 'd3';
 import { motion } from 'framer-motion';
 import chartStyles from '../css/Explorer.module.css';
-import { DEFAULT_TAX_REGIME, EFF_GILTI_RATE, GILTI_RATE, OptimizationResult, OptimizationScenario, US_TAX_RATE } from '../types';
+import { DEFAULT_TAX_REGIME, type OptimizationResult, OptimizationScenario } from '../types';
+import { SCENARIOS, SCENARIO_LABELS } from '../scenarios';
 
 interface RemittanceChartProps {
   blends: Record<OptimizationScenario, OptimizationResult>;
@@ -13,52 +14,64 @@ type SegmentKey = 'usedFtc' | 'haircut' | 'topUp' | 'excess' | 'domestic';
 type StackDatum = Record<SegmentKey, number>;
 
 const SEGMENTS: Array<{ key: SegmentKey; label: string; className: string }> = [
+  { key: 'domestic', label: 'U.S. tax on U.S. profit', className: chartStyles.chartDomestic },
   { key: 'usedFtc', label: 'FTC used', className: chartStyles.chartFtc },
   { key: 'topUp', label: 'NCTI top-up', className: chartStyles.chartTopup },
   { key: 'haircut', label: '10% FTC haircut', className: chartStyles.chartHaircut },
   { key: 'excess', label: 'Excess foreign tax', className: chartStyles.chartExcess },
-  { key: 'domestic', label: 'U.S. corporate tax', className: chartStyles.chartDomestic },
 ];
 
-const WIDTH = 300;
+const WIDTH = 340;
 const HEIGHT = 200;
 const MARGIN = { top: 12, right: 8, bottom: 30, left: 24 };
 const INACTIVE_OPACITY = 0.15;
-const SCENARIOS = [OptimizationScenario.unconstrained, OptimizationScenario.ftcEfficient, OptimizationScenario.usOnly];
-const SCENARIO_LABELS: Record<OptimizationScenario, string> = {
-  [OptimizationScenario.unconstrained]: 'Lowest tax',
-  [OptimizationScenario.ftcEfficient]: 'FTC-efficient',
-  [OptimizationScenario.usOnly]: 'U.S. rate',
-};
+const PLOT_RIGHT = WIDTH - MARGIN.right;
+const x = d3.scaleBand<OptimizationScenario>().domain(SCENARIOS).range([MARGIN.left, PLOT_RIGHT]).padding(0.18);
+const formatAxisRate = d3.format('.0%');
+const formatTaxRate = d3.format('.2%');
 
 export const RemittanceChart: React.FC<RemittanceChartProps> = ({ blends, activeScenario }) => {
   const activeBlend = blends[activeScenario];
   const activeBreakdown = activeBlend.taxBreakdown;
   const activeIsUsOnly = activeScenario === OptimizationScenario.usOnly;
-  const activeTotalBurden = activeIsUsOnly ? US_TAX_RATE : activeBreakdown.totalTaxRate;
-  const yMax = Math.max(US_TAX_RATE, ...SCENARIOS.map((scenario) => (scenario === OptimizationScenario.usOnly ? US_TAX_RATE : blends[scenario].taxBreakdown.totalTaxRate))) * 1.08;
-  const y = d3
-    .scaleLinear()
-    .domain([0, yMax])
-    .range([HEIGHT - MARGIN.bottom, MARGIN.top]);
-  const stack = d3.stack<StackDatum>().keys(SEGMENTS.map(({ key }) => key));
-  const ticks = y.ticks(5);
-  const plotRight = WIDTH - MARGIN.right;
-  const x = d3.scaleBand<OptimizationScenario>().domain(SCENARIOS).range([MARGIN.left, plotRight]).padding(0.18);
+  const activeTotalBurden = activeBlend.effectiveTaxRate;
+  const { ticks, scenarioStacks } = React.useMemo(() => {
+    const yMax = Math.max(...SCENARIOS.map((scenario) => blends[scenario].effectiveTaxRate)) * 1.08;
+    const y = d3
+      .scaleLinear()
+      .domain([0, yMax || 1])
+      .range([HEIGHT - MARGIN.bottom, MARGIN.top]);
+    const stack = d3.stack<StackDatum>().keys(SEGMENTS.map(({ key }) => key));
+    const scenarioStacks = SCENARIOS.map((scenario) => {
+      const { taxBreakdown: breakdown, domesticShare, domesticTaxAmount, profit } = blends[scenario];
+      // Breakdown rates apply to foreign profit; scale them to shares of total profit.
+      const foreignShare = 1 - domesticShare;
+      const datum: StackDatum = {
+        domestic: domesticTaxAmount / profit,
+        usedFtc: breakdown.usedFtcRate * foreignShare,
+        haircut: breakdown.haircutRate * foreignShare,
+        topUp: breakdown.topUpRate * foreignShare,
+        excess: breakdown.excessFtcRate * foreignShare,
+      };
 
-  const scenarioStacks = SCENARIOS.map((scenario) => {
-    const breakdown = blends[scenario].taxBreakdown;
-    const isUsOnly = scenario === OptimizationScenario.usOnly;
-    const datum: StackDatum = {
-      usedFtc: isUsOnly ? 0 : breakdown.usedFtcRate,
-      haircut: isUsOnly ? 0 : breakdown.haircutRate,
-      topUp: isUsOnly ? 0 : breakdown.topUpRate,
-      excess: isUsOnly ? 0 : breakdown.excessFtcRate,
-      domestic: isUsOnly ? US_TAX_RATE : 0,
+      const segments = stack([datum]).map((layer, index) => {
+        const segment = SEGMENTS[index];
+        const [start, end] = layer[0];
+        return {
+          ...segment,
+          y: y(end),
+          height: Math.max(0, y(start) - y(end)),
+          title: `${segment.label}: ${formatTaxRate(end - start)}`,
+        };
+      });
+      return { scenario, segments };
+    });
+
+    return {
+      scenarioStacks,
+      ticks: y.ticks(5).map((value) => ({ value, y: y(value), label: formatAxisRate(value) })),
     };
-
-    return { scenario, layers: stack([datum]) };
-  });
+  }, [blends]);
 
   return (
     <figure className={chartStyles.remittanceFigure}>
@@ -73,15 +86,15 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ blends, active
         }
       >
         {ticks.map((tick) => (
-          <g key={tick}>
-            <line className={chartStyles.gridLine} x1={MARGIN.left} x2={plotRight} y1={y(tick)} y2={y(tick)} />
-            <text className={chartStyles.axisLabel} x={MARGIN.left - 2} y={y(tick)} textAnchor="end" dominantBaseline="middle">
-              {d3.format('.0%')(tick)}
+          <g key={tick.value}>
+            <line className={chartStyles.gridLine} x1={MARGIN.left} x2={PLOT_RIGHT} y1={tick.y} y2={tick.y} />
+            <text className={chartStyles.axisLabel} x={MARGIN.left - 2} y={tick.y} textAnchor="end" dominantBaseline="middle">
+              {tick.label}
             </text>
           </g>
         ))}
 
-        {scenarioStacks.map(({ scenario, layers }) => {
+        {scenarioStacks.map(({ scenario, segments }) => {
           const isActive = scenario === activeScenario;
 
           return (
@@ -93,38 +106,14 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ blends, active
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               style={{ pointerEvents: isActive ? 'auto' : 'none' }}
             >
-              {layers.map((layer, index) => {
-                const segment = SEGMENTS[index];
-                const [start, end] = layer[0];
-                const segmentHeight = y(start) - y(end);
-                const value = end - start;
-
-                return (
-                  <g key={segment.key}>
-                    <rect className={segment.className} x={0} y={y(end)} width={x.bandwidth()} height={Math.max(0, segmentHeight)}>
-                      <title>{`${segment.label}: ${d3.format('.2%')(value)}`}</title>
-                    </rect>
-                  </g>
-                );
-              })}
+              {segments.map((segment) => (
+                <rect key={segment.key} className={segment.className} x={0} y={segment.y} width={x.bandwidth()} height={segment.height}>
+                  <title>{segment.title}</title>
+                </rect>
+              ))}
             </motion.g>
           );
         })}
-
-        {/* <line className={chartStyles.giltiRateLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(GILTI_RATE)} y2={y(GILTI_RATE)} />
-        <text className={chartStyles.referenceLabel} x={plotRight + 6} y={y(GILTI_RATE) - 4}>
-          NCTI liability {d3.format('.1%')(GILTI_RATE)}
-        </text>
-
-        <line className={chartStyles.optimizationLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(EFF_GILTI_RATE)} y2={y(EFF_GILTI_RATE)} />
-        <text className={chartStyles.referenceLabel} x={plotRight + 6} y={y(EFF_GILTI_RATE) - 4}>
-          No-top-up FTR {d3.format('.1%')(EFF_GILTI_RATE)}
-        </text>
-
-        <line className={chartStyles.usRateLine} x1={MARGIN.left} x2={WIDTH - 2} y1={y(US_TAX_RATE)} y2={y(US_TAX_RATE)} />
-        <text className={chartStyles.referenceLabel} x={plotRight + 6} y={y(US_TAX_RATE) - 4}>
-          U.S. rate 21%
-        </text> */}
 
         {SCENARIOS.map((scenario) => (
           <motion.text
@@ -137,12 +126,12 @@ export const RemittanceChart: React.FC<RemittanceChartProps> = ({ blends, active
             animate={{ opacity: scenario === activeScenario ? 1 : 0.45 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
-            {SCENARIO_LABELS[scenario]}
+            {SCENARIO_LABELS[scenario].chartLabel}
           </motion.text>
         ))}
       </svg>
       <figcaption className={chartStyles.chartCaption}>
-        Total burden {d3.format('.2%')(activeTotalBurden)} · {DEFAULT_TAX_REGIME.label}
+        Total burden {formatTaxRate(activeTotalBurden)} · {DEFAULT_TAX_REGIME.label}
       </figcaption>
     </figure>
   );
