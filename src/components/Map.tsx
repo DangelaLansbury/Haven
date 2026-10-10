@@ -11,7 +11,7 @@ type WorldMapProps = {
   /** Kept as an alias for existing callers. */
   highlightedIds?: Array<string | number>;
   candidateCountries?: Array<string | number>;
-  flows?: JurisdictionFlow[];
+  // flows?: JurisdictionFlow[];
   defaultFill?: string;
   candidateFill?: string;
   highlightFill?: string;
@@ -87,7 +87,7 @@ export const WorldMap = React.memo(function WorldMap({
   highlightedCountries = EMPTY_HIGHLIGHTS,
   highlightedIds = EMPTY_HIGHLIGHTS,
   candidateCountries = EMPTY_HIGHLIGHTS,
-  flows = EMPTY_FLOWS,
+  // flows = EMPTY_FLOWS,
   defaultFill = 'var(--gray-125)',
   candidateFill = 'var(--gray-300)',
   highlightFill = 'var(--haven-green)',
@@ -98,32 +98,32 @@ export const WorldMap = React.memo(function WorldMap({
   const descriptionId = `${markerId}-description`;
   const highlighted = useMemo(() => new Set([...highlightedCountries, ...highlightedIds].map(normalizeCountry)), [highlightedCountries, highlightedIds]);
   const candidates = useMemo(() => new Set(candidateCountries.map(normalizeCountry)), [candidateCountries]);
-  const flowPaths = useMemo(
-    () =>
-      flows.flatMap(({ from, to }) => {
-        const normalizedFrom = normalizeCountry(from);
-        const normalizedTo = normalizeCountry(to);
-        const fromPoint = flowAnchors[normalizedFrom];
-        const toPoint = flowAnchors[normalizedTo];
-        if (!fromPoint || !toPoint) return [];
-        const destinationRadius = highlighted.has(normalizedTo) ? highlightedDotRadius : dotRadius;
-        const path = createFlowPath(fromPoint, toPoint, destinationRadius);
-        return path ? [{ key: `${normalizedFrom}-${normalizedTo}`, path, title: `${from} to ${to}` }] : [];
-      }),
-    [flows, highlighted, highlightedDotRadius, dotRadius],
-  );
+  // const flowPaths = useMemo(
+  //   () =>
+  //     flows.flatMap(({ from, to }) => {
+  //       const normalizedFrom = normalizeCountry(from);
+  //       const normalizedTo = normalizeCountry(to);
+  //       const fromPoint = flowAnchors[normalizedFrom];
+  //       const toPoint = flowAnchors[normalizedTo];
+  //       if (!fromPoint || !toPoint) return [];
+  //       const destinationRadius = highlighted.has(normalizedTo) ? highlightedDotRadius : dotRadius;
+  //       const path = createFlowPath(fromPoint, toPoint, destinationRadius);
+  //       return path ? [{ key: `${normalizedFrom}-${normalizedTo}`, path, title: `${from} to ${to}` }] : [];
+  //     }),
+  //   [flows, highlighted, highlightedDotRadius, dotRadius],
+  // );
 
   return (
     <svg
       className={styles.map}
       role="img"
-      aria-label={`Dot matrix world map${highlighted.size ? ` highlighting ${[...new Set([...highlightedCountries, ...highlightedIds])].join(', ')}` : ''}${flowPaths.length ? ` with ${flowPaths.length} illustrative profit flows` : ''}`}
-      aria-describedby={flowPaths.length ? descriptionId : undefined}
+      // aria-label={`Dot matrix world map${highlighted.size ? ` highlighting ${[...new Set([...highlightedCountries, ...highlightedIds])].join(', ')}` : ''}${flowPaths.length ? ` with ${flowPaths.length} illustrative profit flows` : ''}`}
+      // aria-describedby={flowPaths.length ? descriptionId : undefined}
       viewBox={`0 0 ${WORLD_MAP_WIDTH} ${WORLD_MAP_HEIGHT}`}
       width={width}
       height={height}
     >
-      {flowPaths.length > 0 && <desc id={descriptionId}>Illustrative profit flows: {flowPaths.map(({ title }) => title).join('; ')}.</desc>}
+      {/* {flowPaths.length > 0 && <desc id={descriptionId}>Illustrative profit flows: {flowPaths.map(({ title }) => title).join('; ')}.</desc>} */}
       <defs>
         <marker id={markerId} viewBox="0 0 6 6" refX="6" refY="3" markerWidth="5" markerHeight="5" orient="auto">
           <path className={styles.flowArrow} d="M0,0 L6,3 L0,6 Z" />
@@ -146,11 +146,11 @@ export const WorldMap = React.memo(function WorldMap({
           />
         );
       })}
-      {flowPaths.map(({ key, path, title }) => (
+      {/* {flowPaths.map(({ key, path, title }) => (
         <path key={key} className={styles.flow} d={path} markerEnd={`url(#${markerId})`}>
           <title>{title}</title>
         </path>
-      ))}
+      ))} */}
     </svg>
   );
 });

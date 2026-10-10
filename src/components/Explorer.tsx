@@ -64,19 +64,19 @@ const Explorer = ({ data, profit, presetBlends, selectedScenario, onSelectScenar
   const displayedRate = isUsOnly ? blend.effectiveTaxRate : blend.foreignTaxRate;
   const targetRate = blend.targetRate ?? taxBreakdown.noTopUpForeignRate;
   const highlightedCountries = useMemo(() => blend.allocations.filter(({ share }) => share > 0).map(({ country }) => country), [blend.allocations]);
-  const activeFlows = activeScenario === OptimizationScenario.illustrativeFunnel ? funnelFlows : undefined;
+  // const activeFlows = activeScenario === OptimizationScenario.illustrativeFunnel ? funnelFlows : undefined;
 
   return (
     <motion.div className={`${commonStyles.pageContainer} ${styles.explorerPage}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <motion.div variants={mainFormVariants} initial="initial" animate="animate" className={styles.mapPanel}>
         <figure className={styles.mapFigure}>
-          <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={countries} flows={activeFlows} />
-          {activeFlows && (
+          <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={countries} />
+          {/* {activeFlows && (
             <figcaption>
               In this illustration, operating companies pay affiliated hubs service fees or royalties for brands and technology. These payments reduce profit in the markets and become income in the hubs. Hubs keep a margin and pay onward
               royalties to a low-tax affiliate, reducing hub profit and booking income at the endpoint.
             </figcaption>
-          )}
+          )} */}
         </figure>
         <div>
           Revenue: <CurrencyAmount amount={revenue} />
@@ -141,15 +141,7 @@ const Explorer = ({ data, profit, presetBlends, selectedScenario, onSelectScenar
             {(hasTopUp || hasDomesticAndForeign) && <span>{' = '}</span>}
             <CurrencyAmount amount={blend.totalTaxAmount} />
           </div>
-          <div className={styles.summaryLabel}>
-            {hasDomesticAndForeign
-              ? hasTopUp
-                ? 'U.S. tax + foreign tax + U.S. top-up*'
-                : 'U.S. tax + foreign tax'
-              : hasTopUp
-                ? 'Foreign tax + U.S. top-up*'
-                : 'Tax remitted'}
-          </div>
+          <div className={styles.summaryLabel}>{hasDomesticAndForeign ? (hasTopUp ? 'U.S. tax + foreign tax + U.S. top-up*' : 'U.S. tax + foreign tax') : hasTopUp ? 'Foreign tax + U.S. top-up*' : 'Tax remitted'}</div>
           {hasTopUp && (
             <p className={styles.modelNote}>
               *The residual U.S. top-up is the {percent.format(taxBreakdown.usLiabilityRate)} NCTI liability less the usable deemed-paid credit ({percent.format(DEFAULT_TAX_REGIME.deemedPaidCreditRate)} of foreign tax), floored at zero.

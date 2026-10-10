@@ -45,7 +45,7 @@ export interface FtcBlendConstraints {
 
 export enum OptimizationScenario {
   economicFootprint = 'economicFootprint',
-  illustrativeFunnel = 'illustrativeFunnel',
+  // illustrativeFunnel = 'illustrativeFunnel',
   ftcCrossCredit = 'ftcCrossCredit',
   usOnly = 'usOnly',
 }
