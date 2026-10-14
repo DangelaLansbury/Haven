@@ -64,27 +64,16 @@ const Explorer = ({ data, profit, presetBlends, selectedScenario, onSelectScenar
   const displayedRate = isUsOnly ? blend.effectiveTaxRate : blend.foreignTaxRate;
   const targetRate = blend.targetRate ?? taxBreakdown.noTopUpForeignRate;
   const highlightedCountries = useMemo(() => blend.allocations.filter(({ share }) => share > 0).map(({ country }) => country), [blend.allocations]);
-  // const activeFlows = activeScenario === OptimizationScenario.illustrativeFunnel ? funnelFlows : undefined;
 
   return (
     <motion.div className={`${commonStyles.pageContainer} ${styles.explorerPage}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <motion.div variants={mainFormVariants} initial="initial" animate="animate" className={styles.mapPanel}>
         <figure className={styles.mapFigure}>
           <WorldMap width={640} height={330} highlightedCountries={highlightedCountries} candidateCountries={countries} />
-          {/* {activeFlows && (
-            <figcaption>
-              In this illustration, operating companies pay affiliated hubs service fees or royalties for brands and technology. These payments reduce profit in the markets and become income in the hubs. Hubs keep a margin and pay onward
-              royalties to a low-tax affiliate, reducing hub profit and booking income at the endpoint.
-            </figcaption>
-          )} */}
         </figure>
-        <div>
-          Revenue: <CurrencyAmount amount={revenue} />
-        </div>
-        <div>Profit margin: {percent.format(profitMargin)}</div>
-        <div>
-          Taxable profit: <CurrencyAmount amount={profit} />
-        </div>
+        <input readOnly type="text" value={`Revenue: ${formatDollars(revenue).value}${formatDollars(revenue).suffix}`} />
+        <input readOnly type="text" value={`Profit margin: ${percent.format(profitMargin)}`} />
+        <input readOnly type="text" value={`Taxable profit: ${formatDollars(profit).value}${formatDollars(profit).suffix}`} />
         <JurisdictionTable sections={jurisdictionSections} generated={generatedAllocations} booked={blend.allocations} />
         {activeScenario === OptimizationScenario.ftcCrossCredit && (
           <p className={styles.modelNote} role="status">
