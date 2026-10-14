@@ -14,7 +14,6 @@ const App = () => {
   const presetBlends = useMemo<Record<OptimizationScenario, OptimizationResult>>(
     () => ({
       [OptimizationScenario.economicFootprint]: createAllocationResult(generatedAllocations, profit, OptimizationScenario.economicFootprint),
-      [OptimizationScenario.illustrativeFunnel]: createAllocationResult(funnelAllocations, profit, OptimizationScenario.illustrativeFunnel),
       [OptimizationScenario.ftcCrossCredit]: optimizeFtcBlend(generatedAllocations, jurisdictionSections, profit),
       [OptimizationScenario.usOnly]: createUsOnlyResult(profit),
     }),
@@ -28,17 +27,7 @@ const App = () => {
           <img src={`${import.meta.env.BASE_URL}assets/images/HavenBanana.svg`} alt="Haven Logo" />
         </div>
       </header>
-      {screen === 'initial' ? (
-        <WelcomeScreen setScreen={setScreen} />
-      ) : (
-        <Explorer
-          data={DefaultMockData}
-          profit={profit}
-          presetBlends={presetBlends}
-          selectedScenario={selectedScenario}
-          onSelectScenario={setSelectedScenario}
-        />
-      )}
+      {screen === 'initial' ? <WelcomeScreen setScreen={setScreen} /> : <Explorer data={DefaultMockData} profit={profit} presetBlends={presetBlends} selectedScenario={selectedScenario} onSelectScenario={setSelectedScenario} />}
     </>
   );
 };
