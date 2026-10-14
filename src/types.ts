@@ -207,7 +207,6 @@ export interface OptimizationResult {
 }
 
 export interface TaxRegime {
-  id: 'legacy-gilti' | '2026-ncti';
   label: string;
   effectiveYear: number;
   corporateRate: number;
@@ -242,7 +241,6 @@ export interface DollarValue {
 }
 
 export const CURRENT_NCTI_REGIME: TaxRegime = {
-  id: '2026-ncti',
   label: 'NCTI (2026+)',
   effectiveYear: 2026,
   corporateRate: US_TAX_RATE,
