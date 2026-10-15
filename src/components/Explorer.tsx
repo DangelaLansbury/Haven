@@ -75,13 +75,6 @@ const Explorer = ({ data, profit, presetBlends, selectedScenario, onSelectScenar
         <input readOnly type="text" value={`Profit margin: ${percent.format(profitMargin)}`} />
         <input readOnly type="text" value={`Taxable profit: ${formatDollars(profit).value}${formatDollars(profit).suffix}`} />
         <JurisdictionTable sections={jurisdictionSections} generated={generatedAllocations} booked={blend.allocations} />
-        {activeScenario === OptimizationScenario.ftcCrossCredit && (
-          <p className={styles.modelNote} role="status">
-            {blend.targetWasReachable
-              ? `The ${percent.format(targetRate)} target is reached through cross-crediting across multiple CFCs under the displayed illustrative constraints.`
-              : `The constraints cannot reach the ${percent.format(targetRate)} target; the closest feasible rate is shown.`}
-          </p>
-        )}
       </motion.div>
 
       <motion.div variants={sideGraphVariants} initial="initial" animate="animate" className={styles.rightSide}>
