@@ -1,28 +1,98 @@
-.map {
-  display: block;
+.mapShell {
+  position: relative;
   width: 100%;
+}
+
+.map {
+  border-radius: 0.5rem;
+  cursor: grab;
+  display: block;
   height: auto;
-  overflow: visible;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  width: 100%;
 }
 
-.dots {
-  transition: stroke-width 220ms ease-in-out, stroke 220ms ease-in-out, opacity 220ms ease-in-out;
+.map:focus-visible {
+  outline: 2px solid var(--haven-green);
+  outline-offset: 2px;
 }
 
-.flow {
+.dragging {
+  cursor: grabbing;
+}
+
+.sphere {
+  fill: var(--gray-025);
+  stroke: var(--gray-250);
+  stroke-width: 1.25;
+}
+
+.graticule {
   fill: none;
-  opacity: 0.7;
-  stroke: var(--haven-gold);
-  stroke-linecap: round;
-  stroke-width: 1.5;
+  opacity: 0.65;
+  pointer-events: none;
+  stroke: var(--gray-150);
+  stroke-width: 0.55;
 }
 
-.flowArrow {
-  fill: var(--haven-gold);
+.country {
+  pointer-events: none;
+  stroke: var(--paper);
+  stroke-linejoin: round;
+  stroke-width: 0.65;
+  transition: fill 220ms ease-in-out;
+  vector-effect: non-scaling-stroke;
+}
+
+.marker {
+  pointer-events: none;
+  stroke: var(--paper);
+  stroke-width: 1.5;
+  transition: fill 220ms ease-in-out, r 220ms ease-in-out;
+  vector-effect: non-scaling-stroke;
+}
+
+.mapHint,
+.resetButton {
+  bottom: 0.45rem;
+  font-size: var(--font-xxs);
+  position: absolute;
+}
+
+.mapHint {
+  color: var(--gray-500);
+  left: 0.6rem;
+  pointer-events: none;
+}
+
+.resetButton {
+  appearance: none;
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  border: 1px solid var(--gray-150);
+  border-radius: 999px;
+  color: var(--gray-600);
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+  padding: 0.35rem 0.55rem;
+  right: 0.6rem;
+}
+
+.resetButton:hover {
+  border-color: var(--gray-300);
+  color: var(--gray-800);
+}
+
+.resetButton:focus-visible {
+  outline: 2px solid var(--haven-green);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dots {
+  .country,
+  .marker {
     transition: none;
   }
 }
