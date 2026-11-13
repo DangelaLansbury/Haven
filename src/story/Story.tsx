@@ -15,9 +15,10 @@ export default function Story() {
       </a>
       <aside className="story-stage" aria-label="Globe accompanying the explanation">
         <header className="stage-header">
-          <a href="#intro" className="story-wordmark">
-            haven<span>®</span>
-          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <img src={`${import.meta.env.BASE_URL}assets/images/HavenBanana.svg`} alt="Haven Logo" />
+          </div>
+
           <span className="stage-edition">A field guide to tax havens</span>
         </header>
         <div className="stage-visual">
