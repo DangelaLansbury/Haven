@@ -17,6 +17,7 @@ export default function Story() {
         <header className="stage-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <img src={`${import.meta.env.BASE_URL}assets/images/HavenBanana.svg`} alt="Haven Logo" />
+            <span className="story-wordmark">Haven</span>
           </div>
 
           <span className="stage-edition">A field guide to tax havens</span>
