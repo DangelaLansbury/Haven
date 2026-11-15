@@ -25,9 +25,12 @@ export type StoryStep = {
     countries: string[];
     places: PlaceId[];
     routes: RouteId[];
-    label: string;
-    amount: string;
-    caption: string;
+    tracker: {
+      money: string;
+      moneyCaption: string;
+      profit: string;
+      profitCaption: string;
+    };
   };
 };
 
@@ -43,7 +46,7 @@ export const steps: StoryStep[] = [
       'Follow the historical “Double Irish with a Dutch Sandwich”: a chain of related companies that moved profits through Ireland and the Netherlands to an offshore destination.',
     ],
     note: 'Scroll to follow the money. Each chapter reveals another part of the route.',
-    scene: { rotation: [25, -28, 0], countries: [], places: [], routes: [], label: 'One business. Several jurisdictions.', amount: '€100', caption: 'An imaginary sale. Let’s follow it.' },
+    scene: { rotation: [25, -28, 0], countries: [], places: [], routes: [], tracker: { money: '€100', moneyCaption: 'Starting sale', profit: '€80', profitCaption: 'After €20 operating costs' } },
   },
   {
     id: 'companies',
@@ -54,7 +57,7 @@ export const steps: StoryStep[] = [
       'Both are incorporated in Ireland. In this historical structure, the IP company is managed from Bermuda and treated as resident there for Irish tax purposes. A Dutch company sits between them in the licensing chain.',
     ],
     note: '“Double Irish” refers to two Irish-incorporated companies, even though their tax residences differed.',
-    scene: { rotation: [25, -35, 0], countries: ['372', '528'], places: ['ireland', 'netherlands', 'bermuda'], routes: [], label: 'The companies behind the route', amount: '3', caption: 'Related companies in the licensing chain' },
+    scene: { rotation: [25, -35, 0], countries: ['372', '528'], places: ['ireland', 'netherlands', 'bermuda'], routes: [], tracker: { money: '€100', moneyCaption: 'Starting sale', profit: '€80', profitCaption: 'Available to allocate' } },
   },
   {
     id: 'sale',
@@ -65,7 +68,7 @@ export const steps: StoryStep[] = [
       'That leaves €80 before royalties. Next comes the payment for using the group’s intellectual property.',
     ],
     note: 'Illustrative starting point: €100 revenue − €20 operating costs = €80 before royalties.',
-    scene: { rotation: [-2, -43, 0], countries: ['372'], places: ['customers', 'ireland'], routes: ['sales'], label: 'Revenue enters the operating company', amount: '€80', caption: 'Profit before royalty payments' },
+    scene: { rotation: [-2, -43, 0], countries: ['372'], places: ['customers', 'ireland'], routes: ['sales'], tracker: { money: '€80', moneyCaption: 'After operating costs', profit: '€80', profitCaption: 'Booked before royalties' } },
   },
   {
     id: 'royalty',
@@ -81,9 +84,7 @@ export const steps: StoryStep[] = [
       countries: ['372', '528'],
       places: ['ireland', 'netherlands'],
       routes: ['royalty'],
-      label: 'The Irish tax base becomes smaller',
-      amount: '€5',
-      caption: 'Profit remaining in the Irish operating company',
+      tracker: { money: '€80', moneyCaption: 'Still held by the group', profit: '€5', profitCaption: 'Remaining in Ireland' },
     },
   },
   {
@@ -100,9 +101,7 @@ export const steps: StoryStep[] = [
       countries: ['528'],
       places: ['ireland', 'netherlands', 'bermuda'],
       routes: ['royalty', 'offshore'],
-      label: 'A royalty passes through the Dutch company',
-      amount: '€74',
-      caption: 'Sent onward after an illustrative €1 margin',
+      tracker: { money: '€74', moneyCaption: 'Sent onward', profit: '€1', profitCaption: 'Retained in the Netherlands' },
     },
   },
   {
@@ -115,7 +114,7 @@ export const steps: StoryStep[] = [
       'The total tax remitted to the countries in this example is based on the €5 of profit in Ireland and the €1 of profit in the Netherlands. Bermuda has no corporate tax, so no tax is remitted there, meaning the total tax is €5 + €1 = €6.',
     ],
     note: 'Bermuda marks the IP company’s management and tax-residence location in this historical example, not its place of incorporation.',
-    scene: { rotation: [55, -30, 0], countries: [], places: ['netherlands', 'bermuda'], routes: ['offshore'], label: 'The IP company receives the royalty', amount: '€74', caption: 'Profit routed to the offshore IP company' },
+    scene: { rotation: [55, -30, 0], countries: [], places: ['netherlands', 'bermuda'], routes: ['offshore'], tracker: { money: '€74', moneyCaption: 'Received offshore', profit: '€74', profitCaption: 'Booked offshore' } },
   },
   {
     id: 'takeaway',
@@ -132,9 +131,7 @@ export const steps: StoryStep[] = [
       countries: ['372', '528'],
       places: ['customers', 'ireland', 'netherlands', 'bermuda'],
       routes: ['sales', 'royalty', 'offshore'],
-      label: 'The complete route',
-      amount: '€5 / €1 / €74',
-      caption: 'Ireland / Netherlands / offshore IP company',
+      tracker: { money: '€80', moneyCaption: 'Total money accounted for', profit: '€80', profitCaption: '€5 Ireland · €1 Netherlands · €74 offshore' },
     },
   },
 ];

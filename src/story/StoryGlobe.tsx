@@ -51,7 +51,7 @@ export default function StoryGlobe({ scene }: { scene: StoryStep['scene'] }) {
 
   return (
     <svg className="story-globe" viewBox="0 0 640 600" role="img" aria-labelledby={`${id}-title ${id}-description`}>
-      <title id={`${id}-title`}>{scene.label}</title>
+      <title id={`${id}-title`}>Money flow between jurisdictions</title>
       <desc id={`${id}-description`}>{scene.routes.map(route => routes[route].label).join('. ') || 'A globe introduces the jurisdictions in the story.'}</desc>
       <defs>
         <marker id={`${id}-arrow`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
