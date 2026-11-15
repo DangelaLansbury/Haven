@@ -19,16 +19,21 @@ export default function Story() {
             <img src={`${import.meta.env.BASE_URL}assets/images/HavenBanana.svg`} alt="Haven Logo" />
             <span className="story-wordmark">Haven</span>
           </div>
-
-          <span className="stage-edition">A field guide to tax havens</span>
         </header>
         <div className="stage-visual">
           <StoryGlobe scene={step.scene} />
         </div>
-        <div className="stage-summary">
-          <p className="stage-label">{step.scene.label}</p>
-          <p className="stage-amount">{step.scene.amount}</p>
-          <p className="stage-caption">{step.scene.caption}</p>
+        <div className="stage-summary" aria-live="polite" aria-atomic="true">
+          <div className="tracker-stat">
+            <p className="stage-label">Money remaining</p>
+            <p className="stage-amount">{step.scene.tracker.money}</p>
+            <p className="stage-caption">{step.scene.tracker.moneyCaption}</p>
+          </div>
+          <div className="tracker-stat">
+            <p className="stage-label">Profit</p>
+            <p className="stage-amount">{step.scene.tracker.profit}</p>
+            <p className="stage-caption">{step.scene.tracker.profitCaption}</p>
+          </div>
         </div>
         <footer className="stage-footer">
           <span>
