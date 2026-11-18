@@ -1,8 +1,13 @@
 import StoryGlobe from './StoryGlobe';
-import { steps } from './steps';
+import { INITIAL_REVENUE, steps } from './steps';
 import { useActiveStep } from './useActiveStep';
+import { motion, type Variants } from 'framer-motion';
+import NumberFlow from '@number-flow/react';
 
 const stepIds = steps.map((step) => step.id);
+const NUMBER_FLOW_TIMING: EffectTiming = { duration: 300 };
+const PERCENT_FORMAT = { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 } as const;
+const CURRENCY_FORMAT = { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 } as const;
 
 export default function Story() {
   const active = useActiveStep(stepIds);
@@ -25,13 +30,24 @@ export default function Story() {
         </div>
         <div className="stage-summary" aria-live="polite" aria-atomic="true">
           <div className="tracker-stat">
+            <p className="stage-label">Initial revenue</p>
+            <p className="stage-amount">
+              <NumberFlow value={INITIAL_REVENUE} format={CURRENCY_FORMAT} locales="en-US" transformTiming={NUMBER_FLOW_TIMING} />
+            </p>
+            <p className="stage-caption">{'Sale of goods'}</p>
+          </div>
+          <div className="tracker-stat">
             <p className="stage-label">Money remaining</p>
-            <p className="stage-amount">{step.scene.tracker.money}</p>
+            <p className="stage-amount">
+              <NumberFlow value={parseFloat(step.scene.tracker.money.replace('€', ''))} format={CURRENCY_FORMAT} locales="en-US" transformTiming={NUMBER_FLOW_TIMING} />
+            </p>
             <p className="stage-caption">{step.scene.tracker.moneyCaption}</p>
           </div>
           <div className="tracker-stat">
             <p className="stage-label">Profit</p>
-            <p className="stage-amount">{step.scene.tracker.profit}</p>
+            <p className="stage-amount">
+              <NumberFlow value={parseFloat(step.scene.tracker.profit.replace('€', ''))} format={CURRENCY_FORMAT} locales="en-US" transformTiming={NUMBER_FLOW_TIMING} />
+            </p>
             <p className="stage-caption">{step.scene.tracker.profitCaption}</p>
           </div>
         </div>

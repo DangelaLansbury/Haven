@@ -16,7 +16,7 @@ export const routes: Record<RouteId, { from: PlaceId; to: PlaceId; label: string
 
 export type StoryStep = {
   id: string;
-  kicker: string;
+  kicker?: string;
   title: string;
   paragraphs: string[];
   note: string;
@@ -34,12 +34,14 @@ export type StoryStep = {
   };
 };
 
+export const INITIAL_REVENUE = 100;
+
 // Edit the story here. Each section owns its copy and its corresponding globe state.
 // Amounts are invented teaching examples, not reported company results or tax rates.
 export const steps: StoryStep[] = [
   {
     id: 'intro',
-    kicker: 'A short guide to profit shifting',
+    // kicker: 'A short guide to profit shifting',
     title: 'Follow the profit.',
     paragraphs: [
       'A customer buys something. A company earns money. But where does that profit end up?',
