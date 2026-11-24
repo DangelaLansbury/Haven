@@ -39,14 +39,14 @@ export default function Story() {
           <div className="tracker-stat">
             <p className="stage-label">Money remaining</p>
             <p className="stage-amount">
-              <NumberFlow value={parseFloat(step.scene.tracker.money.replace('€', ''))} format={CURRENCY_FORMAT} locales="en-US" transformTiming={NUMBER_FLOW_TIMING} />
+              <NumberFlow value={parseFloat(step.scene.tracker.money.replace('$', ''))} format={CURRENCY_FORMAT} locales="en-US" transformTiming={NUMBER_FLOW_TIMING} />
             </p>
             <p className="stage-caption">{step.scene.tracker.moneyCaption}</p>
           </div>
           <div className="tracker-stat">
             <p className="stage-label">Profit</p>
             <p className="stage-amount">
-              <NumberFlow value={parseFloat(step.scene.tracker.profit.replace('€', ''))} format={CURRENCY_FORMAT} locales="en-US" transformTiming={NUMBER_FLOW_TIMING} />
+              <NumberFlow value={parseFloat(step.scene.tracker.profit.replace('$', ''))} format={CURRENCY_FORMAT} locales="en-US" transformTiming={NUMBER_FLOW_TIMING} />
             </p>
             <p className="stage-caption">{step.scene.tracker.profitCaption}</p>
           </div>
