@@ -71,13 +71,7 @@ export default function Story() {
           <section id={item.id} key={item.id} className={`story-chapter ${index === 0 ? 'story-intro' : ''}`} aria-labelledby={`${item.id}-heading`} data-active={index === active}>
             <p className="chapter-kicker">{item.kicker}</p>
             {index === 0 ? <h1 id={`${item.id}-heading`}>{item.title}</h1> : <h2 id={`${item.id}-heading`}>{item.title}</h2>}
-            {index === 0 && (
-              <p className="story-subtitle">
-                The Double Irish
-                <br />
-                with a Dutch Sandwich
-              </p>
-            )}
+            {index === 0 && <p className="story-subtitle">Understanding the Double Irish with a Dutch Sandwich</p>}
             <div className="chapter-copy">
               {item.paragraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
